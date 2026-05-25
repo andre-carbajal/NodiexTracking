@@ -9,26 +9,26 @@
 ## FASE 1: CONCEPCIÓN (Semanas 1-2)
 
 ### 1.1 Revisión y ajustes del proyecto existente
-- [ ] Auditar `package.json`: verificar dependencias actualizadas y agregar las faltantes
-- [ ] Instalar dependencias nuevas: `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner` (Cloudflare R2)
-- [ ] Configurar variables de entorno en `.env.local`: `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_ENDPOINT`, `R2_PUBLIC_URL`
-- [ ] Revisar que `.gitignore` incluya `.env*.local`
-- [ ] Verificar deploy existente en Vercel y CI/CD (`.github/workflows/deploy.yml`)
+- [x] Auditar `package.json`: verificar dependencias actualizadas y agregar las faltantes
+- [x] Instalar dependencias nuevas: `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner` (Cloudflare R2)
+- [x] Configurar variables de entorno en `.env.local`: `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_ENDPOINT`, `R2_PUBLIC_URL`, `RESEND_API_KEY`
+- [x] Revisar que `.gitignore` incluya `.env*.local`
+- [x] Verificar deploy existente en Vercel y CI/CD (`.github/workflows/deploy.yml`)
 
 ### 1.2 Cloudflare R2 — Storage de archivos
-- [ ] Crear bucket en Cloudflare R2 para assets del proyecto
+- [x] Crear bucket en Cloudflare R2 para assets del proyecto
 - [ ] Configurar políticas CORS en el bucket (permitir upload desde el dominio de la app)
-- [ ] Configurar subdominio público para assets (ej. `cdn.nodiexdelperu.com`)
-- [ ] Crear `src/lib/storage.js` con funciones: `uploadFile(buffer, key, contentType)`, `deleteFile(key)`, `getPublicUrl(key)`
+- [x] Configurar subdominio público para assets (`pub-b8368783935b452db4d37c617979f165.r2.dev`)
+- [x] Crear `src/lib/storage.js` con funciones: `uploadFile(buffer, key, contentType)`, `deleteFile(key)`, `getPublicUrl(key)`, `generateKey(prefix, filename)`
 - [ ] Probar upload/download de un archivo de prueba desde el entorno local
 
 ### 1.3 Verificación del modelo de datos existente
-- [ ] Revisar schema de Prisma (`prisma/schema.prisma`): confirmar que las 14 tablas reflejan las reglas de negocio
-- [ ] Verificar migraciones aplicadas en Supabase (3 migraciones existentes)
-- [ ] Agregar campo `imagen_url` a modelo `productos` si no existe
-- [ ] Agregar campo `archivo_url` a modelo `certificaciones` si no existe
+- [x] Revisar schema de Prisma (`prisma/schema.prisma`): las 14 tablas reflejan las reglas de negocio
+- [x] Verificar migraciones aplicadas en Supabase (3 migraciones existentes)
+- [x] Agregar campo `imagen_url` a modelo `productos` (schema + migración + ALTER TABLE en SQL Editor)
+- [x] Modelo `certificaciones` ya tiene `url_evidencia` y `evidencia` — no requiere campo adicional
 - [ ] Ejecutar seed (`prisma/seed.js`) en entorno local y verificar datos de prueba
-- [ ] Verificar RLS (Row Level Security) habilitado en tablas públicas (migración 003)
+- [x] Verificar RLS (Row Level Security) habilitado en tablas públicas (migración 003)
 
 ---
 

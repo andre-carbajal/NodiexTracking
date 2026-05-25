@@ -41,6 +41,25 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Sync Vercel environment variables
+        shell: bash
+        run: |
+          TOKEN="${{ secrets.VERCEL_TOKEN }}"
+          declare -A VARS=(
+            ["JWT_SECRET"]="${{ secrets.JWT_SECRET }}"
+            ["R2_ACCESS_KEY_ID"]="${{ secrets.R2_ACCESS_KEY_ID }}"
+            ["R2_SECRET_ACCESS_KEY"]="${{ secrets.R2_SECRET_ACCESS_KEY }}"
+            ["R2_BUCKET_NAME"]="${{ secrets.R2_BUCKET_NAME }}"
+            ["R2_ENDPOINT"]="${{ secrets.R2_ENDPOINT }}"
+            ["R2_PUBLIC_URL"]="${{ secrets.R2_PUBLIC_URL }}"
+            ["RESEND_API_KEY"]="${{ secrets.RESEND_API_KEY }}"
+          )
+          for NAME in "${!VARS[@]}"; do
+            echo "Syncing $NAME to Vercel production"
+            npx vercel@54.4.1 env rm "$NAME" production --yes --token="$TOKEN" 2>/dev/null || true
+            echo -n "${VARS[$NAME]}" | npx vercel@54.4.1 env add "$NAME" production --token="$TOKEN" --yes
+          done
+
       - name: Build application
         run: npm run build
 
