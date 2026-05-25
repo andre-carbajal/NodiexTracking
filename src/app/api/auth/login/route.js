@@ -31,5 +31,15 @@ export async function POST(request) {
   const expiresAt = new Date(Date.now() + 8 * 60 * 60 * 1000);
   const token = signUser(payload, expiresAt);
   await registerLoginSuccess(user, token, clientIp(request), expiresAt);
-  return NextResponse.json({ ok: true, token, user: { username: payload.username, role: payload.role } });
+
+  const response = NextResponse.json({ ok: true, token, user: { username: payload.username, role: payload.role } });
+  response.cookies.set("nodiex-auth", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 8 * 60 * 60
+  });
+
+  return response;
 }
