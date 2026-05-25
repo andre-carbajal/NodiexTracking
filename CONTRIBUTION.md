@@ -89,13 +89,14 @@ gh secret set VERCEL_TOKEN --repo andre-carbajal/NodiexTracking
 gh secret set VERCEL_ORG_ID --repo andre-carbajal/NodiexTracking --body "team_dyQ9QQq1ttQsJHnXmGz0plKr"
 gh secret set VERCEL_PROJECT_ID --repo andre-carbajal/NodiexTracking --body "prj_ohiotljTTqaMXEYtBIfWam5wCZez"
 gh secret set DATABASE_URL --repo andre-carbajal/NodiexTracking --body "<production-pooler-url>"
+gh secret set MIGRATE_DATABASE_URL --repo andre-carbajal/NodiexTracking --body "<migration-owner-production-url>"
 ```
 
-`VERCEL_TOKEN` can be created in Vercel:
+`DATABASE_URL` may be enough for migrations that only insert migration records or run SQL the app role owns. For schema changes that alter existing production tables, set `MIGRATE_DATABASE_URL` to a production connection whose role owns the schema objects, such as the Supabase `postgres` owner connection. The workflow prefers `MIGRATE_DATABASE_URL` and falls back to `DATABASE_URL`.
 
-```bash
-vercel tokens add "NodiexTracking CI" --project prj_ohiotljTTqaMXEYtBIfWam5wCZez --format json
-```
+Create `VERCEL_TOKEN` from the Vercel dashboard at https://vercel.com/account/tokens. OAuth CLI sessions cannot create classic tokens.
+
+If a migration fails with `P3018`, fix the database state first, then use Prisma's migrate resolve workflow before rerunning CI. Do not delete or edit production migration history without understanding the applied SQL.
 
 Never commit `.env.local`, tokens, passwords, or connection strings.
 
