@@ -13,9 +13,14 @@ export default function AdminPage() {
   const [message, setMessage] = useState("");
   const [login, setLogin] = useState({ username: "admin", password: "Nodiex2026!" });
 
-  const load = useCallback(async (currentToken = token) => {
+  const load = useCallback(async (currentToken = token, params = {}) => {
     if (!currentToken) return;
-    const res = await fetch("/api/admin", { headers: { Authorization: `Bearer ${currentToken}` } });
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") query.set(key, String(value));
+    });
+    const path = query.toString() ? `/api/admin?${query.toString()}` : "/api/admin";
+    const res = await fetch(path, { headers: { Authorization: `Bearer ${currentToken}` } });
     const json = await res.json();
     if (res.ok) {
       setData(json.data);

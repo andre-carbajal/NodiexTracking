@@ -20,8 +20,9 @@ export function isValidUnit(unit) {
 }
 
 export function isValidPrice(price) {
-  const num = Number(price);
-  return num > 0 && Number.isFinite(num);
+  const raw = String(price ?? "").trim();
+  const num = Number(raw);
+  return /^\d+(\.\d{1,2})?$/.test(raw) && num > 0 && Number.isFinite(num);
 }
 
 export function isValidCertType(type) {
@@ -40,9 +41,28 @@ export function validateProductFields(body) {
   const errors = {};
   if (!sanitize(body.name)) errors.name = "Nombre es obligatorio";
   if (!sanitize(body.description)) errors.description = "Descripcion es obligatoria";
-  if (!isValidUnit(body.unit)) errors.unit = "Unidad no valida (TM, Contenedor 20', Contenedor 40')";
-  if (!isValidCurrency(body.currency)) errors.currency = "Moneda no valida (PEN, USD, EUR)";
-  if (!isValidPrice(body.price)) errors.price = "Precio debe ser > 0";
+  const presentations = Array.isArray(body.presentations) ? body.presentations : [];
+  const hasValidPrice = presentations.some((presentation) => (
+    isValidUnit(presentation.unit)
+    && Array.isArray(presentation.prices)
+    && presentation.prices.some((price) => isValidCurrency(price.currency) && isValidPrice(price.amount))
+  ));
+
+  presentations.forEach((presentation, presentationIndex) => {
+    if (!isValidUnit(presentation.unit)) errors[`presentation-${presentationIndex}`] = "Unidad no valida";
+    const prices = Array.isArray(presentation.prices) ? presentation.prices : [];
+    const currencies = new Set();
+    prices.forEach((price, priceIndex) => {
+      if (!isValidCurrency(price.currency)) errors[`price-currency-${presentationIndex}-${priceIndex}`] = "Moneda no valida";
+      if (currencies.has(price.currency)) errors[`price-currency-${presentationIndex}-${priceIndex}`] = "Moneda duplicada en la presentacion";
+      currencies.add(price.currency);
+      if (price.amount !== "" && !isValidPrice(price.amount)) errors[`price-amount-${presentationIndex}-${priceIndex}`] = "Monto > 0 con maximo 2 decimales";
+    });
+  });
+
+  if (body.publish && !hasValidPrice) {
+    errors.presentations = "Para publicar agrega al menos una presentacion con precio valido";
+  }
   return { valid: Object.keys(errors).length === 0, errors };
 }
 

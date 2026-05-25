@@ -26,13 +26,20 @@ export default function DespachosList({ shipments = [], onPost, onEdit }) {
 
   return (
     <>
-      <div className="filter-bar" style={{ marginBottom: "0.5rem" }}>
-        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
-          <option value="">Todos los estados</option>
-          <option value="registrado">Registrado</option>
-          <option value="en tránsito">En transito</option>
-          <option value="entregado/cerrado">Entregado/Cerrado</option>
-        </select>
+      <div className="list-filter-panel">
+        <div>
+          <strong>Filtrar despachos</strong>
+          <span>{filtered.length} registros visibles</span>
+        </div>
+        <label>
+          Estado
+          <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
+            <option value="">Todos los estados</option>
+            <option value="registrado">Registrado</option>
+            <option value="en tránsito">En transito</option>
+            <option value="entregado/cerrado">Entregado/Cerrado</option>
+          </select>
+        </label>
       </div>
       <div className="data-table">
         {paginated.map((item) => (

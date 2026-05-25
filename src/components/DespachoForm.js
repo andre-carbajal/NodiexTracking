@@ -2,7 +2,9 @@
 
 import { Plus } from "lucide-react";
 
-export default function DespachoForm({ shipment, setShipment, onPost, onEdit, editingId, onCancel, errors }) {
+export default function DespachoForm({ shipment, setShipment, onPost, onEdit, editingId, onCancel, errors, productOptions = [] }) {
+  const hasCurrentProduct = shipment.product && productOptions.some((product) => product.name === shipment.product);
+
   return (
     <div className="form-grid">
       <div>
@@ -24,12 +26,17 @@ export default function DespachoForm({ shipment, setShipment, onPost, onEdit, ed
         {errors?.destination && <span className="field-error">{errors.destination}</span>}
       </div>
       <div>
-        <input
-          placeholder="Producto"
+        <select
           value={shipment.product}
           onChange={(e) => setShipment({ ...shipment, product: e.target.value })}
           className={errors?.product ? "input-error" : ""}
-        />
+        >
+          <option value="">Producto</option>
+          {shipment.product && !hasCurrentProduct && <option value={shipment.product}>{shipment.product}</option>}
+          {productOptions.map((product) => (
+            <option key={product.id} value={product.name}>{product.name}</option>
+          ))}
+        </select>
         {errors?.product && <span className="field-error">{errors.product}</span>}
       </div>
       <input
