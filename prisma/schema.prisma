@@ -96,13 +96,14 @@ model EstadoDespacho {
 }
 
 model Producto {
-  id              String                  @id @default(uuid())
-  activo          Boolean                 @default(true)
-  estadoPublicacion String                @default("borrador") @map("estado_publicacion")
-  createdAt       DateTime                @default(now()) @map("created_at")
-  updatedAt       DateTime                @updatedAt @map("updated_at")
-  traducciones    Traduccion[]
-  presentaciones  PresentacionLogistica[]
+  id                String                  @id @default(uuid())
+  activo            Boolean                 @default(true)
+  imagenUrl         String?                 @map("imagen_url")
+  estadoPublicacion String                  @default("borrador") @map("estado_publicacion")
+  createdAt         DateTime                @default(now()) @map("created_at")
+  updatedAt         DateTime                @updatedAt @map("updated_at")
+  traducciones      Traduccion[]
+  presentaciones    PresentacionLogistica[]
 
   @@map("productos")
 }
