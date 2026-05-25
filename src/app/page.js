@@ -8,7 +8,6 @@ import TrackingResult from "@/components/TrackingResult";
 import AboutBand from "@/components/AboutBand";
 import CatalogSection from "@/components/CatalogSection";
 import CertificatesStrip from "@/components/CertificatesStrip";
-import SupportGrid from "@/components/SupportGrid";
 import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -65,7 +64,6 @@ export default function HomePage() {
         <AboutBand t={t} />
         <CatalogSection t={t} publicData={publicData} hasFallback={hasFallback} />
         <CertificatesStrip publicData={publicData} />
-        <SupportGrid />
         <ContactForm t={t} />
         <Footer />
       </main>

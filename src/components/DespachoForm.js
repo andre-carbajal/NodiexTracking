@@ -1,8 +1,8 @@
 "use client";
 
-import { Plus, Ship } from "lucide-react";
+import { Plus } from "lucide-react";
 
-export default function DespachoForm({ shipment, setShipment, onPost, onEdit, editingId, setEditingId, errors }) {
+export default function DespachoForm({ shipment, setShipment, onPost, onEdit, editingId, onCancel, errors }) {
   return (
     <div className="form-grid">
       <div>
@@ -46,12 +46,22 @@ export default function DespachoForm({ shipment, setShipment, onPost, onEdit, ed
         <option value="en">Notificaciones: English</option>
         <option value="pt">Notificaciones: Portugues</option>
       </select>
+      {editingId && (
+        <select
+          value={shipment.currentStatus || "registrado"}
+          onChange={(e) => setShipment({ ...shipment, currentStatus: e.target.value })}
+        >
+          <option value="registrado">Estado: Registrado</option>
+          <option value="en tránsito">Estado: En transito</option>
+          <option value="entregado/cerrado">Estado: Entregado/Cerrado</option>
+        </select>
+      )}
       {editingId ? (
-        <div style={{ display: "flex", gap: "0.5rem" }}>
+        <div className="inline-actions">
           <button className="button primary" onClick={() => onEdit({ type: "shipmentEdit", id: editingId })}>
             Guardar cambios
           </button>
-          <button className="button secondary" onClick={() => setEditingId(null)}>
+          <button className="button secondary" onClick={onCancel}>
             Cancelar
           </button>
         </div>

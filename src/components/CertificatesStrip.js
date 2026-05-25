@@ -1,6 +1,7 @@
 "use client";
 
 import { ShieldCheck } from "lucide-react";
+import Image from "next/image";
 
 export default function CertificatesStrip({ publicData }) {
   return (
@@ -11,6 +12,7 @@ export default function CertificatesStrip({ publicData }) {
       </div>
       {publicData.certificates.map((certificate) => (
         <article key={certificate.id}>
+          {certificate.imageUrl && <Image unoptimized src={certificate.imageUrl} alt={certificate.type} width={220} height={70} />}
           <strong>{certificate.type}</strong>
           <span>Vigente hasta {certificate.validUntil}</span>
         </article>

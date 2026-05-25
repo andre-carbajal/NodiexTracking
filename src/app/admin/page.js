@@ -6,9 +6,10 @@ import AdminDashboard from "@/components/AdminDashboard";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function AdminPage() {
-  const [token, setToken] = useState(() => (typeof window === "undefined" ? "" : localStorage.getItem("nodiex-token") || ""));
+  const [hydrated, setHydrated] = useState(false);
+  const [token, setToken] = useState("");
   const [user, setUser] = useState(null);
-  const [data, setData] = useState({ shipments: [], products: [], certificates: [], audit: [] });
+  const [data, setData] = useState({ shipments: [], products: [], certificates: [], audit: [], users: [] });
   const [message, setMessage] = useState("");
   const [login, setLogin] = useState({ username: "admin", password: "Nodiex2026!" });
 
@@ -24,6 +25,11 @@ export default function AdminPage() {
       setToken("");
     }
   }, [token]);
+
+  useEffect(() => {
+    setHydrated(true);
+    setToken(localStorage.getItem("nodiex-token") || "");
+  }, []);
 
   useEffect(() => {
     if (token) load(token);
@@ -52,6 +58,19 @@ export default function AdminPage() {
     localStorage.removeItem("nodiex-token");
     setToken("");
     setUser(null);
+  }
+
+  if (!hydrated) {
+    return (
+      <ErrorBoundary>
+        <main className="admin-shell login-shell">
+          <section className="login-panel">
+            <p className="eyebrow">Panel administrativo</p>
+            <h1>Cargando...</h1>
+          </section>
+        </main>
+      </ErrorBoundary>
+    );
   }
 
   if (!token) {
