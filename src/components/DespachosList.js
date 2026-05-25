@@ -37,12 +37,12 @@ export default function DespachosList({ shipments = [], onPost, onEdit }) {
       <div className="data-table">
         {paginated.map((item) => (
           <div key={item.id}>
-            <div className="data-row">
+            <div className="data-row admin-list-row">
               <strong>{item.code}</strong>
               <span>{item.client}</span>
               <span>{item.destination}</span>
               <span className="status-pill">{item.currentStatus}</span>
-              <div style={{ display: "flex", gap: "0.25rem" }}>
+              <div className="row-actions">
                 <button
                   className="ghost-button small"
                   onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}

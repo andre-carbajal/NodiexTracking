@@ -1,6 +1,18 @@
 import { NextResponse } from "next/server";
 import { can, verifyToken } from "@/lib/auth";
-import { createCertificate, createProduct, createShipment, getAdminData, updateShipment, updateShipmentStatus } from "@/lib/store";
+import {
+  createCertificate,
+  createProduct,
+  createShipment,
+  createUser,
+  deleteCertificate,
+  deleteProduct,
+  getAdminData,
+  updateCertificate,
+  updateProduct,
+  updateShipment,
+  updateShipmentStatus
+} from "@/lib/store";
 
 function deny() {
   return NextResponse.json({ ok: false, message: "No autorizado" }, { status: 403 });
@@ -54,11 +66,46 @@ export async function POST(request) {
     return NextResponse.json({ ok: true, item: result.item, message: "Producto creado." });
   }
 
+  if (body.type === "productEdit") {
+    if (!can(user.role, "catalog:write")) return deny();
+    const result = await updateProduct(user, body);
+    if (result.error) return NextResponse.json({ ok: false, message: result.error }, { status: result.status });
+    return NextResponse.json({ ok: true, item: result.item, message: "Producto actualizado." });
+  }
+
+  if (body.type === "productDelete") {
+    if (!can(user.role, "catalog:write")) return deny();
+    const result = await deleteProduct(user, body);
+    if (result.error) return NextResponse.json({ ok: false, message: result.error }, { status: result.status });
+    return NextResponse.json({ ok: true, item: result.item, message: "Producto retirado del catalogo." });
+  }
+
   if (body.type === "certificate") {
     if (!can(user.role, "certificates:write")) return deny();
     const result = await createCertificate(user, body);
     if (result.error) return NextResponse.json({ ok: false, message: result.error }, { status: result.status });
     return NextResponse.json({ ok: true, item: result.item, message: "Certificacion registrada." });
+  }
+
+  if (body.type === "certificateEdit") {
+    if (!can(user.role, "certificates:write")) return deny();
+    const result = await updateCertificate(user, body);
+    if (result.error) return NextResponse.json({ ok: false, message: result.error }, { status: result.status });
+    return NextResponse.json({ ok: true, item: result.item, message: "Certificacion actualizada." });
+  }
+
+  if (body.type === "certificateDelete") {
+    if (!can(user.role, "certificates:write")) return deny();
+    const result = await deleteCertificate(user, body);
+    if (result.error) return NextResponse.json({ ok: false, message: result.error }, { status: result.status });
+    return NextResponse.json({ ok: true, item: result.item, message: "Certificacion retirada." });
+  }
+
+  if (body.type === "user") {
+    if (!can(user.role, "roles:manage")) return deny();
+    const result = await createUser(user, body);
+    if (result.error) return NextResponse.json({ ok: false, message: result.error }, { status: result.status });
+    return NextResponse.json({ ok: true, item: result.item, message: "Usuario creado." });
   }
 
   return NextResponse.json({ ok: false, message: "Operacion no soportada" }, { status: 400 });

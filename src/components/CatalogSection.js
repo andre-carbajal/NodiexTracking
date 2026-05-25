@@ -32,7 +32,7 @@ export default function CatalogSection({ t, publicData, hasFallback }) {
         <div className="catalog-grid">
           {publicData.products.map((product, index) => (
             <article className="catalog-card" key={product.id}>
-              <Image alt={product.name} src={productImages[index % productImages.length]} width={520} height={260} />
+              <Image unoptimized alt={product.name} src={product.imageUrl || productImages[index % productImages.length]} width={520} height={260} />
               <span className="category-pill">Exportacion</span>
               <h3>{product.name}</h3>
               <p>{product.description}</p>

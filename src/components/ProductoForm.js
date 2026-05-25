@@ -1,10 +1,16 @@
 "use client";
 
-import { Plus, Boxes } from "lucide-react";
-import { useState } from "react";
-import { validateProductFields } from "@/lib/validators";
+import { Plus } from "lucide-react";
+import Image from "next/image";
 
-export default function ProductForm({ product, setProduct, onPost, errors }) {
+function imageToDataUrl(file, onReady) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => onReady(String(reader.result || ""));
+  reader.readAsDataURL(file);
+}
+
+export default function ProductForm({ product, setProduct, onPost, onEdit, editingId, onCancel, errors }) {
   return (
     <div className="form-grid">
       <div>
@@ -50,7 +56,42 @@ export default function ProductForm({ product, setProduct, onPost, errors }) {
         />
         {errors?.price && <span className="field-error">{errors.price}</span>}
       </div>
-      <button className="button primary" onClick={() => onPost({ type: "product" })}><Plus size={18} />Crear producto</button>
+      <label className="check-row">
+        <input
+          type="checkbox"
+          checked={product.publish}
+          onChange={(e) => setProduct({ ...product, publish: e.target.checked })}
+        />
+        Publicado
+      </label>
+      <label className="file-field">
+        Imagen del producto
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => imageToDataUrl(e.target.files?.[0], (imageUrl) => setProduct({ ...product, imageUrl }))}
+        />
+      </label>
+      {product.imageUrl && (
+        <div className="image-preview">
+          <Image unoptimized src={product.imageUrl} alt="Vista previa producto" width={84} height={64} />
+          <button type="button" className="ghost-button small danger" onClick={() => setProduct({ ...product, imageUrl: "" })}>
+            Quitar
+          </button>
+        </div>
+      )}
+      {editingId ? (
+        <div className="inline-actions">
+          <button className="button primary" onClick={() => onEdit({ type: "productEdit", id: editingId })}>
+            Guardar cambios
+          </button>
+          <button className="button secondary" onClick={onCancel}>
+            Cancelar
+          </button>
+        </div>
+      ) : (
+        <button className="button primary" onClick={() => onPost({ type: "product" })}><Plus size={18} />Crear producto</button>
+      )}
     </div>
   );
 }

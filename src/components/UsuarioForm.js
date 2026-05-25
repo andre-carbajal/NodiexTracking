@@ -21,6 +21,7 @@ export default function UsuarioForm({ usuario, setUsuario, onPost }) {
         onChange={(e) => setUsuario({ ...usuario, role: e.target.value })}
       >
         <option value="">Seleccionar rol</option>
+        <option value="superadmin">Superadmin</option>
         <option value="operativo">Operativo</option>
         <option value="comercial">Comercial</option>
         <option value="gerencia">Gerencia</option>
