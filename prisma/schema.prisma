@@ -73,6 +73,8 @@ model Despacho {
   destino            String
   producto           String
   estadoActual       String           @map("estado_actual")
+  emailCliente       String?          @map("email_cliente")
+  idiomaPreferido    String           @default("es") @map("idioma_preferido")
   fechaRegistro      DateTime         @default(now()) @map("fecha_registro")
   fechaActualizacion DateTime         @default(now()) @map("fecha_actualizacion")
   activo             Boolean          @default(true)

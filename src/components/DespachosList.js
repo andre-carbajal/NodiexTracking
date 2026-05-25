@@ -1,5 +1,6 @@
 "use client";
 
+import { Pencil } from "lucide-react";
 import { useState } from "react";
 import EstadosTimeline from "@/components/EstadosTimeline";
 import EmptyState from "@/components/EmptyState";
@@ -7,12 +8,17 @@ import Pagination from "@/components/Pagination";
 
 const PAGE_SIZE = 8;
 
-export default function DespachosList({ shipments = [], onPost }) {
+export default function DespachosList({ shipments = [], onPost, onEdit }) {
   const [page, setPage] = useState(1);
   const [expandedId, setExpandedId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("");
 
-  const totalPages = Math.max(1, Math.ceil(shipments.length / PAGE_SIZE));
-  const paginated = shipments.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const filtered = statusFilter
+    ? shipments.filter((s) => s.currentStatus === statusFilter)
+    : shipments;
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   if (shipments.length === 0) {
     return <EmptyState title="Sin despachos" description="Crea el primer despacho con el formulario de arriba." />;
@@ -20,6 +26,14 @@ export default function DespachosList({ shipments = [], onPost }) {
 
   return (
     <>
+      <div className="filter-bar" style={{ marginBottom: "0.5rem" }}>
+        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
+          <option value="">Todos los estados</option>
+          <option value="registrado">Registrado</option>
+          <option value="en tránsito">En transito</option>
+          <option value="entregado/cerrado">Entregado/Cerrado</option>
+        </select>
+      </div>
       <div className="data-table">
         {paginated.map((item) => (
           <div key={item.id}>
@@ -28,12 +42,21 @@ export default function DespachosList({ shipments = [], onPost }) {
               <span>{item.client}</span>
               <span>{item.destination}</span>
               <span className="status-pill">{item.currentStatus}</span>
-              <button
-                className="ghost-button small"
-                onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-              >
-                {expandedId === item.id ? "Ocultar" : "Detalle"}
-              </button>
+              <div style={{ display: "flex", gap: "0.25rem" }}>
+                <button
+                  className="ghost-button small"
+                  onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                >
+                  {expandedId === item.id ? "Ocultar" : "Detalle"}
+                </button>
+                <button
+                  className="ghost-button small"
+                  onClick={() => onEdit(item)}
+                  title="Editar despacho"
+                >
+                  <Pencil size={14} />
+                </button>
+              </div>
             </div>
             {expandedId === item.id && (
               <div className="expanded-row">
