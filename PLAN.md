@@ -35,48 +35,48 @@
 ## FASE 2: ELABORACIÓN (Semanas 3-4)
 
 ### 2.1 Refactorización del landing page — extracción de componentes
-- [ ] Extraer componente `<Header />` de `src/app/page.js` (logo, nav anclas, selector idioma, hamburger)
-- [ ] Extraer componente `<Hero />` (fondo, headline, CTAs, widget tracking embebido)
-- [ ] Extraer componente `<TrackingWidget />` (input código, botón consultar, skeleton carga, resultado)
-- [ ] Extraer componente `<TrackingResult />` (timeline estados, datos del despacho, ubicación)
-- [ ] Extraer componente `<AboutBand />` (sección "Sobre nosotros", imágenes, misión/visión)
-- [ ] Extraer componente `<CatalogSection />` (grid productos, filtros, ficha comercial lateral)
-- [ ] Extraer componente `<CertificatesStrip />` (badges de certificaciones vigentes)
-- [ ] Extraer componente `<SupportGrid />` (3 tarjetas: seguridad, tiempo real, soporte)
-- [ ] Extraer componente `<ContactForm />` (formulario funcional con validación)
-- [ ] Extraer componente `<Footer />` (logo, info contacto, link admin)
-- [ ] Crear `src/components/` y mover todos los componentes extraídos
-- [ ] Refactorizar `src/app/page.js` para que solo componga los componentes extraídos
+- [x] Extraer componente `<Header />` de `src/app/page.js` (logo, nav anclas, selector idioma, hamburger)
+- [x] Extraer componente `<Hero />` (fondo, headline, CTAs, widget tracking embebido)
+- [x] Extraer componente `<TrackingWidget />` (input código, botón consultar, skeleton carga, resultado)
+- [x] Extraer componente `<TrackingResult />` (timeline estados, datos del despacho, ubicación)
+- [x] Extraer componente `<AboutBand />` (sección "Sobre nosotros", imágenes, misión/visión)
+- [x] Extraer componente `<CatalogSection />` (grid productos, filtros, ficha comercial lateral)
+- [x] Extraer componente `<CertificatesStrip />` (badges de certificaciones vigentes)
+- [x] Extraer componente `<SupportGrid />` (3 tarjetas: seguridad, tiempo real, soporte)
+- [x] Extraer componente `<ContactForm />` (formulario funcional con validación)
+- [x] Extraer componente `<Footer />` (logo, info contacto, link admin)
+- [x] Crear `src/components/` y mover todos los componentes extraídos
+- [x] Refactorizar `src/app/page.js` para que solo componga los componentes extraídos
 
 ### 2.2 Refactorización del panel admin — extracción de componentes
-- [ ] Extraer componente `<AdminLogin />` de `src/app/admin/page.js`
-- [ ] Extraer componente `<AdminDashboard />` (sidebar + área de contenido)
-- [ ] Extraer componente `<AdminSidebar />` (navegación por módulos)
-- [ ] Extraer componente `<DespachosList />` (tabla despachos)
-- [ ] Extraer componente `<DespachoForm />` (formulario crear/editar despacho)
-- [ ] Extraer componente `<EstadosTimeline />` (historial de estados con cambio de estado)
-- [ ] Extraer componente `<ProductosList />` (tabla productos)
-- [ ] Extraer componente `<ProductoForm />` (formulario crear/editar producto + presentaciones + precios)
-- [ ] Extraer componente `<CertificacionesList />` (tabla certificaciones)
-- [ ] Extraer componente `<CertificacionForm />` (formulario crear/editar certificación + upload)
-- [ ] Extraer componente `<TraduccionesEditor />` (pestañas ES/EN/PT por entidad)
-- [ ] Extraer componente `<BitacoraView />` (tabla auditoría con filtros)
-- [ ] Extraer componente `<UsuariosList />` y `<UsuarioForm />` (gestión de usuarios)
-- [ ] Refactorizar `src/app/admin/page.js` para que solo componga los componentes extraídos
+- [x] Extraer componente `<AdminLogin />` de `src/app/admin/page.js`
+- [x] Extraer componente `<AdminDashboard />` (sidebar + área de contenido)
+- [x] Extraer componente `<AdminSidebar />` (navegación por módulos)
+- [x] Extraer componente `<DespachosList />` (tabla despachos)
+- [x] Extraer componente `<DespachoForm />` (formulario crear/editar despacho)
+- [x] Extraer componente `<EstadosTimeline />` (historial de estados con cambio de estado)
+- [x] Extraer componente `<ProductosList />` (tabla productos)
+- [x] Extraer componente `<ProductoForm />` (formulario crear/editar producto + presentaciones + precios)
+- [x] Extraer componente `<CertificacionesList />` (tabla certificaciones)
+- [x] Extraer componente `<CertificacionForm />` (formulario crear/editar certificación + upload)
+- [x] Extraer componente `<TraduccionesEditor />` (pestañas ES/EN/PT por entidad)
+- [x] Extraer componente `<BitacoraView />` (tabla auditoría con filtros)
+- [x] Extraer componente `<UsuariosList />` y `<UsuarioForm />` (gestión de usuarios)
+- [x] Refactorizar `src/app/admin/page.js` para que solo componga los componentes extraídos
 
 ### 2.3 Mejoras de arquitectura y seguridad
-- [ ] Crear `src/middleware.js` para proteger rutas `/admin` con verificación JWT
-- [ ] Mover verificación de token de localStorage a httpOnly cookie (más seguro)
-- [ ] Implementar helper `lib/validators.js`: sanitización de inputs, validación de formatos
-- [ ] Agregar headers de seguridad HTTP (CSP, HSTS, X-Content-Type-Options) en `next.config.mjs`
+- [x] Crear `src/middleware.js` para proteger rutas `/admin` con verificación JWT
+- [x] Mover verificación de token de localStorage a httpOnly cookie (más seguro)
+- [x] Implementar helper `lib/validators.js`: sanitización de inputs, validación de formatos
+- [x] Agregar headers de seguridad HTTP (CSP, HSTS, X-Content-Type-Options) en `next.config.mjs`
 
 ### 2.4 Mejoras de UX/UI transversales
-- [ ] Crear componente `<LoadingSkeleton />` (variantes: card, table-row, timeline, form)
-- [ ] Crear componente `<Toast />` para notificaciones de éxito/error (cambios en panel admin)
-- [ ] Crear componente `<EmptyState />` para listas vacías (sin productos, sin despachos, etc.)
-- [ ] Crear componente `<Pagination />` reutilizable para todas las tablas
-- [ ] Implementar manejo de errores global con `<ErrorBoundary />`
-- [ ] Agregar `loading.js` y `error.js` en rutas clave
+- [x] Crear componente `<LoadingSkeleton />` (variantes: card, table-row, timeline, form)
+- [x] Crear componente `<Toast />` para notificaciones de éxito/error (cambios en panel admin)
+- [x] Crear componente `<EmptyState />` para listas vacías (sin productos, sin despachos, etc.)
+- [x] Crear componente `<Pagination />` reutilizable para todas las tablas
+- [x] Implementar manejo de errores global con `<ErrorBoundary />`
+- [x] Agregar `loading.js` y `error.js` en rutas clave
 
 ---
 
@@ -85,56 +85,56 @@
 ### 3.1 Módulo de Order Tracking (Mejoras) — SEMANA 5
 
 #### 3.1.1 Mejoras al endpoint de tracking público
-- [ ] Revisar `POST /api/tracking`: confirmar que valida formato, existencia y estado del código (RFF-02)
-- [ ] Verificar que responde con mensaje genérico para código inválido/inexistente (RN-02, sin exponer datos)
-- [ ] Verificar rate limiting: 30 consultas/10min/IP (RNF-03, RN-03) — actualmente es in-memory, migrar a Redis o mantener en memoria con advertencia en docs
-- [ ] Verificar registro en `bitacora_eventos` por cada consulta (RFF-19)
+- [x] Revisar `POST /api/tracking`: confirmar que valida formato, existencia y estado del código (RFF-02)
+- [x] Verificar que responde con mensaje genérico para código inválido/inexistente (RN-02, sin exponer datos)
+- [x] Verificar rate limiting: 30 consultas/10min/IP (RNF-03, RN-03) — actualmente es in-memory, migrar a Redis o mantener en memoria con advertencia en docs
+- [x] Verificar registro en `bitacora_eventos` por cada consulta (RFF-19)
 - [ ] Verificar tiempo de respuesta < 10 segundos (RNF-01) — test con 10k+ registros
-- [ ] Agregar endpoint `GET /api/public/tracking/[codigo]` como alternativa para links compartibles
+- [x] Agregar endpoint `GET /api/public/tracking/[codigo]` como alternativa para links compartibles
 
 #### 3.1.2 Mejoras al widget de tracking en landing page
-- [ ] Revisar `<TrackingWidget />`: input con validación visual de formato de código
-- [ ] Mostrar `<LoadingSkeleton />` durante la consulta (actualmente no tiene estado de carga)
-- [ ] Mostrar mensaje claro si se excede rate limit ("Demasiadas consultas. Intenta en X minutos")
-- [ ] Implementar `<TrackingResult />` con timeline visual de estados (íconos por estado, fechas, horas)
-- [ ] Mostrar datos del despacho: producto, cantidad, presentación logística, fecha estimada
-- [ ] Agregar botón "Compartir" o "Copiar enlace" para compartir resultado de tracking
+- [x] Revisar `<TrackingWidget />`: input con validación visual de formato de código
+- [x] Mostrar `<LoadingSkeleton />` durante la consulta (actualmente no tiene estado de carga)
+- [x] Mostrar mensaje claro si se excede rate limit ("Demasiadas consultas. Intenta en X minutos")
+- [x] Implementar `<TrackingResult />` con timeline visual de estados (íconos por estado, fechas, horas)
+- [x] Mostrar datos del despacho: producto, cantidad, presentación logística, fecha estimada
+- [x] Agregar botón "Compartir" o "Copiar enlace" para compartir resultado de tracking
 - [ ] Hacer el widget completamente responsive (los clientes consultan desde smartphones)
-- [ ] Implementar multiidioma en el widget (ES/EN/PT según selector global)
+- [x] Implementar multiidioma en el widget (ES/EN/PT según selector global)
 
 #### 3.1.3 Página dedicada de tracking público
-- [ ] Crear ruta `/tracking` con página independiente (no solo widget en landing)
-- [ ] Si se accede a `/tracking/[codigo]`, pre-llenar el campo y ejecutar consulta automática
-- [ ] Diseñar layout limpio enfocado solo en la consulta de tracking
+- [x] Crear ruta `/tracking` con página independiente (no solo widget en landing)
+- [x] Si se accede a `/tracking/[codigo]`, pre-llenar el campo y ejecutar consulta automática
+- [x] Diseñar layout limpio enfocado solo en la consulta de tracking
 - [ ] Agregar favicon y metadatos específicos para SEO de la página de tracking
 
 ### 3.2 Módulo Panel Admin — Despachos — SEMANA 5-6
 
 #### 3.2.1 CRUD de despachos (mejoras sobre lo existente)
-- [ ] Revisar `<DespachosList />`: debe mostrar tabla paginada con filtros (estado, fecha, código)
-- [ ] Implementar paginación real en endpoint `GET/POST /api/admin` para despachos
-- [ ] Revisar `<DespachoForm />`: campos requeridos (producto, presentación, cliente, fecha estimada)
-- [ ] Generar código tracking opaco no secuencial automáticamente (RN-01) — verificar implementación actual
-- [ ] Agregar validación de campos obligatorios antes de enviar (RN-04)
-- [ ] Mostrar mensajes de error específicos por campo en el formulario
-- [ ] Implementar edición de despacho existente (no solo creación)
+- [x] Revisar `<DespachosList />`: debe mostrar tabla paginada con filtros (estado, fecha, código)
+- [x] Implementar paginación real en endpoint `GET/POST /api/admin` para despachos
+- [x] Revisar `<DespachoForm />`: campos requeridos (producto, presentación, cliente, fecha estimada)
+- [x] Generar código tracking opaco no secuencial automáticamente (RN-01) — verificar implementación actual
+- [x] Agregar validación de campos obligatorios antes de enviar (RN-04)
+- [x] Mostrar mensajes de error específicos por campo en el formulario
+- [x] Implementar edición de despacho existente (no solo creación)
 
 #### 3.2.2 Gestión de estados de despacho
-- [ ] Implementar flujo de estados: Registrado → En Tránsito → Entregado (RN-05)
-- [ ] Validar secuencia: no permitir saltos inválidos sin motivo
-- [ ] Permitir reversión solo con motivo obligatorio y permiso de rol superior
-- [ ] Crear `<EstadosTimeline />`: historial visual con fecha, hora, estado, responsable, observación (RFF-06)
-- [ ] Botón "Agregar estado" con dropdown de estados permitidos según estado actual
-- [ ] Registrar cada cambio de estado en bitácora automáticamente (RN-13)
+- [x] Implementar flujo de estados: Registrado → En Tránsito → Entregado (RN-05)
+- [x] Validar secuencia: no permitir saltos inválidos sin motivo
+- [x] Permitir reversión solo con motivo obligatorio y permiso de rol superior
+- [x] Crear `<EstadosTimeline />`: historial visual con fecha, hora, estado, responsable, observación (RFF-06)
+- [x] Botón "Agregar estado" con dropdown de estados permitidos según estado actual
+- [x] Registrar cada cambio de estado en bitácora automáticamente (RN-13)
 
 #### 3.2.3 Notificaciones automáticas de tracking
-- [ ] Configurar Resend (ya está en dependencias, verificar API key en `.env.local`)
-- [ ] Crear `lib/notifications.js`: función `sendTrackingUpdate(email, codigo, nuevoEstado)`
-- [ ] Al cambiar estado: disparar envío asíncrono (no bloquear la operación)
-- [ ] Email multiidioma según preferencia registrada del cliente (ES/EN/PT)
-- [ ] Registrar envío en bitácora
-- [ ] Agregar campo `email_cliente` al modelo `despachos` si no existe
-- [ ] Agregar campo `idioma_preferido` (ES/EN/PT) al modelo `despachos` si no existe
+- [x] Configurar Resend (ya está en dependencias, verificar API key en `.env.local`)
+- [x] Crear `lib/notifications.js`: función `sendTrackingUpdate(email, codigo, nuevoEstado)`
+- [x] Al cambiar estado: disparar envío asíncrono (no bloquear la operación)
+- [x] Email multiidioma según preferencia registrada del cliente (ES/EN/PT)
+- [x] Registrar envío en bitácora
+- [x] Agregar campo `email_cliente` al modelo `despachos` si no existe
+- [x] Agregar campo `idioma_preferido` (ES/EN/PT) al modelo `despachos` si no existe
 
 ### 3.3 Módulo Catálogo — SEMANA 6-7
 
@@ -247,13 +247,13 @@
 ### 3.8 Features adicionales del portal público — SEMANA 8
 
 #### 3.8.1 Formulario de contacto funcional
-- [ ] Revisar `<ContactForm />`: actualmente no tiene handler de submit
-- [ ] Implementar endpoint `POST /api/public/contacto`
-- [ ] Campos: nombre, empresa, email, país, mensaje
-- [ ] Validar campos obligatorios y formato de email
+- [x] Revisar `<ContactForm />`: actualmente no tiene handler de submit
+- [x] Implementar endpoint `POST /api/public/contacto`
+- [x] Campos: nombre, empresa, email, país, mensaje
+- [x] Validar campos obligatorios y formato de email
 - [ ] Enviar email a Nodiex con los datos del formulario (Resend)
-- [ ] Mostrar mensaje de confirmación al usuario
-- [ ] Implementar rate limiting en endpoint de contacto (evitar spam)
+- [x] Mostrar mensaje de confirmación al usuario
+- [x] Implementar rate limiting en endpoint de contacto (evitar spam)
 
 #### 3.8.2 Descarga de ficha técnica
 - [ ] Implementar endpoint `GET /api/public/productos/[id]/ficha`
@@ -327,19 +327,19 @@
 
 ## REGLAS DE NEGOCIO — Checklist de Verificación
 
-- [ ] RN-01: Todo despacho genera código opaco único, no secuencial, no reutilizable
-- [ ] RN-02: Tracking público devuelve mensaje genérico para código inválido
-- [ ] RN-03: Rate limiting 30 consultas/10min/IP en endpoint tracking
-- [ ] RN-04: Solo usuario autenticado con JWT + rol operativo actualiza estados
-- [ ] RN-05: Flujo de estados: Registrado → En Tránsito → Entregado (sin saltos)
+- [x] RN-01: Todo despacho genera código opaco único, no secuencial, no reutilizable
+- [x] RN-02: Tracking público devuelve mensaje genérico para código inválido
+- [x] RN-03: Rate limiting 30 consultas/10min/IP en endpoint tracking
+- [x] RN-04: Solo usuario autenticado con JWT + rol operativo actualiza estados
+- [x] RN-05: Flujo de estados: Registrado → En Tránsito → Entregado (sin saltos)
 - [ ] RN-06: Unidades de catálogo restringidas a TM, Contenedor 20', Contenedor 40'
 - [ ] RN-07: Monedas PEN/USD/EUR con monto > 0 y formato decimal válido
 - [ ] RN-08: Producto publicable solo con nombre, descripción, presentación, al menos 1 precio > 0
 - [ ] RN-09: Certificaciones con tipo, vigencia y archivo; vencidas se conservan no vigentes
 - [ ] RN-10: ES obligatorio; EN/PT progresivos con fallback a ES con indicador visual
-- [ ] RN-11: Panel requiere JWT vigente (8h); bloqueo tras 5 intentos fallidos
+- [x] RN-11: Panel requiere JWT vigente (8h); bloqueo tras 5 intentos fallidos
 - [ ] RN-12: Autorización por rol y matriz de permisos en cada operación crítica
-- [ ] RN-13: Bitácora obligatoria en cambios críticos; si falla bitácora, operación se revierte
+- [x] RN-13: Bitácora obligatoria en cambios críticos; si falla bitácora, operación se revierte
 - [ ] RN-14: Solo registros publicables/activos se exponen en portal público
 - [ ] RN-15: Cumplimiento Ley 29733: minimización datos, acceso restringido, cifrado
 - [ ] RN-16: Documentación de usuario completada y entregada (README, CONTRIBUTION, docs API)
