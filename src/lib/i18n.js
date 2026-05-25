@@ -1,0 +1,71 @@
+export const languages = [
+  { code: "es", label: "ES" },
+  { code: "en", label: "EN" },
+  { code: "pt", label: "PT" }
+];
+
+export const copy = {
+  es: {
+    nav: { catalog: "Catálogo", certificates: "Certificaciones", tracking: "Tracking", contact: "Contacto", admin: "Panel" },
+    heroTitle: "NODIEX DEL PERÚ S.A.C.",
+    heroLead: "Agroexportación con trazabilidad logística, certificaciones visibles y atención preparada para compradores internacionales.",
+    heroMeta: "Tacna, Perú · Exportaciones agrícolas · ES / EN / PT",
+    ctaTracking: "Consultar despacho",
+    ctaCatalog: "Ver catálogo",
+    trustTitle: "Confianza exportadora, información verificable",
+    trustBody: "La plataforma centraliza catálogo, precios por presentación logística, certificaciones oficiales y estados de despacho para reducir consultas manuales y fortalecer relaciones comerciales.",
+    trackingTitle: "Tracking de pedidos",
+    trackingHelp: "Ingrese el código opaco entregado por NODIEX. No necesita crear una cuenta.",
+    trackingPlaceholder: "Ej. NDX-8Q4M-2026",
+    trackingButton: "Consultar",
+    invalidTracking: "No se pudo validar el código ingresado. Verifique el dato o contacte a NODIEX.",
+    catalogTitle: "Catálogo exportador",
+    certificatesTitle: "Certificaciones vigentes",
+    contactTitle: "Contacto comercial",
+    contactBody: "Canal para compradores, distribuidores e importadores que necesitan información comercial.",
+    fallback: "Contenido mostrado desde español por traducción pendiente.",
+    dashboard: "Panel administrativo"
+  },
+  en: {
+    nav: { catalog: "Catalog", certificates: "Certifications", tracking: "Tracking", contact: "Contact", admin: "Admin" },
+    heroTitle: "NODIEX DEL PERU S.A.C.",
+    heroLead: "Agro-export operations with logistics traceability, visible certifications and international buyer support.",
+    heroMeta: "Tacna, Peru · Agricultural exports · ES / EN / PT",
+    ctaTracking: "Track shipment",
+    ctaCatalog: "View catalog",
+    trustTitle: "Export trust with verifiable information",
+    trustBody: "The platform centralizes catalog data, prices by logistics presentation, official certifications and shipment states to reduce manual inquiries.",
+    trackingTitle: "Order tracking",
+    trackingHelp: "Enter the opaque code provided by NODIEX. No account is required.",
+    trackingPlaceholder: "Ex. NDX-8Q4M-2026",
+    trackingButton: "Search",
+    invalidTracking: "The code could not be validated. Please check it or contact NODIEX.",
+    catalogTitle: "Export catalog",
+    certificatesTitle: "Current certifications",
+    contactTitle: "Commercial contact",
+    contactBody: "Channel for buyers, distributors and importers needing commercial information.",
+    fallback: "Content shown from Spanish because translation is pending.",
+    dashboard: "Admin panel"
+  },
+  pt: {
+    nav: { catalog: "Catálogo", certificates: "Certificações", tracking: "Rastreamento", contact: "Contato", admin: "Painel" },
+    heroTitle: "NODIEX DEL PERU S.A.C.",
+    heroLead: "Agroexportação com rastreabilidade logística, certificações visíveis e atendimento para compradores internacionais.",
+    heroMeta: "Tacna, Peru · Exportações agrícolas · ES / EN / PT",
+    ctaTracking: "Consultar envio",
+    ctaCatalog: "Ver catálogo",
+    trustTitle: "Confiança exportadora com informação verificável",
+    trustBody: "A plataforma centraliza catálogo, preços por apresentação logística, certificações oficiais e estados de envio para reduzir consultas manuais.",
+    trackingTitle: "Rastreamento de pedidos",
+    trackingHelp: "Digite o código opaco entregue pela NODIEX. Não é necessário criar conta.",
+    trackingPlaceholder: "Ex. NDX-8Q4M-2026",
+    trackingButton: "Consultar",
+    invalidTracking: "Não foi possível validar o código. Verifique o dado ou entre em contato com a NODIEX.",
+    catalogTitle: "Catálogo de exportação",
+    certificatesTitle: "Certificações vigentes",
+    contactTitle: "Contato comercial",
+    contactBody: "Canal para compradores, distribuidores e importadores que precisam de informação comercial.",
+    fallback: "Conteúdo exibido em espanhol porque a tradução está pendente.",
+    dashboard: "Painel administrativo"
+  }
+};
