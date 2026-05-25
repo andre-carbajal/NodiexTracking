@@ -1,35 +1,35 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { signUser } from "@/lib/auth";
-import { audit, store } from "@/lib/store";
+import { audit, getUserByUsername, registerLoginFailure, registerLoginSuccess, userSessionPayload } from "@/lib/store";
+
+function clientIp(request) {
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+}
 
 export async function POST(request) {
   const { username, password } = await request.json().catch(() => ({}));
-  const user = store.users.find((item) => item.username === username);
+  const user = await getUserByUsername(username);
   const now = Date.now();
 
   if (!user) {
-    audit("anonimo", "login_fallido", "usuario", "Usuario inexistente");
+    await audit("anonimo", "login_fallido", "usuario", "Usuario inexistente");
     return NextResponse.json({ ok: false, message: "Credenciales invalidas" }, { status: 401 });
   }
 
-  if (user.lockedUntil && user.lockedUntil > now) {
+  if (user.lockedUntil && user.lockedUntil.getTime() > now) {
     return NextResponse.json({ ok: false, message: "Acceso bloqueado temporalmente" }, { status: 423 });
   }
 
-  const valid = await bcrypt.compare(String(password ?? ""), user.passwordHash);
+  const valid = await bcrypt.compare(String(password ?? ""), user.hashPassword);
   if (!valid) {
-    user.failedAttempts += 1;
-    if (user.failedAttempts >= 5) {
-      user.lockedUntil = now + 15 * 60 * 1000;
-      user.failedAttempts = 0;
-    }
-    audit(user.username, "login_fallido", "usuario", "Credenciales invalidas");
+    await registerLoginFailure(user);
     return NextResponse.json({ ok: false, message: "Credenciales invalidas" }, { status: 401 });
   }
 
-  user.failedAttempts = 0;
-  user.lockedUntil = null;
-  audit(user.username, "login_exitoso", "usuario", `Rol ${user.role}`);
-  return NextResponse.json({ ok: true, token: signUser(user), user: { username: user.username, role: user.role } });
+  const payload = userSessionPayload(user);
+  const expiresAt = new Date(Date.now() + 8 * 60 * 60 * 1000);
+  const token = signUser(payload, expiresAt);
+  await registerLoginSuccess(user, token, clientIp(request), expiresAt);
+  return NextResponse.json({ ok: true, token, user: { username: payload.username, role: payload.role } });
 }
