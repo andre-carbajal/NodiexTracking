@@ -1,49 +1,60 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
-const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
-const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY;
-const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME;
-const R2_ENDPOINT = process.env.R2_ENDPOINT;
-const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL;
+function getConfig() {
+  const config = {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+    bucket: process.env.R2_BUCKET_NAME,
+    endpoint: process.env.R2_ENDPOINT,
+    publicUrl: process.env.R2_PUBLIC_URL
+  };
 
-if (!R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME || !R2_ENDPOINT || !R2_PUBLIC_URL) {
-  throw new Error("Missing R2 environment variables. Check R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_ENDPOINT, R2_PUBLIC_URL");
+  if (!config.accessKeyId || !config.secretAccessKey || !config.bucket || !config.endpoint || !config.publicUrl) {
+    throw new Error("Missing R2 environment variables. Check R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_ENDPOINT, R2_PUBLIC_URL");
+  }
+
+  return config;
 }
 
-const r2 = new S3Client({
-  region: "auto",
-  endpoint: R2_ENDPOINT,
-  credentials: {
-    accessKeyId: R2_ACCESS_KEY_ID,
-    secretAccessKey: R2_SECRET_ACCESS_KEY,
-  },
-  forcePathStyle: true,
-});
+function getClient() {
+  const config = getConfig();
+  return new S3Client({
+    region: "auto",
+    endpoint: config.endpoint,
+    credentials: {
+      accessKeyId: config.accessKeyId,
+      secretAccessKey: config.secretAccessKey,
+    },
+    forcePathStyle: true,
+  });
+}
 
 export async function uploadFile(key, buffer, contentType) {
+  const config = getConfig();
   const command = new PutObjectCommand({
-    Bucket: R2_BUCKET_NAME,
+    Bucket: config.bucket,
     Key: key,
     Body: buffer,
     ContentType: contentType,
   });
 
-  await r2.send(command);
+  await getClient().send(command);
 
   return getPublicUrl(key);
 }
 
 export async function deleteFile(key) {
+  const config = getConfig();
   const command = new DeleteObjectCommand({
-    Bucket: R2_BUCKET_NAME,
+    Bucket: config.bucket,
     Key: key,
   });
 
-  await r2.send(command);
+  await getClient().send(command);
 }
 
 export function getPublicUrl(key) {
-  return `${R2_PUBLIC_URL}/${key}`;
+  return `${getConfig().publicUrl}/${key}`;
 }
 
 export function generateKey(prefix, filename) {

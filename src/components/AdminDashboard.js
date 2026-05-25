@@ -15,10 +15,18 @@ import CertificacionForm from "@/components/CertificacionForm";
 import BitacoraView from "@/components/BitacoraView";
 import UsuariosList from "@/components/UsuariosList";
 import UsuarioForm from "@/components/UsuarioForm";
+import Pagination from "@/components/Pagination";
 import { validateShipmentFields, validateProductFields, validateCertificateFields } from "@/lib/validators";
 
 const initialShipment = { client: "", destination: "", product: "", emailCliente: "", idiomaPreferido: "es", currentStatus: "registrado" };
-const initialProduct = { name: "", description: "", unit: "TM", currency: "USD", price: "", publish: true, imageUrl: "" };
+const initialProduct = {
+  name: "",
+  description: "",
+  publish: false,
+  imageUrl: "",
+  previewUrl: "",
+  presentations: [{ unit: "TM", prices: [{ currency: "USD", amount: "" }] }]
+};
 const initialCertificate = { certType: "SENASA", validUntil: "2026-12-31", evidence: "", publish: true, imageUrl: "" };
 
 function EditModal({ title, children, onClose }) {
@@ -35,6 +43,25 @@ function EditModal({ title, children, onClose }) {
       </section>
     </div>
   );
+}
+
+async function readJsonResponse(response) {
+  const text = await response.text();
+  if (!text) {
+    return {
+      ok: false,
+      message: response.ok ? "Operacion completada sin respuesta del servidor." : "El servidor no devolvio detalles del error."
+    };
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {
+      ok: false,
+      message: response.ok ? "Respuesta inesperada del servidor." : text
+    };
+  }
 }
 
 export default function AdminDashboard({ user, data, token, onLogout, load }) {
@@ -54,6 +81,18 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
   const [editingId, setEditingId] = useState(null);
   const [editingProductId, setEditingProductId] = useState(null);
   const [editingCertId, setEditingCertId] = useState(null);
+  const [productPage, setProductPage] = useState(1);
+  const [productSearch, setProductSearch] = useState("");
+  const [productStatus, setProductStatus] = useState("");
+
+  function productParams(nextPage = productPage) {
+    return {
+      productPage: nextPage,
+      productPageSize: 8,
+      productSearch,
+      productStatus
+    };
+  }
 
   function resetShipmentForm() {
     setShipment(initialShipment);
@@ -90,7 +129,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
 
   const stats = useMemo(() => [
     { label: "Despachos", value: data.totalShipments || data.shipments.length, icon: Ship, section: "shipments" },
-    { label: "Productos", value: data.products.length, icon: Boxes, section: "catalog" },
+    { label: "Productos", value: data.totalProducts || data.products.length, icon: Boxes, section: "catalog" },
     { label: "Certificaciones", value: data.certificates.length, icon: Award, section: "certifications" },
     { label: "Eventos auditoria", value: data.audit.length, icon: Activity, section: "audit" }
   ], [data]);
@@ -203,7 +242,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(actualBody)
     });
-    const json = await res.json();
+    const json = await readJsonResponse(res);
     setMessage(json.message || (res.ok ? "Operacion registrada en bitacora." : "Operacion rechazada."));
     setToast({ message: json.message || (res.ok ? "Operacion exitosa" : "Error"), variant: res.ok ? "success" : "error" });
     if (res.ok) {
@@ -229,8 +268,19 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
         setUsuario({ username: "", password: "", role: "" });
       }
     }
-    await load();
+    await load(token, activeSection === "catalog" ? productParams() : {});
   }
+
+  useEffect(() => {
+    if (activeSection === "catalog" && token) {
+      load(token, {
+        productPage,
+        productPageSize: 8,
+        productSearch,
+        productStatus
+      });
+    }
+  }, [activeSection, load, productPage, productSearch, productStatus, token]);
 
   function startEdit(despacho) {
     setEditingId(despacho.id);
@@ -246,33 +296,40 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
   }
 
   function startProductEdit(item) {
-    const firstPresentation = item.presentations?.[0];
-    const firstPrice = Object.entries(firstPresentation?.prices || {})[0] || ["USD", ""];
     setEditingProductId(item.id);
     changeSection("catalog");
     setEditProduct({
       name: item.name || "",
       description: item.description || "",
-      unit: firstPresentation?.unit || "TM",
-      currency: firstPrice[0] || "USD",
-      price: firstPrice[1] ? String(firstPrice[1]) : "",
       publish: item.published,
-      imageUrl: item.imageUrl || ""
+      imageUrl: item.imageUrl || "",
+      previewUrl: item.imageUrl || "",
+      presentations: item.presentations?.length
+        ? item.presentations.map((presentation) => ({
+          unit: presentation.unit || "TM",
+          prices: Object.entries(presentation.prices || {}).map(([currency, amount]) => ({
+            currency,
+            amount: String(amount)
+          }))
+        }))
+        : initialProduct.presentations
     });
   }
 
   function toggleProduct(item) {
-    const firstPresentation = item.presentations?.[0];
-    const firstPrice = Object.entries(firstPresentation?.prices || {})[0] || ["USD", ""];
     const nextProduct = {
       name: item.name || "",
       description: item.description || "",
-      unit: firstPresentation?.unit || "TM",
-      currency: firstPrice[0] || "USD",
-      price: firstPrice[1] ? String(firstPrice[1]) : "1",
       publish: !item.published,
       active: true,
-      imageUrl: item.imageUrl || ""
+      imageUrl: item.imageUrl || "",
+      presentations: item.presentations?.map((presentation) => ({
+        unit: presentation.unit || "TM",
+        prices: Object.entries(presentation.prices || {}).map(([currency, amount]) => ({
+          currency,
+          amount: String(amount)
+        }))
+      })) || initialProduct.presentations
     };
     post({ type: "productEdit", id: item.id, productPayload: nextProduct });
   }
@@ -334,22 +391,6 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
 
         <section className="admin-panel dashboard-panel">
           <div className="panel-heading"><ShieldCheck /><h2>Vista general</h2></div>
-          <div className="dashboard-actions">
-            <button type="button" className="button secondary" onClick={() => changeSection("shipments")}>
-              <Ship size={18} />Abrir despachos
-            </button>
-            <button type="button" className="button secondary" onClick={() => changeSection("catalog")}>
-              <Boxes size={18} />Abrir catalogo
-            </button>
-            <button type="button" className="button secondary" onClick={() => changeSection("certifications")}>
-              <Award size={18} />Abrir certificaciones
-            </button>
-            {user?.canReadAudit && (
-              <button type="button" className="button secondary" onClick={() => changeSection("audit")}>
-                <FileClock size={18} />Abrir auditoria
-              </button>
-            )}
-          </div>
 
           {latestAudit.length > 0 && (
             <div className="dashboard-feed">
@@ -381,6 +422,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
             setShipment={setShipment}
             onPost={post}
             errors={shipmentErrors}
+            productOptions={data.productOptions || []}
           />
           <DespachosList shipments={data.shipments} onPost={post} onEdit={startEdit} />
           {editingId && (
@@ -392,6 +434,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
                 editingId={editingId}
                 onCancel={closeShipmentModal}
                 errors={shipmentErrors}
+                productOptions={data.productOptions || []}
               />
             </EditModal>
           )}
@@ -408,12 +451,46 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
             setProduct={setProduct}
             onPost={post}
             errors={productErrors}
+            token={token}
           />
+          <div className="admin-filters">
+            <label>
+              Buscar producto
+              <input
+                placeholder="Nombre del producto"
+                value={productSearch}
+                onChange={(event) => {
+                  setProductSearch(event.target.value);
+                  setProductPage(1);
+                }}
+              />
+            </label>
+            <label>
+              Estado
+              <select
+                value={productStatus}
+                onChange={(event) => {
+                  setProductStatus(event.target.value);
+                  setProductPage(1);
+                }}
+              >
+                <option value="">Todos activos</option>
+                <option value="publicado">Publicado</option>
+                <option value="borrador">Borrador</option>
+                <option value="retirado">Retirado</option>
+              </select>
+            </label>
+          </div>
           <ProductosList
             products={data.products}
             onEdit={startProductEdit}
             onDelete={deleteProductItem}
             onToggle={toggleProduct}
+          />
+          <Pagination
+            page={productPage}
+            totalPages={Math.max(1, Math.ceil((data.totalProducts || data.products.length) / 8))}
+            onPageChange={setProductPage}
           />
           {editingProductId && (
             <EditModal title="Editar producto" onClose={closeProductModal}>
@@ -424,6 +501,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
                 editingId={editingProductId}
                 onCancel={closeProductModal}
                 errors={productErrors}
+                token={token}
               />
             </EditModal>
           )}

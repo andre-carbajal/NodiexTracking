@@ -5,9 +5,14 @@ import { sendTrackingUpdate } from "@/lib/notifications";
 const globalRateLimit = globalThis.__nodiexRateLimit ?? new Map();
 globalThis.__nodiexRateLimit = globalRateLimit;
 
+export const PRODUCT_UNITS = ["TM", "Contenedor 20'", "Contenedor 40'"];
+export const PRODUCT_CURRENCIES = ["PEN", "USD", "EUR"];
+
 export const store = {
   rateLimit: globalRateLimit
 };
+
+let shipmentNotificationColumnsAvailable = null;
 
 function roleNames(user) {
   return user?.roles?.map((item) => item.rol.nombreRol) ?? [];
@@ -27,6 +32,53 @@ function money(value) {
   return Number(value);
 }
 
+async function hasShipmentNotificationColumns(client = prisma) {
+  if (shipmentNotificationColumnsAvailable !== null) return shipmentNotificationColumnsAvailable;
+
+  const rows = await client.$queryRaw`
+    SELECT attname
+    FROM pg_attribute
+    WHERE attrelid = 'public.despachos'::regclass
+      AND attname IN ('email_cliente', 'idioma_preferido')
+      AND NOT attisdropped
+  `;
+  shipmentNotificationColumnsAvailable = rows.length === 2;
+  return shipmentNotificationColumnsAvailable;
+}
+
+function shipmentSelect(includeNotifications = false) {
+  return {
+    id: true,
+    codigoTracking: true,
+    cliente: true,
+    destino: true,
+    producto: true,
+    estadoActual: true,
+    ...(includeNotifications ? { emailCliente: true, idiomaPreferido: true } : {}),
+    fechaRegistro: true,
+    fechaActualizacion: true,
+    activo: true,
+    usuarioId: true,
+    estados: true
+  };
+}
+
+function validPriceValue(value) {
+  const raw = String(value ?? "").trim();
+  return /^\d+(\.\d{1,2})?$/.test(raw) && Number(raw) > 0;
+}
+
+function productCompleteness(product) {
+  const translation = product.traducciones?.find((item) => item.idioma === "es");
+  const missing = [];
+  if (!translation?.titulo?.trim()) missing.push("nombre");
+  if (!translation?.cuerpo?.trim()) missing.push("descripcion");
+  if (!product.presentaciones?.length) missing.push("presentacion");
+  const hasPrice = product.presentaciones?.some((presentation) => presentation.precios?.some((price) => money(price.monto) > 0));
+  if (!hasPrice) missing.push("precio");
+  return { complete: missing.length === 0, missing };
+}
+
 function serializeProduct(product, lang = "es") {
   const translations = Object.fromEntries(
     product.traducciones.map((item) => [
@@ -41,15 +93,18 @@ function serializeProduct(product, lang = "es") {
     id: product.id,
     active: product.activo,
     published: product.estadoPublicacion === "publicado",
+    publicationStatus: product.estadoPublicacion,
     imageUrl: product.imagenUrl ?? "",
     translations,
     presentations: product.presentaciones.map((presentation) => ({
+      id: presentation.id,
       unit: presentation.tipoUnidad,
       prices: Object.fromEntries(presentation.precios.map((price) => [price.moneda, money(price.monto)]))
     })),
     name: localized.name,
     description: localized.description,
-    fallback: !translations[lang]
+    fallback: !translations[lang],
+    completeness: productCompleteness(product)
   };
 }
 
@@ -109,6 +164,13 @@ function serializeUser(user) {
   };
 }
 
+function serializeProductOption(product) {
+  const es = product.traducciones?.find((item) => item.idioma === "es");
+  const fallback = product.traducciones?.[0];
+  const name = es?.titulo || fallback?.titulo || "Producto sin nombre";
+  return { id: product.id, name };
+}
+
 export async function audit(user, operation, entity, detail, tx = prisma, userId = null) {
   const event = await tx.bitacoraEvento.create({
     data: {
@@ -122,14 +184,32 @@ export async function audit(user, operation, entity, detail, tx = prisma, userId
   return serializeAudit(event);
 }
 
-export async function getVisibleProducts(lang) {
+export async function getVisibleProducts(lang, filters = {}) {
+  const search = String(filters.search || "").trim();
   const products = await prisma.producto.findMany({
     where: {
       activo: true,
       estadoPublicacion: "publicado",
+      traducciones: {
+        some: {
+          idioma: "es",
+          titulo: { not: "" },
+          cuerpo: { not: "" }
+        }
+      },
+      ...(search ? {
+        AND: [{
+          traducciones: {
+            some: {
+              idioma: { in: [...new Set([lang, "es"])] },
+              titulo: { contains: search, mode: "insensitive" }
+            }
+          }
+        }]
+      } : {}),
       presentaciones: {
         some: {
-          precios: { some: {} }
+          precios: { some: { monto: { gt: 0 } } }
         }
       }
     },
@@ -143,6 +223,36 @@ export async function getVisibleProducts(lang) {
   });
 
   return products.map((product) => serializeProduct(product, lang));
+}
+
+export async function getPublicProduct(id, lang = "es") {
+  const product = await prisma.producto.findFirst({
+    where: {
+      id,
+      activo: true,
+      estadoPublicacion: "publicado",
+      traducciones: {
+        some: {
+          idioma: "es",
+          titulo: { not: "" },
+          cuerpo: { not: "" }
+        }
+      },
+      presentaciones: {
+        some: {
+          precios: { some: { monto: { gt: 0 } } }
+        }
+      }
+    },
+    include: {
+      traducciones: true,
+      presentaciones: {
+        include: { precios: true }
+      }
+    }
+  });
+
+  return product ? serializeProduct(product, lang) : null;
 }
 
 export async function getVisibleCertificates() {
@@ -203,23 +313,50 @@ export async function registerLoginSuccess(user, token, ip, expiresAt) {
 }
 
 export async function findActiveShipmentByCode(code) {
+  const includeNotifications = await hasShipmentNotificationColumns();
   const shipment = await prisma.despacho.findFirst({
     where: { codigoTracking: code, activo: true },
-    include: { estados: true }
+    select: shipmentSelect(includeNotifications)
   });
   return shipment ? serializeShipment(shipment) : null;
 }
 
-export async function getAdminData(user, page = 1, pageSize = 8) {
-  const [shipments, products, certificates, events, totalShipments, users] = await Promise.all([
+export async function getAdminData(user, page = 1, pageSize = 8, filters = {}) {
+  const includeNotifications = await hasShipmentNotificationColumns();
+  const productPage = Number(filters.productPage || 1);
+  const productPageSize = Number(filters.productPageSize || 8);
+  const productSearch = String(filters.productSearch || "").trim();
+  const productStatus = ["borrador", "publicado", "retirado"].includes(filters.productStatus) ? filters.productStatus : "";
+  const productWhere = {
+    ...(productStatus === "retirado" ? { activo: false } : { activo: true }),
+    ...(productStatus && productStatus !== "retirado" ? { estadoPublicacion: productStatus } : {}),
+    ...(productSearch ? {
+      traducciones: {
+        some: {
+          idioma: "es",
+          titulo: { contains: productSearch, mode: "insensitive" }
+        }
+      }
+    } : {})
+  };
+
+  const [shipments, products, productOptions, certificates, events, totalShipments, totalProducts, users] = await Promise.all([
     prisma.despacho.findMany({
-      include: { estados: true },
+      select: shipmentSelect(includeNotifications),
       orderBy: { fechaRegistro: "desc" },
       skip: (page - 1) * pageSize,
       take: pageSize
     }),
     prisma.producto.findMany({
+      where: productWhere,
       include: { traducciones: true, presentaciones: { include: { precios: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (productPage - 1) * productPageSize,
+      take: productPageSize
+    }),
+    prisma.producto.findMany({
+      where: { activo: true },
+      include: { traducciones: true },
       orderBy: { createdAt: "desc" }
     }),
     prisma.certificacion.findMany({ orderBy: { fechaVencimiento: "asc" } }),
@@ -227,6 +364,7 @@ export async function getAdminData(user, page = 1, pageSize = 8) {
       ? prisma.bitacoraEvento.findMany({ include: { usuario: true }, orderBy: { fechaHora: "desc" }, take: 100 })
       : Promise.resolve([]),
     prisma.despacho.count(),
+    prisma.producto.count({ where: productWhere }),
     user.role === "superadmin"
       ? prisma.usuario.findMany({ include: { roles: { include: { rol: true } } }, orderBy: { createdAt: "desc" } })
       : Promise.resolve([])
@@ -235,10 +373,12 @@ export async function getAdminData(user, page = 1, pageSize = 8) {
   return {
     shipments: shipments.map(serializeShipment),
     products: products.map((product) => serializeProduct(product, "es")),
+    productOptions: productOptions.map(serializeProductOption),
     certificates: certificates.map(serializeCertificate),
     audit: events.map(serializeAudit),
     users: users.map(serializeUser),
-    totalShipments
+    totalShipments,
+    totalProducts
   };
 }
 
@@ -275,18 +415,70 @@ export async function createUser(user, body) {
 }
 
 export async function createShipment(user, body) {
+  const includeNotifications = await hasShipmentNotificationColumns();
   return prisma.$transaction(async (tx) => {
     const code = await generateTrackingCode(tx);
     const now = new Date();
+    const shipmentId = crypto.randomUUID();
+    const notificationData = includeNotifications
+      ? {
+        emailCliente: body.emailCliente || null,
+        idiomaPreferido: body.idiomaPreferido || "es"
+      }
+      : {};
+
+    if (!includeNotifications) {
+      await tx.$executeRaw`
+        INSERT INTO despachos (
+          id,
+          codigo_tracking,
+          cliente,
+          destino,
+          producto,
+          estado_actual,
+          fecha_registro,
+          fecha_actualizacion,
+          activo,
+          usuario_id
+        ) VALUES (
+          ${shipmentId},
+          ${code},
+          ${body.client || "Cliente internacional"},
+          ${body.destination || "Destino pendiente"},
+          ${body.product || "Producto pendiente"},
+          ${"registrado"},
+          ${now},
+          ${now},
+          ${true},
+          ${user.id}
+        )
+      `;
+      await tx.estadoDespacho.create({
+        data: {
+          estado: "registrado",
+          fechaHora: now,
+          responsable: user.username,
+          observacion: "Despacho creado desde panel.",
+          despachoId: shipmentId
+        }
+      });
+      const shipment = await tx.despacho.findUnique({
+        where: { id: shipmentId },
+        select: shipmentSelect(false)
+      });
+      await audit(user.username, "crear", "despacho", code, tx, user.id);
+      return serializeShipment(shipment);
+    }
+
     const shipment = await tx.despacho.create({
       data: {
+        id: shipmentId,
         codigoTracking: code,
         cliente: body.client || "Cliente internacional",
         destino: body.destination || "Destino pendiente",
         producto: body.product || "Producto pendiente",
         estadoActual: "registrado",
-        emailCliente: body.emailCliente || null,
-        idiomaPreferido: body.idiomaPreferido || "es",
+        ...notificationData,
         fechaRegistro: now,
         fechaActualizacion: now,
         usuarioId: user.id,
@@ -299,7 +491,7 @@ export async function createShipment(user, body) {
           }
         }
       },
-      include: { estados: true }
+      select: shipmentSelect(includeNotifications)
     });
     await audit(user.username, "crear", "despacho", code, tx, user.id);
     return serializeShipment(shipment);
@@ -307,6 +499,7 @@ export async function createShipment(user, body) {
 }
 
 export async function updateShipment(user, body) {
+  const includeNotifications = await hasShipmentNotificationColumns();
   const allowed = ["registrado", "en tránsito", "entregado/cerrado"];
   const nextStatus = body.currentStatus || body.status;
   if (nextStatus && !allowed.includes(nextStatus)) {
@@ -314,15 +507,18 @@ export async function updateShipment(user, body) {
   }
 
   return prisma.$transaction(async (tx) => {
-    const existing = await tx.despacho.findUnique({ where: { id: body.id } });
+    const existing = await tx.despacho.findUnique({
+      where: { id: body.id },
+      select: shipmentSelect(includeNotifications)
+    });
     if (!existing) return { error: "Despacho no encontrado", status: 404 };
 
     const data = {};
     if (body.client !== undefined) data.cliente = body.client;
     if (body.destination !== undefined) data.destino = body.destination;
     if (body.product !== undefined) data.producto = body.product;
-    if (body.emailCliente !== undefined) data.emailCliente = body.emailCliente;
-    if (body.idiomaPreferido !== undefined) data.idiomaPreferido = body.idiomaPreferido;
+    if (includeNotifications && body.emailCliente !== undefined) data.emailCliente = body.emailCliente || null;
+    if (includeNotifications && body.idiomaPreferido !== undefined) data.idiomaPreferido = body.idiomaPreferido;
     if (nextStatus && nextStatus !== existing.estadoActual) {
       data.estadoActual = nextStatus;
       data.estados = {
@@ -339,7 +535,7 @@ export async function updateShipment(user, body) {
     const shipment = await tx.despacho.update({
       where: { id: existing.id },
       data,
-      include: { estados: true }
+      select: shipmentSelect(includeNotifications)
     });
 
     await audit(user.username, "actualizar", "despacho", shipment.codigoTracking, tx, user.id);
@@ -347,7 +543,7 @@ export async function updateShipment(user, body) {
       await audit(user.username, "actualizar_estado", "despacho", `${shipment.codigoTracking} -> ${nextStatus}`, tx, user.id);
     }
 
-    if (nextStatus && nextStatus !== existing.estadoActual && shipment.emailCliente) {
+    if (includeNotifications && nextStatus && nextStatus !== existing.estadoActual && shipment.emailCliente) {
       sendTrackingUpdate(
         shipment.emailCliente,
         shipment.codigoTracking,
@@ -366,13 +562,17 @@ export async function updateShipment(user, body) {
 }
 
 export async function updateShipmentStatus(user, body) {
+  const includeNotifications = await hasShipmentNotificationColumns();
   const allowed = ["registrado", "en tránsito", "entregado/cerrado"];
   if (!allowed.includes(body.status)) {
     return { error: "Estado no permitido", status: 400 };
   }
 
   return prisma.$transaction(async (tx) => {
-    const existing = await tx.despacho.findUnique({ where: { id: body.id }, include: { estados: true } });
+    const existing = await tx.despacho.findUnique({
+      where: { id: body.id },
+      select: shipmentSelect(includeNotifications)
+    });
     if (!existing) return { error: "Despacho no encontrado", status: 404 };
 
     const currentIndex = allowed.indexOf(existing.estadoActual);
@@ -396,12 +596,11 @@ export async function updateShipmentStatus(user, body) {
           }
         }
       },
-      include: { estados: true }
+      select: shipmentSelect(includeNotifications)
     });
     await audit(user.username, "actualizar_estado", "despacho", `${shipment.codigoTracking} -> ${body.status}`, tx, user.id);
 
-    if (shipment.emailCliente) {
-      const serialized = serializeShipment(shipment);
+    if (includeNotifications && shipment.emailCliente) {
       sendTrackingUpdate(
         shipment.emailCliente,
         shipment.codigoTracking,
@@ -419,51 +618,131 @@ export async function updateShipmentStatus(user, body) {
   });
 }
 
-export async function createProduct(user, body) {
-  const price = Number(body.price);
-  if (!["PEN", "USD", "EUR"].includes(body.currency) || !["TM", "Contenedor 20'", "Contenedor 40'"].includes(body.unit) || !(price > 0)) {
-    return { error: "Unidad, moneda o precio invalido", status: 400 };
+function normalizeProductPayload(body) {
+  const presentations = Array.isArray(body.presentations)
+    ? body.presentations
+      .map((presentation) => ({
+        unit: String(presentation.unit || "").trim(),
+        prices: Array.isArray(presentation.prices)
+          ? presentation.prices
+            .map((price) => ({
+              currency: String(price.currency || "").trim(),
+              amount: String(price.amount ?? "").trim()
+            }))
+            .filter((price) => price.currency || price.amount)
+          : []
+      }))
+      .filter((presentation) => presentation.unit || presentation.prices.length)
+    : [];
+
+  if (!presentations.length && body.unit) {
+    presentations.push({
+      unit: body.unit,
+      prices: [{ currency: body.currency || "USD", amount: String(body.price ?? "") }]
+    });
   }
+
+  return {
+    name: String(body.name || "").trim(),
+    description: String(body.description || "").trim(),
+    imageUrl: String(body.imageUrl || "").trim(),
+    publish: Boolean(body.publish),
+    active: body.active !== false,
+    presentations
+  };
+}
+
+function validateProductPayload(payload) {
+  const missing = [];
+  if (!payload.name) missing.push("nombre");
+  if (!payload.description) missing.push("descripcion");
+
+  const normalizedPresentations = [];
+  for (const presentation of payload.presentations) {
+    if (!PRODUCT_UNITS.includes(presentation.unit)) {
+      missing.push(`unidad ${presentation.unit || "vacia"}`);
+      continue;
+    }
+
+    const prices = [];
+    const currencies = new Set();
+    for (const price of presentation.prices) {
+      if (!price.amount) continue;
+      if (!PRODUCT_CURRENCIES.includes(price.currency)) {
+        missing.push(`moneda ${price.currency || "vacia"}`);
+        continue;
+      }
+      if (currencies.has(price.currency)) {
+        missing.push(`moneda duplicada ${presentation.unit}/${price.currency}`);
+        continue;
+      }
+      currencies.add(price.currency);
+      if (!validPriceValue(price.amount)) {
+        missing.push(`precio ${presentation.unit}/${price.currency}`);
+        continue;
+      }
+      prices.push({
+        moneda: price.currency,
+        monto: Number(price.amount).toFixed(2)
+      });
+    }
+
+    normalizedPresentations.push({ tipoUnidad: presentation.unit, prices });
+  }
+
+  const hasValidPrice = normalizedPresentations.some((presentation) => presentation.prices.length > 0);
+  if (payload.publish) {
+    if (!normalizedPresentations.length) missing.push("presentacion");
+    if (!hasValidPrice) missing.push("precio");
+  }
+
+  if (missing.length) {
+    return { error: `Producto incompleto: ${[...new Set(missing)].join(", ")}`, status: 400 };
+  }
+
+  return { presentations: normalizedPresentations.filter((presentation) => presentation.prices.length > 0) };
+}
+
+export async function createProduct(user, body) {
+  const payload = normalizeProductPayload(body);
+  const validation = validateProductPayload(payload);
+  if (validation.error) return validation;
 
   return prisma.$transaction(async (tx) => {
     const product = await tx.producto.create({
       data: {
         activo: true,
-        imagenUrl: body.imageUrl || null,
-        estadoPublicacion: body.publish ? "publicado" : "borrador",
+        imagenUrl: payload.imageUrl || null,
+        estadoPublicacion: payload.publish ? "publicado" : "borrador",
         traducciones: {
           create: {
             idioma: "es",
-            titulo: body.name,
-            cuerpo: body.description,
-            estado: body.publish ? "publicado" : "borrador"
+            titulo: payload.name,
+            cuerpo: payload.description,
+            estado: payload.publish ? "publicado" : "borrador"
           }
         },
         presentaciones: {
-          create: {
-            tipoUnidad: body.unit,
+          create: validation.presentations.map((presentation) => ({
+            tipoUnidad: presentation.tipoUnidad,
             precios: {
-              create: {
-                moneda: body.currency,
-                monto: price
-              }
+              create: presentation.prices
             }
-          }
+          }))
         }
       },
       include: { traducciones: true, presentaciones: { include: { precios: true } } }
     });
-    await audit(user.username, "crear", "producto", body.name, tx, user.id);
+    await audit(user.username, "crear", "producto", payload.name, tx, user.id);
     return { item: serializeProduct(product, "es") };
   });
 }
 
 export async function updateProduct(user, body) {
-  const price = Number(body.price);
   if (!body.id) return { error: "Producto no encontrado", status: 404 };
-  if (!["PEN", "USD", "EUR"].includes(body.currency) || !["TM", "Contenedor 20'", "Contenedor 40'"].includes(body.unit) || !(price > 0)) {
-    return { error: "Unidad, moneda o precio invalido", status: 400 };
-  }
+  const payload = normalizeProductPayload(body);
+  const validation = validateProductPayload(payload);
+  if (validation.error) return validation;
 
   return prisma.$transaction(async (tx) => {
     const existing = await tx.producto.findUnique({ where: { id: body.id } });
@@ -472,16 +751,16 @@ export async function updateProduct(user, body) {
     await tx.traduccion.upsert({
       where: { productoId_idioma: { productoId: body.id, idioma: "es" } },
       update: {
-        titulo: body.name,
-        cuerpo: body.description,
-        estado: body.publish ? "publicado" : "borrador"
+        titulo: payload.name,
+        cuerpo: payload.description,
+        estado: payload.publish ? "publicado" : "borrador"
       },
       create: {
         productoId: body.id,
         idioma: "es",
-        titulo: body.name,
-        cuerpo: body.description,
-        estado: body.publish ? "publicado" : "borrador"
+        titulo: payload.name,
+        cuerpo: payload.description,
+        estado: payload.publish ? "publicado" : "borrador"
       }
     });
 
@@ -490,25 +769,22 @@ export async function updateProduct(user, body) {
     const product = await tx.producto.update({
       where: { id: body.id },
       data: {
-        activo: body.active !== false,
-        imagenUrl: body.imageUrl || null,
-        estadoPublicacion: body.publish ? "publicado" : "borrador",
+        activo: payload.active,
+        imagenUrl: payload.imageUrl || null,
+        estadoPublicacion: payload.publish ? "publicado" : "borrador",
         presentaciones: {
-          create: {
-            tipoUnidad: body.unit,
+          create: validation.presentations.map((presentation) => ({
+            tipoUnidad: presentation.tipoUnidad,
             precios: {
-              create: {
-                moneda: body.currency,
-                monto: price
-              }
+              create: presentation.prices
             }
-          }
+          }))
         }
       },
       include: { traducciones: true, presentaciones: { include: { precios: true } } }
     });
 
-    await audit(user.username, "actualizar", "producto", body.name, tx, user.id);
+    await audit(user.username, "actualizar", "producto", payload.name, tx, user.id);
     return { item: serializeProduct(product, "es") };
   });
 }
@@ -607,7 +883,10 @@ async function generateTrackingCode(tx) {
   for (let attempt = 0; attempt < 8; attempt += 1) {
     const random = crypto.randomUUID().replace(/-/g, "").slice(0, 4).toUpperCase();
     const code = `NDX-${random}-${new Date().getFullYear()}`;
-    const existing = await tx.despacho.findUnique({ where: { codigoTracking: code } });
+    const existing = await tx.despacho.findUnique({
+      where: { codigoTracking: code },
+      select: { id: true }
+    });
     if (!existing) return code;
   }
   throw new Error("No se pudo generar un codigo de tracking unico.");

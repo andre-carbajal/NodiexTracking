@@ -1,7 +1,5 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "");
-
 const templates = {
   es: {
     subject: (code) => `NODIEX — Actualizacion de su despacho ${code}`,
@@ -53,8 +51,15 @@ const templates = {
   }
 };
 
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  return new Resend(apiKey);
+}
+
 export async function sendTrackingUpdate(email, codigo, nuevoEstado, destino, idioma = "es") {
-  if (!email || !process.env.RESEND_API_KEY) return null;
+  const resend = getResendClient();
+  if (!email || !resend) return null;
 
   const lang = templates[idioma] ? idioma : "es";
   const template = templates[lang];

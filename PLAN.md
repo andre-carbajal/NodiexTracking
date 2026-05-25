@@ -139,40 +139,40 @@
 ### 3.3 Módulo Catálogo — SEMANA 6-7
 
 #### 3.3.1 Gestión de productos (mejoras)
-- [ ] Revisar `<ProductosList />`: tabla paginada con filtros por nombre y estado
-- [ ] Implementar paginación real en API para productos
-- [ ] Revisar `<ProductoForm />`: campos nombre, descripción, categoría + upload de imagen
-- [ ] Agregar upload de imagen del producto a Cloudflare R2 (`lib/storage.js`)
-- [ ] Mostrar preview de imagen antes de guardar
-- [ ] Validar campos obligatorios: nombre, descripción (RN-08)
+- [x] Revisar `<ProductosList />`: tabla paginada con filtros por nombre y estado
+- [x] Implementar paginación real en API para productos
+- [x] Revisar `<ProductoForm />`: campos nombre, descripción + upload de imagen
+- [x] Agregar upload de imagen del producto a Cloudflare R2 (`lib/storage.js`)
+- [x] Mostrar preview de imagen antes de guardar
+- [x] Validar campos obligatorios: nombre, descripción (RN-08)
 
 #### 3.3.2 Gestión de presentaciones logísticas
-- [ ] En `<ProductoForm />`: sección "Presentaciones" dentro del formulario de producto
-- [ ] Selector de tipo de unidad: TM, Contenedor 20', Contenedor 40' (RN-06)
-- [ ] Agregar/eliminar presentaciones dinámicamente (múltiples por producto)
-- [ ] Validar que tipo de unidad sea uno de los 3 permitidos
+- [x] En `<ProductoForm />`: sección "Presentaciones" dentro del formulario de producto
+- [x] Selector de tipo de unidad: TM, Contenedor 20', Contenedor 40' (RN-06)
+- [x] Agregar/eliminar presentaciones dinámicamente (múltiples por producto)
+- [x] Validar que tipo de unidad sea uno de los 3 permitidos
 
 #### 3.3.3 Gestión de precios multimoneda
-- [ ] En cada presentación: sub-sección "Precios"
-- [ ] Selector de moneda: PEN, USD, EUR (RN-07)
-- [ ] Campo monto: numérico con validación > 0 y 2 decimales máx (RN-07, RNF-06)
-- [ ] Agregar/quitar precios dinámicamente por presentación
-- [ ] Validar que al menos 1 precio esté definido para poder publicar (RN-08)
+- [x] En cada presentación: sub-sección "Precios"
+- [x] Selector de moneda: PEN, USD, EUR (RN-07)
+- [x] Campo monto: numérico con validación > 0 y 2 decimales máx (RN-07, RNF-06)
+- [x] Agregar/quitar precios dinámicamente por presentación
+- [x] Validar que al menos 1 precio esté definido para poder publicar (RN-08)
 
 #### 3.3.4 Publicación controlada
-- [ ] Botón "Publicar" con validación previa de completitud (RN-08)
-- [ ] Indicador visual de estado: borrador (gris), completo no publicado (amarillo), publicado (verde)
-- [ ] Al publicar: verificar nombre, descripción, al menos 1 presentación, al menos 1 precio > 0
-- [ ] Producto incompleto no se puede publicar: mostrar lista de campos faltantes
+- [x] Botón "Publicar" con validación previa de completitud (RN-08)
+- [x] Indicador visual de estado: borrador (gris), completo no publicado (amarillo), publicado (verde)
+- [x] Al publicar: verificar nombre, descripción, al menos 1 presentación, al menos 1 precio > 0
+- [x] Producto incompleto no se puede publicar: mostrar lista de campos faltantes
 
 #### 3.3.5 Mejoras al catálogo público
-- [ ] Revisar `<CatalogSection />`: los filtros actuales son decorativos, hacerlos funcionales
-- [ ] Implementar filtro real por nombre de producto en el frontend
-- [ ] Hacer funcional el botón "Descargar ficha técnica" (generar PDF simple con datos del producto)
-- [ ] Mejorar `<CatalogCard />` con imagen del producto, precios destacados en 3 monedas
-- [ ] Crear ruta `/productos` como página independiente (no solo sección en landing)
-- [ ] Crear ruta `/productos/[id]` con página de detalle de producto individual
-- [ ] Implementar SEO: metadatos dinámicos por producto y por idioma
+- [x] Revisar `<CatalogSection />`: los filtros actuales son decorativos, hacerlos funcionales
+- [x] Implementar filtro real por nombre de producto en el frontend
+- [x] Hacer funcional el botón "Descargar ficha técnica" (generar PDF simple con datos del producto)
+- [x] Mejorar `<CatalogCard />` con imagen del producto, precios destacados en 3 monedas
+- [x] Crear ruta `/productos` como página independiente (no solo sección en landing)
+- [x] Crear ruta `/productos/[id]` con página de detalle de producto individual
+- [x] Implementar SEO: metadatos dinámicos por producto y por idioma
 
 ### 3.4 Módulo de Certificaciones — SEMANA 7
 
@@ -332,9 +332,9 @@
 - [x] RN-03: Rate limiting 30 consultas/10min/IP en endpoint tracking
 - [x] RN-04: Solo usuario autenticado con JWT + rol operativo actualiza estados
 - [x] RN-05: Flujo de estados: Registrado → En Tránsito → Entregado (sin saltos)
-- [ ] RN-06: Unidades de catálogo restringidas a TM, Contenedor 20', Contenedor 40'
-- [ ] RN-07: Monedas PEN/USD/EUR con monto > 0 y formato decimal válido
-- [ ] RN-08: Producto publicable solo con nombre, descripción, presentación, al menos 1 precio > 0
+- [x] RN-06: Unidades de catálogo restringidas a TM, Contenedor 20', Contenedor 40'
+- [x] RN-07: Monedas PEN/USD/EUR con monto > 0 y formato decimal válido
+- [x] RN-08: Producto publicable solo con nombre, descripción, presentación, al menos 1 precio > 0
 - [ ] RN-09: Certificaciones con tipo, vigencia y archivo; vencidas se conservan no vigentes
 - [ ] RN-10: ES obligatorio; EN/PT progresivos con fallback a ES con indicador visual
 - [x] RN-11: Panel requiere JWT vigente (8h); bloqueo tras 5 intentos fallidos

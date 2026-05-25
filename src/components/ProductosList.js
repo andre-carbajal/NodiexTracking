@@ -4,6 +4,13 @@ import { Eye, EyeOff, Pencil, Trash2 } from "lucide-react";
 import Image from "next/image";
 import EmptyState from "@/components/EmptyState";
 
+function productStatus(item) {
+  if (!item.active) return "Retirado";
+  if (item.published) return "Publicado";
+  if (item.completeness?.complete) return "Completo no publicado";
+  return "Borrador";
+}
+
 export default function ProductosList({ products = [], onEdit, onDelete, onToggle }) {
   if (products.length === 0) {
     return <EmptyState title="Sin productos" description="Crea el primer producto con el formulario de arriba." />;
@@ -22,7 +29,9 @@ export default function ProductosList({ products = [], onEdit, onDelete, onToggl
             const price = Object.entries(p.prices || {})[0];
             return price ? `${p.unit} · ${price[0]} ${price[1]}` : p.unit;
           }).join(", ")}</span>
-          <span className="status-pill">{item.active ? (item.published ? "Publicado" : "Borrador") : "Retirado"}</span>
+          <span className={`status-pill ${item.published ? "published" : item.completeness?.complete ? "complete" : "draft"}`}>
+            {productStatus(item)}
+          </span>
           <div className="row-actions">
             <button className="ghost-button small" onClick={() => onEdit(item)} title="Editar producto">
               <Pencil size={14} />
