@@ -1,129 +1,355 @@
-import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
 
-const now = new Date().toISOString();
+const globalRateLimit = globalThis.__nodiexRateLimit ?? new Map();
+globalThis.__nodiexRateLimit = globalRateLimit;
 
-const initialProducts = [
-  {
-    id: "prod-olive",
-    active: true,
-    published: true,
-    translations: {
-      es: { name: "Aceituna de mesa", description: "Producto seleccionado para exportación, calibrado y preparado para compradores internacionales." },
-      en: { name: "Table olives", description: "Selected export-ready product, graded and prepared for international buyers." },
-      pt: { name: "Azeitona de mesa", description: "Produto selecionado para exportação, calibrado e preparado para compradores internacionais." }
-    },
-    presentations: [
-      { unit: "TM", prices: { PEN: 4200, USD: 1125, EUR: 1035 } },
-      { unit: "Contenedor 20'", prices: { USD: 21400, EUR: 19600 } }
-    ]
-  },
-  {
-    id: "prod-oregano",
-    active: true,
-    published: true,
-    translations: {
-      es: { name: "Orégano seco", description: "Lote agroexportable con control de calidad y documentación comercial disponible." },
-      en: { name: "Dried oregano", description: "Exportable agricultural lot with quality control and commercial documentation available." }
-    },
-    presentations: [
-      { unit: "TM", prices: { PEN: 8800, USD: 2350, EUR: 2160 } },
-      { unit: "Contenedor 40'", prices: { USD: 46800 } }
-    ]
-  }
-];
-
-const initialCertificates = [
-  { id: "cert-senasa", type: "SENASA", status: "vigente", validUntil: "2026-12-31", evidence: "Certificado fitosanitario vigente", published: true },
-  { id: "cert-brc", type: "BRC", status: "vigente", validUntil: "2026-10-15", evidence: "Evidencia de inocuidad alimentaria", published: true },
-  { id: "cert-iso", type: "ISO", status: "vigente", validUntil: "2027-02-20", evidence: "Sistema de gestion de calidad", published: true },
-  { id: "cert-basc-old", type: "BASC", status: "vencida", validUntil: "2024-09-01", evidence: "Registro historico conservado", published: false }
-];
-
-const initialShipments = [
-  {
-    id: "ship-001",
-    code: "NDX-8Q4M-2026",
-    client: "Andes Import LLC",
-    destination: "Miami, Estados Unidos",
-    product: "Aceituna de mesa",
-    currentStatus: "en tránsito",
-    createdAt: "2026-05-01T09:15:00.000Z",
-    updatedAt: "2026-05-23T15:20:00.000Z",
-    active: true,
-    history: [
-      { status: "registrado", at: "2026-05-01T09:15:00.000Z", responsible: "Admin Operativo", note: "Despacho registrado en NODIEX." },
-      { status: "en tránsito", at: "2026-05-23T15:20:00.000Z", responsible: "Admin Operativo", note: "Contenedor en ruta internacional." }
-    ]
-  },
-  {
-    id: "ship-002",
-    code: "NDX-P7K2-2026",
-    client: "Lusitana Foods",
-    destination: "Lisboa, Portugal",
-    product: "Orégano seco",
-    currentStatus: "entregado/cerrado",
-    createdAt: "2026-04-20T11:40:00.000Z",
-    updatedAt: "2026-05-18T18:05:00.000Z",
-    active: true,
-    history: [
-      { status: "registrado", at: "2026-04-20T11:40:00.000Z", responsible: "Admin Operativo", note: "Codigo generado." },
-      { status: "en tránsito", at: "2026-04-30T08:00:00.000Z", responsible: "Admin Operativo", note: "Salida confirmada." },
-      { status: "entregado/cerrado", at: "2026-05-18T18:05:00.000Z", responsible: "Admin Operativo", note: "Entrega cerrada." }
-    ]
-  }
-];
-
-const passwordHash = bcrypt.hashSync("Nodiex2026!", 10);
-
-const initialUsers = [
-  { id: "u-admin", username: "admin", passwordHash, role: "superadmin", failedAttempts: 0, lockedUntil: null },
-  { id: "u-operativo", username: "operativo", passwordHash, role: "operativo", failedAttempts: 0, lockedUntil: null },
-  { id: "u-comercial", username: "comercial", passwordHash, role: "comercial", failedAttempts: 0, lockedUntil: null },
-  { id: "u-gerencia", username: "gerencia", passwordHash, role: "gerencia", failedAttempts: 0, lockedUntil: null }
-];
-
-const globalStore = globalThis.__nodiexStore ?? {
-  products: initialProducts,
-  certificates: initialCertificates,
-  shipments: initialShipments,
-  users: initialUsers,
-  audit: [
-    { id: "audit-seed", user: "sistema", operation: "seed", entity: "sistema", createdAt: now, detail: "Datos iniciales cargados." }
-  ],
-  rateLimit: new Map()
+export const store = {
+  rateLimit: globalRateLimit
 };
 
-globalThis.__nodiexStore = globalStore;
+function roleNames(user) {
+  return user?.roles?.map((item) => item.rol.nombreRol) ?? [];
+}
 
-export const store = globalStore;
-
-export function audit(user, operation, entity, detail) {
-  const event = {
-    id: crypto.randomUUID(),
-    user,
-    operation,
-    entity,
-    detail,
-    createdAt: new Date().toISOString()
+export function userSessionPayload(user) {
+  const roles = roleNames(user);
+  return {
+    id: user.id,
+    username: user.username,
+    role: roles[0] ?? "cliente_b2b_publico",
+    roles
   };
-  store.audit.unshift(event);
-  return event;
 }
 
-export function publicProduct(product, lang) {
-  const base = product.translations.es;
-  const localized = product.translations[lang] ?? base;
-  const fallback = !product.translations[lang];
-  return { ...product, name: localized.name, description: localized.description, fallback };
+function money(value) {
+  return Number(value);
 }
 
-export function getVisibleProducts(lang) {
-  return store.products
-    .filter((product) => product.active && product.published && product.presentations?.some((item) => Object.keys(item.prices ?? {}).length))
-    .map((product) => publicProduct(product, lang));
+function serializeProduct(product, lang = "es") {
+  const translations = Object.fromEntries(
+    product.traducciones.map((item) => [
+      item.idioma,
+      { name: item.titulo ?? "", description: item.cuerpo ?? "" }
+    ])
+  );
+  const base = translations.es ?? { name: "", description: "" };
+  const localized = translations[lang] ?? base;
+
+  return {
+    id: product.id,
+    active: product.activo,
+    published: product.estadoPublicacion === "publicado",
+    translations,
+    presentations: product.presentaciones.map((presentation) => ({
+      unit: presentation.tipoUnidad,
+      prices: Object.fromEntries(presentation.precios.map((price) => [price.moneda, money(price.monto)]))
+    })),
+    name: localized.name,
+    description: localized.description,
+    fallback: !translations[lang]
+  };
 }
 
-export function getVisibleCertificates() {
-  const today = new Date();
-  return store.certificates.filter((certificate) => certificate.published && certificate.status === "vigente" && new Date(certificate.validUntil) >= today);
+function serializeCertificate(certificate) {
+  return {
+    id: certificate.id,
+    type: certificate.tipo,
+    status: certificate.estadoVigencia,
+    validUntil: certificate.fechaVencimiento.toISOString().slice(0, 10),
+    evidence: certificate.evidencia ?? certificate.urlEvidencia ?? "",
+    published: certificate.publicado
+  };
+}
+
+function serializeShipment(shipment) {
+  return {
+    id: shipment.id,
+    code: shipment.codigoTracking,
+    client: shipment.cliente,
+    destination: shipment.destino,
+    product: shipment.producto,
+    currentStatus: shipment.estadoActual,
+    createdAt: shipment.fechaRegistro.toISOString(),
+    updatedAt: shipment.fechaActualizacion.toISOString(),
+    active: shipment.activo,
+    history: [...(shipment.estados ?? [])]
+      .sort((a, b) => a.fechaHora.getTime() - b.fechaHora.getTime())
+      .map((event) => ({
+        status: event.estado,
+        at: event.fechaHora.toISOString(),
+        responsible: event.responsable,
+        note: event.observacion ?? ""
+      }))
+  };
+}
+
+function serializeAudit(event) {
+  return {
+    id: event.id,
+    user: event.usuarioNombre ?? event.usuario?.username ?? "sistema",
+    operation: event.accion,
+    entity: event.entidad,
+    createdAt: event.fechaHora.toISOString(),
+    detail: event.detalle?.detail ?? String(event.detalle ?? "")
+  };
+}
+
+export async function audit(user, operation, entity, detail, tx = prisma, userId = null) {
+  const event = await tx.bitacoraEvento.create({
+    data: {
+      usuarioId: userId,
+      usuarioNombre: user,
+      accion: operation,
+      entidad: entity,
+      detalle: { detail }
+    }
+  });
+  return serializeAudit(event);
+}
+
+export async function getVisibleProducts(lang) {
+  const products = await prisma.producto.findMany({
+    where: {
+      activo: true,
+      estadoPublicacion: "publicado",
+      presentaciones: {
+        some: {
+          precios: { some: {} }
+        }
+      }
+    },
+    include: {
+      traducciones: true,
+      presentaciones: {
+        include: { precios: true }
+      }
+    },
+    orderBy: { createdAt: "asc" }
+  });
+
+  return products.map((product) => serializeProduct(product, lang));
+}
+
+export async function getVisibleCertificates() {
+  const certificates = await prisma.certificacion.findMany({
+    where: {
+      publicado: true,
+      estadoVigencia: "vigente",
+      fechaVencimiento: { gte: new Date() }
+    },
+    orderBy: { fechaVencimiento: "asc" }
+  });
+
+  return certificates.map(serializeCertificate);
+}
+
+export async function getUserByUsername(username) {
+  return prisma.usuario.findUnique({
+    where: { username },
+    include: { roles: { include: { rol: true } } }
+  });
+}
+
+export async function registerLoginFailure(user) {
+  const nextAttempts = user.failedAttempts + 1;
+  const shouldLock = nextAttempts >= 5;
+  await prisma.$transaction(async (tx) => {
+    await tx.usuario.update({
+      where: { id: user.id },
+      data: {
+        failedAttempts: shouldLock ? 0 : nextAttempts,
+        lockedUntil: shouldLock ? new Date(Date.now() + 15 * 60 * 1000) : user.lockedUntil
+      }
+    });
+    await audit(user.username, "login_fallido", "usuario", "Credenciales invalidas", tx, user.id);
+  });
+}
+
+export async function registerLoginSuccess(user, token, ip, expiresAt) {
+  await prisma.$transaction(async (tx) => {
+    await tx.usuario.update({
+      where: { id: user.id },
+      data: {
+        failedAttempts: 0,
+        lockedUntil: null,
+        ultimoAcceso: new Date()
+      }
+    });
+    await tx.sesion.create({
+      data: {
+        tokenJwt: token,
+        fechaExpiracion: expiresAt,
+        ipOrigen: ip,
+        usuarioId: user.id
+      }
+    });
+    await audit(user.username, "login_exitoso", "usuario", `Rol ${userSessionPayload(user).role}`, tx, user.id);
+  });
+}
+
+export async function findActiveShipmentByCode(code) {
+  const shipment = await prisma.despacho.findFirst({
+    where: { codigoTracking: code, activo: true },
+    include: { estados: true }
+  });
+  return shipment ? serializeShipment(shipment) : null;
+}
+
+export async function getAdminData(user) {
+  const [shipments, products, certificates, events] = await Promise.all([
+    prisma.despacho.findMany({ include: { estados: true }, orderBy: { fechaRegistro: "desc" } }),
+    prisma.producto.findMany({
+      include: { traducciones: true, presentaciones: { include: { precios: true } } },
+      orderBy: { createdAt: "desc" }
+    }),
+    prisma.certificacion.findMany({ orderBy: { fechaVencimiento: "asc" } }),
+    user.canReadAudit
+      ? prisma.bitacoraEvento.findMany({ include: { usuario: true }, orderBy: { fechaHora: "desc" }, take: 100 })
+      : Promise.resolve([])
+  ]);
+
+  return {
+    shipments: shipments.map(serializeShipment),
+    products: products.map((product) => serializeProduct(product, "es")),
+    certificates: certificates.map(serializeCertificate),
+    audit: events.map(serializeAudit)
+  };
+}
+
+export async function createShipment(user, body) {
+  return prisma.$transaction(async (tx) => {
+    const code = await generateTrackingCode(tx);
+    const now = new Date();
+    const shipment = await tx.despacho.create({
+      data: {
+        codigoTracking: code,
+        cliente: body.client || "Cliente internacional",
+        destino: body.destination || "Destino pendiente",
+        producto: body.product || "Producto pendiente",
+        estadoActual: "registrado",
+        fechaRegistro: now,
+        fechaActualizacion: now,
+        usuarioId: user.id,
+        estados: {
+          create: {
+            estado: "registrado",
+            fechaHora: now,
+            responsable: user.username,
+            observacion: "Despacho creado desde panel."
+          }
+        }
+      },
+      include: { estados: true }
+    });
+    await audit(user.username, "crear", "despacho", code, tx, user.id);
+    return serializeShipment(shipment);
+  });
+}
+
+export async function updateShipmentStatus(user, body) {
+  const allowed = ["registrado", "en tránsito", "entregado/cerrado"];
+  if (!allowed.includes(body.status)) {
+    return { error: "Estado no permitido", status: 400 };
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.despacho.findUnique({ where: { id: body.id }, include: { estados: true } });
+    if (!existing) return { error: "Estado no permitido", status: 400 };
+
+    const currentIndex = allowed.indexOf(existing.estadoActual);
+    const nextIndex = allowed.indexOf(body.status);
+    if (nextIndex < currentIndex && !body.reason) {
+      return { error: "Reversion requiere motivo", status: 400 };
+    }
+
+    const now = new Date();
+    const shipment = await tx.despacho.update({
+      where: { id: existing.id },
+      data: {
+        estadoActual: body.status,
+        fechaActualizacion: now,
+        estados: {
+          create: {
+            estado: body.status,
+            fechaHora: now,
+            responsable: user.username,
+            observacion: body.reason || "Actualizacion operativa."
+          }
+        }
+      },
+      include: { estados: true }
+    });
+    await audit(user.username, "actualizar_estado", "despacho", `${shipment.codigoTracking} -> ${body.status}`, tx, user.id);
+    return { item: serializeShipment(shipment) };
+  });
+}
+
+export async function createProduct(user, body) {
+  const price = Number(body.price);
+  if (!["PEN", "USD", "EUR"].includes(body.currency) || !["TM", "Contenedor 20'", "Contenedor 40'"].includes(body.unit) || !(price > 0)) {
+    return { error: "Unidad, moneda o precio invalido", status: 400 };
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const product = await tx.producto.create({
+      data: {
+        activo: true,
+        estadoPublicacion: body.publish ? "publicado" : "borrador",
+        traducciones: {
+          create: {
+            idioma: "es",
+            titulo: body.name,
+            cuerpo: body.description,
+            estado: body.publish ? "publicado" : "borrador"
+          }
+        },
+        presentaciones: {
+          create: {
+            tipoUnidad: body.unit,
+            precios: {
+              create: {
+                moneda: body.currency,
+                monto: price
+              }
+            }
+          }
+        }
+      },
+      include: { traducciones: true, presentaciones: { include: { precios: true } } }
+    });
+    await audit(user.username, "crear", "producto", body.name, tx, user.id);
+    return { item: serializeProduct(product, "es") };
+  });
+}
+
+export async function createCertificate(user, body) {
+  if (!["SENASA", "BRC", "ISO", "BASC"].includes(body.certType) || !body.validUntil || !body.evidence) {
+    return { error: "Certificacion incompleta", status: 400 };
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const validUntil = new Date(`${body.validUntil}T00:00:00.000Z`);
+    const valid = validUntil >= new Date();
+    const certificate = await tx.certificacion.create({
+      data: {
+        tipo: body.certType,
+        fechaVencimiento: validUntil,
+        evidencia: body.evidence,
+        estadoVigencia: valid ? "vigente" : "vencida",
+        publicado: valid
+      }
+    });
+    await audit(user.username, "crear", "certificacion", body.certType, tx, user.id);
+    return { item: serializeCertificate(certificate) };
+  });
+}
+
+async function generateTrackingCode(tx) {
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const random = crypto.randomUUID().replace(/-/g, "").slice(0, 4).toUpperCase();
+    const code = `NDX-${random}-${new Date().getFullYear()}`;
+    const existing = await tx.despacho.findUnique({ where: { codigoTracking: code } });
+    if (!existing) return code;
+  }
+  throw new Error("No se pudo generar un codigo de tracking unico.");
 }

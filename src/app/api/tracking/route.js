@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { audit, store } from "@/lib/store";
+import { audit, findActiveShipmentByCode, store } from "@/lib/store";
 
 const MAX_REQUESTS = 30;
 const WINDOW_MS = 10 * 60 * 1000;
@@ -22,9 +22,9 @@ export async function POST(request) {
   const { code } = await request.json().catch(() => ({}));
   const normalized = String(code ?? "").trim().toUpperCase();
   const validFormat = /^NDX-[A-Z0-9]{4}-20\d{2}$/.test(normalized);
-  const shipment = validFormat ? store.shipments.find((item) => item.code === normalized && item.active) : null;
+  const shipment = validFormat ? await findActiveShipmentByCode(normalized) : null;
 
-  audit("public", shipment ? "tracking_consultado" : "tracking_fallido", "despacho", validFormat ? normalized : "formato invalido");
+  await audit("public", shipment ? "tracking_consultado" : "tracking_fallido", "despacho", validFormat ? normalized : "formato invalido");
 
   if (!shipment) {
     return NextResponse.json({ ok: false, message: "No se pudo validar el codigo ingresado." }, { status: 404 });

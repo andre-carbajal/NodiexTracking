@@ -9,8 +9,12 @@ export const permissions = {
   gerencia: ["audit:read"]
 };
 
-export function signUser(user) {
-  return jwt.sign({ sub: user.id, username: user.username, role: user.role }, secret, { expiresIn: "8h" });
+export function signUser(user, expiresAt = new Date(Date.now() + 8 * 60 * 60 * 1000)) {
+  return jwt.sign(
+    { sub: user.id, id: user.id, username: user.username, role: user.role, roles: user.roles ?? [user.role] },
+    secret,
+    { expiresIn: Math.max(1, Math.floor((expiresAt.getTime() - Date.now()) / 1000)) }
+  );
 }
 
 export function verifyToken(request) {
