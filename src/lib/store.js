@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { sendTrackingUpdate } from "@/lib/notifications";
 
 const globalRateLimit = globalThis.__nodiexRateLimit ?? new Map();
 globalThis.__nodiexRateLimit = globalRateLimit;
@@ -69,6 +70,8 @@ function serializeShipment(shipment) {
     destination: shipment.destino,
     product: shipment.producto,
     currentStatus: shipment.estadoActual,
+    emailCliente: shipment.emailCliente ?? "",
+    idiomaPreferido: shipment.idiomaPreferido ?? "es",
     createdAt: shipment.fechaRegistro.toISOString(),
     updatedAt: shipment.fechaActualizacion.toISOString(),
     active: shipment.activo,
@@ -195,9 +198,14 @@ export async function findActiveShipmentByCode(code) {
   return shipment ? serializeShipment(shipment) : null;
 }
 
-export async function getAdminData(user) {
-  const [shipments, products, certificates, events] = await Promise.all([
-    prisma.despacho.findMany({ include: { estados: true }, orderBy: { fechaRegistro: "desc" } }),
+export async function getAdminData(user, page = 1, pageSize = 8) {
+  const [shipments, products, certificates, events, totalShipments] = await Promise.all([
+    prisma.despacho.findMany({
+      include: { estados: true },
+      orderBy: { fechaRegistro: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize
+    }),
     prisma.producto.findMany({
       include: { traducciones: true, presentaciones: { include: { precios: true } } },
       orderBy: { createdAt: "desc" }
@@ -205,14 +213,16 @@ export async function getAdminData(user) {
     prisma.certificacion.findMany({ orderBy: { fechaVencimiento: "asc" } }),
     user.canReadAudit
       ? prisma.bitacoraEvento.findMany({ include: { usuario: true }, orderBy: { fechaHora: "desc" }, take: 100 })
-      : Promise.resolve([])
+      : Promise.resolve([]),
+    prisma.despacho.count()
   ]);
 
   return {
     shipments: shipments.map(serializeShipment),
     products: products.map((product) => serializeProduct(product, "es")),
     certificates: certificates.map(serializeCertificate),
-    audit: events.map(serializeAudit)
+    audit: events.map(serializeAudit),
+    totalShipments
   };
 }
 
@@ -227,6 +237,8 @@ export async function createShipment(user, body) {
         destino: body.destination || "Destino pendiente",
         producto: body.product || "Producto pendiente",
         estadoActual: "registrado",
+        emailCliente: body.emailCliente || null,
+        idiomaPreferido: body.idiomaPreferido || "es",
         fechaRegistro: now,
         fechaActualizacion: now,
         usuarioId: user.id,
@@ -246,6 +258,30 @@ export async function createShipment(user, body) {
   });
 }
 
+export async function updateShipment(user, body) {
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.despacho.findUnique({ where: { id: body.id } });
+    if (!existing) return { error: "Despacho no encontrado", status: 404 };
+
+    const data = {};
+    if (body.client !== undefined) data.cliente = body.client;
+    if (body.destination !== undefined) data.destino = body.destination;
+    if (body.product !== undefined) data.producto = body.product;
+    if (body.emailCliente !== undefined) data.emailCliente = body.emailCliente;
+    if (body.idiomaPreferido !== undefined) data.idiomaPreferido = body.idiomaPreferido;
+    data.fechaActualizacion = new Date();
+
+    const shipment = await tx.despacho.update({
+      where: { id: existing.id },
+      data,
+      include: { estados: true }
+    });
+
+    await audit(user.username, "actualizar", "despacho", shipment.codigoTracking, tx, user.id);
+    return { item: serializeShipment(shipment) };
+  });
+}
+
 export async function updateShipmentStatus(user, body) {
   const allowed = ["registrado", "en tránsito", "entregado/cerrado"];
   if (!allowed.includes(body.status)) {
@@ -254,12 +290,12 @@ export async function updateShipmentStatus(user, body) {
 
   return prisma.$transaction(async (tx) => {
     const existing = await tx.despacho.findUnique({ where: { id: body.id }, include: { estados: true } });
-    if (!existing) return { error: "Estado no permitido", status: 400 };
+    if (!existing) return { error: "Despacho no encontrado", status: 404 };
 
     const currentIndex = allowed.indexOf(existing.estadoActual);
     const nextIndex = allowed.indexOf(body.status);
     if (nextIndex < currentIndex && !body.reason) {
-      return { error: "Reversion requiere motivo", status: 400 };
+      return { error: "Reversion requiere motivo obligatorio", status: 400 };
     }
 
     const now = new Date();
@@ -280,6 +316,22 @@ export async function updateShipmentStatus(user, body) {
       include: { estados: true }
     });
     await audit(user.username, "actualizar_estado", "despacho", `${shipment.codigoTracking} -> ${body.status}`, tx, user.id);
+
+    if (shipment.emailCliente) {
+      const serialized = serializeShipment(shipment);
+      sendTrackingUpdate(
+        shipment.emailCliente,
+        shipment.codigoTracking,
+        body.status,
+        shipment.destino,
+        shipment.idiomaPreferido || "es"
+      ).then((result) => {
+        if (result?.ok) {
+          audit(user.username, "notificacion_enviada", "despacho", `${shipment.codigoTracking} - ${shipment.emailCliente}`, undefined, user.id);
+        }
+      }).catch(() => {});
+    }
+
     return { item: serializeShipment(shipment) };
   });
 }

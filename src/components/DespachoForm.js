@@ -1,10 +1,8 @@
 "use client";
 
 import { Plus, Ship } from "lucide-react";
-import { useState } from "react";
-import { validateShipmentFields } from "@/lib/validators";
 
-export default function DespachoForm({ shipment, setShipment, onPost, errors }) {
+export default function DespachoForm({ shipment, setShipment, onPost, onEdit, editingId, setEditingId, errors }) {
   return (
     <div className="form-grid">
       <div>
@@ -34,7 +32,34 @@ export default function DespachoForm({ shipment, setShipment, onPost, errors }) 
         />
         {errors?.product && <span className="field-error">{errors.product}</span>}
       </div>
-      <button className="button primary" onClick={() => onPost({ type: "shipment" })}><Plus size={18} />Crear despacho</button>
+      <input
+        placeholder="Email cliente (notificaciones)"
+        type="email"
+        value={shipment.emailCliente || ""}
+        onChange={(e) => setShipment({ ...shipment, emailCliente: e.target.value })}
+      />
+      <select
+        value={shipment.idiomaPreferido || "es"}
+        onChange={(e) => setShipment({ ...shipment, idiomaPreferido: e.target.value })}
+      >
+        <option value="es">Notificaciones: Espanol</option>
+        <option value="en">Notificaciones: English</option>
+        <option value="pt">Notificaciones: Portugues</option>
+      </select>
+      {editingId ? (
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <button className="button primary" onClick={() => onEdit({ type: "shipmentEdit", id: editingId })}>
+            Guardar cambios
+          </button>
+          <button className="button secondary" onClick={() => setEditingId(null)}>
+            Cancelar
+          </button>
+        </div>
+      ) : (
+        <button className="button primary" onClick={() => onPost({ type: "shipment" })}>
+          <Plus size={18} />Crear despacho
+        </button>
+      )}
     </div>
   );
 }

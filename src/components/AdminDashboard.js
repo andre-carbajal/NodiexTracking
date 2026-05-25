@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Activity, Award, Boxes, FileClock, Ship, ShieldCheck, Users
+  Activity, Award, Boxes, FileClock, Pencil, Ship, ShieldCheck, Users
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import Toast from "@/components/Toast";
@@ -20,23 +20,32 @@ import { validateShipmentFields, validateProductFields, validateCertificateField
 export default function AdminDashboard({ user, data, token, onLogout, load }) {
   const [message, setMessage] = useState("");
   const [toast, setToast] = useState(null);
-  const [shipment, setShipment] = useState({ client: "", destination: "", product: "" });
+  const [shipment, setShipment] = useState({ client: "", destination: "", product: "", emailCliente: "", idiomaPreferido: "es" });
   const [product, setProduct] = useState({ name: "", description: "", unit: "TM", currency: "USD", price: "", publish: true });
   const [certificate, setCertificate] = useState({ certType: "SENASA", validUntil: "2026-12-31", evidence: "" });
   const [usuario, setUsuario] = useState({ username: "", password: "", role: "" });
   const [shipmentErrors, setShipmentErrors] = useState(null);
   const [productErrors, setProductErrors] = useState(null);
   const [certErrors, setCertErrors] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   const stats = useMemo(() => [
-    { label: "Despachos", value: data.shipments.length, icon: Ship },
+    { label: "Despachos", value: data.totalShipments || data.shipments.length, icon: Ship },
     { label: "Productos", value: data.products.length, icon: Boxes },
     { label: "Certificaciones", value: data.certificates.length, icon: Award },
     { label: "Eventos auditoria", value: data.audit.length, icon: Activity }
   ], [data]);
 
   async function post(body) {
-    if (body.type === "shipment") {
+    const actualBody = {
+      ...body,
+      ...(body.type === "shipment" || body.type === "shipmentEdit" ? { client: shipment.client, destination: shipment.destination, product: shipment.product, emailCliente: shipment.emailCliente, idiomaPreferido: shipment.idiomaPreferido } : {}),
+      ...(body.type === "product" ? product : {}),
+      ...(body.type === "certificate" ? certificate : {}),
+      ...(body.type === "user" ? usuario : {})
+    };
+
+    if (body.type === "shipment" || body.type === "shipmentEdit") {
       const { valid, errors } = validateShipmentFields({ client: shipment.client, destination: shipment.destination, product: shipment.product });
       if (!valid) { setShipmentErrors(errors); return; }
       setShipmentErrors(null);
@@ -55,21 +64,31 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
     const res = await fetch("/api/admin", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({
-        ...body,
-        ...(body.type === "shipment" ? { client: shipment.client, destination: shipment.destination, product: shipment.product } : {}),
-        ...(body.type === "product" ? product : {}),
-        ...(body.type === "certificate" ? certificate : {}),
-        ...(body.type === "user" ? usuario : {})
-      })
+      body: JSON.stringify(actualBody)
     });
     const json = await res.json();
     setMessage(json.message || (res.ok ? "Operacion registrada en bitacora." : "Operacion rechazada."));
     setToast({ message: json.message || (res.ok ? "Operacion exitosa" : "Error"), variant: res.ok ? "success" : "error" });
     if (res.ok) {
-      setShipment({ client: "", destination: "", product: "" });
+      if (body.type === "shipment") {
+        setShipment({ client: "", destination: "", product: "", emailCliente: "", idiomaPreferido: "es" });
+      }
+      if (body.type === "shipmentEdit") {
+        setEditingId(null);
+      }
     }
     await load();
+  }
+
+  function startEdit(despacho) {
+    setEditingId(despacho.id);
+    setShipment({
+      client: despacho.client,
+      destination: despacho.destination,
+      product: despacho.product,
+      emailCliente: despacho.emailCliente || "",
+      idiomaPreferido: despacho.idiomaPreferido || "es"
+    });
   }
 
   return (
@@ -95,8 +114,16 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
 
         <section className="admin-panel" id="shipments">
           <div className="panel-heading"><Ship /><h2>Gestion de despachos</h2></div>
-          <DespachoForm shipment={shipment} setShipment={setShipment} onPost={post} errors={shipmentErrors} />
-          <DespachosList shipments={data.shipments} onPost={post} />
+          <DespachoForm
+            shipment={shipment}
+            setShipment={setShipment}
+            onPost={post}
+            onEdit={post}
+            editingId={editingId}
+            setEditingId={setEditingId}
+            errors={shipmentErrors}
+          />
+          <DespachosList shipments={data.shipments} onPost={post} onEdit={startEdit} />
         </section>
 
         <section className="admin-panel" id="catalog-admin">
