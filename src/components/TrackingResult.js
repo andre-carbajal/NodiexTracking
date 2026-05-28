@@ -36,8 +36,8 @@ export default function TrackingResult({ tracking, t }) {
         <p><ClipboardCheck size={18} />Ultima actualizacion<br /><strong>{fmtDate(tracking.updatedAt)}</strong></p>
         <span className="status-pill">{tracking.currentStatus}</span>
         <button
-          className="button primary"
-          style={{ marginTop: "1rem", width: "100%" }}
+          className="button-lima"
+          style={{ marginTop: "1rem", width: "100%", textAlign: "center", justifyContent: "center" }}
           onClick={() => {
             const url = `${window.location.origin}/tracking/${tracking.code}`;
             navigator.clipboard.writeText(url).then(() => alert("Enlace copiado al portapapeles"));
