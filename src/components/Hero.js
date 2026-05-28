@@ -1,29 +1,24 @@
 "use client";
 
-import { Leaf, Search } from "lucide-react";
-import TrackingWidget from "@/components/TrackingWidget";
+import { ArrowUpRight } from "lucide-react";
 
-export default function Hero({ t, trackingCode, setTrackingCode, loading, trackingError, submitTracking }) {
+export default function Hero({ t }) {
   return (
     <section className="hero" id="top">
       <div className="hero-copy">
-        <p className="eyebrow">Tacna, Peru - mercados internacionales</p>
-        <h1>Agroexportacion con trazabilidad digital</h1>
-        <p>Productos certificados desde Tacna para compradores internacionales que necesitan informacion clara, estados logisticos y respaldo documental.</p>
+        <h1>
+          Tradición familiar, 
+          <span className="cursive-green">calidad global.</span>
+        </h1>
+        <p>
+          Somos una empresa familiar dedicada a la producción y comercialización de productos agrícolas de primera calidad, desde el cultivo hasta la distribución.
+        </p>
         <div className="hero-actions">
-          <a className="button primary" href="#tracking"><Search size={18} />Consultar tracking</a>
-          <a className="button secondary" href="#catalog"><Leaf size={18} />Ver catalogo</a>
+          <a className="button-lima" href="#about" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', fontSize: '16px' }}>
+            Nuestra Empresa <ArrowUpRight size={18} />
+          </a>
         </div>
       </div>
-
-      <TrackingWidget
-        t={t}
-        trackingCode={trackingCode}
-        setTrackingCode={setTrackingCode}
-        loading={loading}
-        trackingError={trackingError}
-        submitTracking={submitTracking}
-      />
     </section>
   );
 }
