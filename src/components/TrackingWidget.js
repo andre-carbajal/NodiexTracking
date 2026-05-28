@@ -24,39 +24,75 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
   }
 
   return (
-    <form className="tracking-widget" id="tracking" onSubmit={handleSubmit}>
-      <div className="widget-title">
-        <span><PackageSearch size={23} /></span>
-        <div>
-          <strong>{t.trackingTitle || "Order Tracking"}</strong>
-          <small>{t.trackingHelp || "Consulta publica y segura"}</small>
+    <div className="tracking-card-modern">
+      <form className="tracking-form-modern" id="tracking" onSubmit={handleSubmit}>
+        <div className="tracking-header-modern">
+          <div className="icon-circle">
+            <PackageSearch size={28} color="white" />
+          </div>
+          <div>
+            <h2>{t.trackingTitle || "Tracking de pedidos"}</h2>
+            <p>Ingrese el código opaco entregado por NODIEX. No necesita crear una cuenta.</p>
+          </div>
         </div>
-      </div>
-      <label>
-        {t.trackingHelp || "Ingrese su codigo de seguimiento"}
-        <div className="tracking-input-row">
-          <input
-            value={trackingCode}
-            onChange={(event) => setTrackingCode(event.target.value)}
-            placeholder={t.trackingPlaceholder}
-            className={localError ? "input-error" : ""}
-          />
-          <button className="icon-button" disabled={loading} aria-label="Consultar tracking">
-            {loading ? (
-              <span className="spinner-small" />
-            ) : (
-              <Search size={22} />
-            )}
-          </button>
+
+        <div className="tracking-input-area">
+          <label htmlFor="tracking-code-input">Ingrese el código opaco entregado por NODIEX</label>
+          <div className="tracking-input-group">
+            <input
+              id="tracking-code-input"
+              value={trackingCode}
+              onChange={(event) => setTrackingCode(event.target.value)}
+              placeholder="NDX-8Q4M-2026"
+              className={localError ? "input-error" : ""}
+            />
+            <button className="button-lima" disabled={loading} aria-label="Consultar tracking" type="submit">
+              {loading ? (
+                <span className="spinner-small" />
+              ) : (
+                <>
+                  <Search size={18} /> Buscar
+                </>
+              )}
+            </button>
+          </div>
+          {(localError || trackingError) && <p className="form-error" style={{marginTop:'8px'}}>{localError || trackingError}</p>}
         </div>
-      </label>
-      <div className="mini-status">
-        <span className="complete"><ClipboardCheck size={18} />Registrado</span>
-        <span className="active"><Truck size={18} />En transito</span>
-        <span><CheckCircle2 size={18} />Entregado</span>
+
+        <div className="tracking-timeline-modern">
+          <div className="timeline-step">
+            <div className="step-icon"><ClipboardCheck size={20} /></div>
+            <div>
+              <strong>Registrado</strong>
+              <span>Hemos recibido tu pedido</span>
+            </div>
+          </div>
+          <div className="timeline-divider"></div>
+          <div className="timeline-step">
+            <div className="step-icon"><Truck size={20} /></div>
+            <div>
+              <strong>En tránsito</strong>
+              <span>Tu pedido va en camino</span>
+            </div>
+          </div>
+          <div className="timeline-divider"></div>
+          <div className="timeline-step">
+            <div className="step-icon"><CheckCircle2 size={20} /></div>
+            <div>
+              <strong>Entregado</strong>
+              <span>Tu pedido fue entregado</span>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div className="tracking-promo-box">
+        <div className="promo-content">
+          <h3>¿Dónde está tu pedido?</h3>
+          <p>Consulta el estado en tiempo real de tu carga de forma rápida y segura.</p>
+        </div>
+        <div className="promo-globe"></div>
       </div>
-      {(localError || trackingError) && <p className="form-error">{localError || trackingError}</p>}
-      {loading && <LoadingSkeleton variant="timeline" />}
-    </form>
+    </div>
   );
 }

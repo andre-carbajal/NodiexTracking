@@ -54,7 +54,7 @@ export default function HomePage() {
       <main className="public-site">
         <Header lang={lang} setLang={setLang} menuOpen={menuOpen} setMenuOpen={setMenuOpen} languages={languages} t={t} />
         <Hero t={t} />
-        <section id="tracking" style={{ width: 'min(1060px, calc(100% - 32px))', margin: '40px auto 0', padding: '20px' }}>
+        <section id="tracking" className="tracking-wrapper-modern">
           <TrackingWidget
             t={t}
             trackingCode={trackingCode}
