@@ -1,4 +1,8 @@
+import { Inter, Caveat } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
+const caveat = Caveat({ subsets: ["latin"], weight: ["400", "700"] });
 
 export const metadata = {
   title: "NODIEX | Trazabilidad logística",
@@ -8,7 +12,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <head>
+        <style dangerouslySetInnerHTML={{__html: `
+          .cursive-green { font-family: ${caveat.style.fontFamily}, cursive !important; }
+        `}} />
+      </head>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
