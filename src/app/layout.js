@@ -9,6 +9,8 @@ export const metadata = {
   description: "Sistema web multiidioma para catálogo exportador, certificaciones y tracking logístico de NODIEX DEL PERU S.A.C."
 };
 
+import Header from "@/components/Header";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
@@ -17,7 +19,10 @@ export default function RootLayout({ children }) {
           .cursive-green { font-family: ${caveat.style.fontFamily}, cursive !important; }
         `}} />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }
