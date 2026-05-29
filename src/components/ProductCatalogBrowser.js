@@ -32,18 +32,24 @@ export default function ProductCatalogBrowser({ products = [] }) {
 
   return (
     <section className="products-page">
-      <div style={{ textAlign: 'left', marginBottom: '40px' }}>
-        <p className="eyebrow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ width: '16px', height: '16px', borderRadius: '50%', border: '2px solid var(--green)', display: 'inline-block' }}></span>
-          Catálogo de productos
-        </p>
-        <h2 style={{ fontSize: '42px', marginTop: '12px', color: 'var(--ink)' }}>
-          Origen Peruano, <br/>
-          <span className="cursive-green" style={{ fontSize: '56px' }}>Calidad</span> que el mundo valora.
-        </h2>
-        <p style={{ maxWidth: '600px', fontSize: '16px', color: 'var(--charcoal)', marginTop: '16px' }}>
-          Conoce nuestra selección de productos naturales, cultivados y procesados con dedicación para ofrecerte lo mejor de nuestra tierra.
-        </p>
+      <div className="catalog-hero-modern">
+        <div className="catalog-hero-text">
+          <p className="eyebrow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ width: '16px', height: '16px', borderRadius: '50%', border: '2px solid var(--green)', display: 'inline-block' }}></span>
+            Catálogo de productos
+          </p>
+          <h2>
+            Origen Peruano, <br/>
+            <span className="cursive-green">Calidad</span> que el mundo valora.
+          </h2>
+          <p>
+            Conoce nuestra selección de productos naturales, cultivados y procesados con dedicación para ofrecerte lo mejor de nuestra tierra.
+          </p>
+        </div>
+        <div className="catalog-hero-image">
+          <div className="blob-bg"></div>
+          <Image unoptimized src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80" alt="Oregano" width={400} height={400} style={{ objectFit: 'contain' }} />
+        </div>
       </div>
 
       <div className="products-toolbar">
@@ -73,17 +79,10 @@ export default function ProductCatalogBrowser({ products = [] }) {
                 <h3>{product.name}</h3>
                 <p className="card-desc">{product.description}</p>
                 
-                <div className="presentation-list-minimal">
-                  {product.presentations.map((presentation) => (
-                    <div key={presentation.id || presentation.unit}>
-                      <strong>{presentation.unit}</strong>
-                    </div>
-                  ))}
-                </div>
-
                 <div className="card-actions-row">
-                  <Link className="action-btn outline" href={`/productos/${product.id}`}>Ver detalle</Link>
-                  <a className="action-btn outline" href={`/api/public/productos/${product.id}/ficha`}><Download size={16} />Ficha</a>
+                  <Link className="button-lima full-width" href={`/productos/${product.id}`}>
+                    Ver más información ↗
+                  </Link>
                 </div>
               </div>
             </article>
