@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { copy, languages } from "@/lib/i18n";
-import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import TrackingWidget from "@/components/TrackingWidget";
 import TrackingResult from "@/components/TrackingResult";
@@ -60,7 +59,6 @@ export default function HomePage() {
   return (
     <ErrorBoundary>
       <main className="public-site">
-        <Header lang={lang} setLang={setLang} menuOpen={menuOpen} setMenuOpen={setMenuOpen} languages={languages} t={t} />
         <Hero t={t} />
         <section id="tracking" className="tracking-wrapper-modern">
           <TrackingWidget

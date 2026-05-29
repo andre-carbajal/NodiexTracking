@@ -15,15 +15,6 @@ export default async function ProductosPage() {
 
   return (
     <main className="public-site">
-      <header className="simple-public-header">
-        <Link className="brand-logo" href="/">
-          <strong>NODIEX</strong>
-          <span>DEL PERU</span>
-          <small>Agroexportacion con calidad y confianza</small>
-        </Link>
-        <Link className="button secondary" href="/">Volver al portal</Link>
-      </header>
-      
       <section className="products-hero-dark">
         <div className="hero-content">
           <p className="eyebrow-light"><span className="circle-icon">🌿</span> Productos de calidad premium</p>

@@ -37,15 +37,7 @@ export default async function ProductoDetallePage({ params }) {
 
   return (
     <main className="public-site">
-      <header className="simple-public-header" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '20px', marginBottom: '40px' }}>
-        <Link className="brand-logo" href="/">
-          <strong>NODIEX</strong>
-          <span>DEL PERU</span>
-          <small>Agroexportacion con calidad y confianza</small>
-        </Link>
-        <Link className="button-outline-green" href="/productos"><ArrowLeft size={18} />Catalogo</Link>
-      </header>
-      <section className="product-detail" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'start', maxWidth: '1000px', margin: '0 auto' }}>
+      <section className="product-detail" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'start', maxWidth: '1000px', margin: '40px auto 0 auto' }}>
         <div className="product-detail-media" style={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 30px rgba(0,0,0,0.08)' }}>
           <Image unoptimized src={product.imageUrl || fallbackImage} alt={product.name} width={920} height={520} style={{ display: 'block', width: '100%', height: 'auto' }} />
         </div>
