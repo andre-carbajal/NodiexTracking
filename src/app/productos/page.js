@@ -23,11 +23,32 @@ export default async function ProductosPage() {
         </Link>
         <Link className="button secondary" href="/">Volver al portal</Link>
       </header>
-      <section className="products-hero">
-        <p className="eyebrow">Catalogo publico</p>
-        <h1>Productos exportables</h1>
-        <p>Consulta productos publicados con sus presentaciones logisticas, precios multimoneda y ficha tecnica.</p>
+      
+      <section className="products-hero-dark">
+        <div className="hero-content">
+          <p className="eyebrow-light"><span className="circle-icon">🌿</span> Productos de calidad premium</p>
+          <h1>Nuestros<br/><span className="cursive-light">Productos.</span></h1>
+          <p className="hero-desc">Exportamos orégano, especias y hierbas aromáticas con los más altos estándares de calidad. Cultivados, seleccionados y procesados para llevar lo mejor del Perú al mundo.</p>
+        </div>
+        <div className="hero-features">
+          <div className="feature">
+            <span className="feature-icon">🍃</span>
+            <strong>100% Naturales</strong>
+            <p>Sin aditivos ni conservantes</p>
+          </div>
+          <div className="feature">
+            <span className="feature-icon">🛡️</span>
+            <strong>Calidad Premium</strong>
+            <p>Estándares internacionales</p>
+          </div>
+          <div className="feature">
+            <span className="feature-icon">✈️</span>
+            <strong>Exportación Global</strong>
+            <p>Envíos seguros y confiables</p>
+          </div>
+        </div>
       </section>
+
       <ProductCatalogBrowser products={products} />
       <Footer />
     </main>
