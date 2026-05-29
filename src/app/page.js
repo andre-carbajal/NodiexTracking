@@ -40,7 +40,15 @@ export default function HomePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code: trackingCode })
     });
-    const json = await res.json();
+    let json = {};
+    try {
+      json = await res.json();
+    } catch (e) {
+      setLoading(false);
+      setTrackingError("Error de conexión con el servidor. Intente nuevamente.");
+      return;
+    }
+
     setLoading(false);
     if (!res.ok) {
       setTrackingError(json.message || t.invalidTracking);

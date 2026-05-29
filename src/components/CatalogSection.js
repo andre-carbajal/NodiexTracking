@@ -43,57 +43,36 @@ export default function CatalogSection({ t, publicData, hasFallback }) {
             />
           </label>
           <button type="button" onClick={() => setSearch("")}>Todos</button>
-          <Link href="/productos">Ver pagina completa</Link>
+          <Link href="/productos" className="button-lima" style={{ color: 'var(--green-dark)', background: '#fff', border: '1px solid #dcebce' }}>Ver pagina completa</Link>
         </div>
       </div>
 
-      <div className="catalog-layout">
-        <div className="catalog-grid">
-          {filteredProducts.map((product, index) => (
-            <article className="catalog-card" key={product.id}>
-              <Image unoptimized alt={product.name} src={product.imageUrl || productImages[index % productImages.length]} width={520} height={260} />
-              <span className="status-pill">Publicado</span>
+      <div className="catalog-grid-modern">
+        {filteredProducts.slice(0, 3).map((product, index) => (
+          <article className="product-card-modern" key={product.id}>
+            <div className="card-image-wrap">
+              <Image unoptimized alt={product.name} src={product.imageUrl || productImages[index % productImages.length]} fill style={{ objectFit: 'cover' }} />
+            </div>
+            
+            <div className="card-content">
               <h3>{product.name}</h3>
-              <p>{product.description}</p>
-              <div className="presentation-list">
+              <p className="card-desc">{product.description}</p>
+              
+              <div className="presentation-list-minimal">
                 {product.presentations.map((presentation) => (
                   <div key={presentation.unit}>
                     <strong>{presentation.unit}</strong>
-                    <span>{Object.entries(presentation.prices).map(([currency, price]) => `${currency} ${price.toLocaleString("es-PE")}`).join(" / ")}</span>
                   </div>
                 ))}
               </div>
-              <div className="catalog-card-actions">
-                <Link className="download-button" href={`/productos/${product.id}`}>Ver detalle</Link>
-                <a className="download-button" href={`/api/public/productos/${product.id}/ficha`}><Download size={16} />Ficha</a>
-              </div>
-            </article>
-          ))}
-        </div>
 
-        {selectedProduct && (
-          <aside className="commercial-sheet">
-            <span className="status-pill">Ficha comercial</span>
-            <h3>{selectedProduct.name}</h3>
-            <p>{selectedProduct.description}</p>
-            <table>
-              <thead>
-                <tr><th>Unidad</th><th>Monedas</th></tr>
-              </thead>
-              <tbody>
-                {selectedProduct.presentations.map((item) => (
-                  <tr key={item.unit}>
-                    <td>{item.unit}</td>
-                    <td>{Object.keys(item.prices).join(", ")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p><CheckCircle2 size={18} />Estado publicado</p>
-            <p><Award size={18} />Respaldo SENASA / ISO</p>
-            <a className="download-button" href={`/api/public/productos/${selectedProduct.id}/ficha`}><Download size={18} />Descargar ficha tecnica</a>
-          </aside>
-        )}
+              <div className="card-actions-row">
+                <Link className="action-btn outline" href={`/productos/${product.id}`}>Ver detalle</Link>
+                <a className="action-btn outline" href={`/api/public/productos/${product.id}/ficha`}><Download size={16} />Ficha</a>
+              </div>
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );

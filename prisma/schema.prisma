@@ -7,18 +7,18 @@ datasource db {
 }
 
 model Usuario {
-  id              String          @id @default(uuid())
-  username        String          @unique
-  hashPassword    String          @map("hash_password")
-  estado          String          @default("activo")
-  failedAttempts  Int             @default(0) @map("failed_attempts")
-  lockedUntil     DateTime?       @map("locked_until")
-  ultimoAcceso    DateTime?       @map("ultimo_acceso")
-  createdAt       DateTime        @default(now()) @map("created_at")
-  roles           UsuarioRol[]
-  sesiones        Sesion[]
-  despachos       Despacho[]
+  id              String           @id @default(uuid())
+  username        String           @unique
+  hashPassword    String           @map("hash_password")
+  estado          String           @default("activo")
+  failedAttempts  Int              @default(0) @map("failed_attempts")
+  lockedUntil     DateTime?        @map("locked_until")
+  ultimoAcceso    DateTime?        @map("ultimo_acceso")
+  createdAt       DateTime         @default(now()) @map("created_at")
   bitacoraEventos BitacoraEvento[]
+  despachos       Despacho[]
+  sesiones        Sesion[]
+  roles           UsuarioRol[]
 
   @@map("usuarios")
 }
@@ -27,8 +27,8 @@ model Rol {
   id          String       @id @default(uuid())
   nombreRol   String       @unique @map("nombre_rol")
   descripcion String?
-  usuarios    UsuarioRol[]
   permisos    Permiso[]
+  usuarios    UsuarioRol[]
 
   @@map("roles")
 }
@@ -36,8 +36,8 @@ model Rol {
 model UsuarioRol {
   usuarioId String  @map("usuario_id")
   rolId     String  @map("rol_id")
-  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   rol       Rol     @relation(fields: [rolId], references: [id], onDelete: Cascade)
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@id([usuarioId, rolId])
   @@map("usuarios_roles")
@@ -56,7 +56,7 @@ model Permiso {
 
 model Sesion {
   id              String   @id @default(uuid())
-  tokenJwt        String   @map("token_jwt") @db.Text
+  tokenJwt        String   @map("token_jwt")
   fechaExpiracion DateTime @map("fecha_expiracion")
   ipOrigen        String?  @map("ip_origen")
   usuarioId       String   @map("usuario_id")
@@ -73,26 +73,26 @@ model Despacho {
   destino            String
   producto           String
   estadoActual       String           @map("estado_actual")
-  emailCliente       String?          @map("email_cliente")
-  idiomaPreferido    String           @default("es") @map("idioma_preferido")
   fechaRegistro      DateTime         @default(now()) @map("fecha_registro")
   fechaActualizacion DateTime         @default(now()) @map("fecha_actualizacion")
   activo             Boolean          @default(true)
   usuarioId          String?          @map("usuario_id")
-  usuario            Usuario?         @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  emailCliente       String?          @map("email_cliente")
+  idiomaPreferido    String           @default("es") @map("idioma_preferido")
+  usuario            Usuario?         @relation(fields: [usuarioId], references: [id])
   estados            EstadoDespacho[]
 
   @@map("despachos")
 }
 
 model EstadoDespacho {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   estado      String
-  fechaHora   DateTime  @default(now()) @map("fecha_hora")
+  fechaHora   DateTime @default(now()) @map("fecha_hora")
   observacion String?
   responsable String
-  despachoId  String    @map("despacho_id")
-  despacho    Despacho  @relation(fields: [despachoId], references: [id], onDelete: Cascade)
+  despachoId  String   @map("despacho_id")
+  despacho    Despacho @relation(fields: [despachoId], references: [id], onDelete: Cascade)
 
   @@map("estados_despacho")
 }
@@ -100,12 +100,12 @@ model EstadoDespacho {
 model Producto {
   id                String                  @id @default(uuid())
   activo            Boolean                 @default(true)
-  imagenUrl         String?                 @map("imagen_url")
   estadoPublicacion String                  @default("borrador") @map("estado_publicacion")
   createdAt         DateTime                @default(now()) @map("created_at")
   updatedAt         DateTime                @updatedAt @map("updated_at")
-  traducciones      Traduccion[]
+  imagenUrl         String?                 @map("imagen_url")
   presentaciones    PresentacionLogistica[]
+  traducciones      Traduccion[]
 
   @@map("productos")
 }
@@ -115,34 +115,34 @@ model PresentacionLogistica {
   tipoUnidad String   @map("tipo_unidad")
   capacidad  String?
   productoId String   @map("producto_id")
-  producto   Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
   precios    Precio[]
+  producto   Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
 
   @@map("presentaciones_logisticas")
 }
 
 model Precio {
-  id             String                 @id @default(uuid())
+  id             String                @id @default(uuid())
   moneda         String
-  monto          Decimal                @db.Decimal(12, 2)
+  monto          Decimal               @db.Decimal(12, 2)
   vigencia       DateTime?
-  presentacionId String                 @map("presentacion_id")
-  presentacion   PresentacionLogistica  @relation(fields: [presentacionId], references: [id], onDelete: Cascade)
+  presentacionId String                @map("presentacion_id")
+  presentacion   PresentacionLogistica @relation(fields: [presentacionId], references: [id], onDelete: Cascade)
 
   @@unique([presentacionId, moneda])
   @@map("precios")
 }
 
 model Certificacion {
-  id              String   @id @default(uuid())
-  tipo            String
-  fechaEmision    DateTime? @map("fecha_emision")
-  fechaVencimiento DateTime @map("fecha_vencimiento")
-  urlEvidencia    String?  @map("url_evidencia")
-  evidencia       String?
-  estadoVigencia  String   @map("estado_vigencia")
-  publicado       Boolean  @default(false)
-  createdAt       DateTime @default(now()) @map("created_at")
+  id               String    @id @default(uuid())
+  tipo             String
+  fechaEmision     DateTime? @map("fecha_emision")
+  fechaVencimiento DateTime  @map("fecha_vencimiento")
+  urlEvidencia     String?   @map("url_evidencia")
+  evidencia        String?
+  estadoVigencia   String    @map("estado_vigencia")
+  publicado        Boolean   @default(false)
+  createdAt        DateTime  @default(now()) @map("created_at")
 
   @@map("certificaciones")
 }
@@ -158,13 +158,13 @@ model Contenido {
 }
 
 model Traduccion {
-  id         String     @id @default(uuid())
-  idioma     String
-  titulo     String?
-  cuerpo     String?
-  estado     String     @default("borrador")
-  contenidoId String?   @map("contenido_id")
-  productoId  String?   @map("producto_id")
+  id          String     @id @default(uuid())
+  idioma      String
+  titulo      String?
+  cuerpo      String?
+  estado      String     @default("borrador")
+  contenidoId String?    @map("contenido_id")
+  productoId  String?    @map("producto_id")
   contenido   Contenido? @relation(fields: [contenidoId], references: [id], onDelete: Cascade)
   producto    Producto?  @relation(fields: [productoId], references: [id], onDelete: Cascade)
 
@@ -174,14 +174,14 @@ model Traduccion {
 }
 
 model BitacoraEvento {
-  id        String   @id @default(uuid())
-  entidad   String
-  accion    String
-  fechaHora DateTime @default(now()) @map("fecha_hora")
-  usuarioId String?  @map("usuario_id")
-  usuarioNombre String? @map("usuario_nombre")
-  detalle   Json
-  usuario   Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  id            String   @id @default(uuid())
+  entidad       String
+  accion        String
+  fechaHora     DateTime @default(now()) @map("fecha_hora")
+  usuarioId     String?  @map("usuario_id")
+  usuarioNombre String?  @map("usuario_nombre")
+  detalle       Json
+  usuario       Usuario? @relation(fields: [usuarioId], references: [id])
 
   @@index([entidad, accion, fechaHora])
   @@map("bitacora_eventos")

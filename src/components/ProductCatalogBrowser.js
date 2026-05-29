@@ -62,43 +62,58 @@ export default function ProductCatalogBrowser({ products = [] }) {
       {filteredProducts.length === 0 ? (
         <EmptyState title="Sin productos" description="No hay productos publicados que coincidan con la busqueda." />
       ) : (
-        <div className="products-grid">
+        <div className="catalog-grid-modern">
           {filteredProducts.map((product, index) => (
-            <article className="catalog-card" key={product.id}>
-              <Image unoptimized alt={product.name} src={product.imageUrl || productImages[index % productImages.length]} width={720} height={360} />
-              <span className="status-pill" style={{ background: 'var(--green-lima)', color: '#111', fontWeight: 'bold' }}>Publicado</span>
-              <h3>{product.name}</h3>
-              <p style={{ fontSize: '14px', color: 'var(--charcoal)', marginBottom: '16px', minHeight: '60px' }}>{product.description}</p>
-              
-              <div className="presentation-list" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {product.presentations.map((presentation) => (
-                  <div key={presentation.id || presentation.unit} style={{ background: '#f5faec', padding: '8px 12px', borderRadius: '8px', flex: '1', minWidth: '120px' }}>
-                    <strong style={{ display: 'block', fontSize: '12px', color: 'var(--green-dark)' }}>{presentation.unit}</strong>
-                    <span style={{ fontSize: '14px', fontWeight: '700' }}>{priceText(presentation.prices)}</span>
-                  </div>
-                ))}
+            <article className="product-card-modern" key={product.id}>
+              <div className="card-image-wrap">
+                <Image unoptimized alt={product.name} src={product.imageUrl || productImages[index % productImages.length]} fill style={{ objectFit: 'cover' }} />
               </div>
+              
+              <div className="card-content">
+                <h3>{product.name}</h3>
+                <p className="card-desc">{product.description}</p>
+                
+                <div className="presentation-list-minimal">
+                  {product.presentations.map((presentation) => (
+                    <div key={presentation.id || presentation.unit}>
+                      <strong>{presentation.unit}</strong>
+                    </div>
+                  ))}
+                </div>
 
-              <div className="catalog-card-actions">
-                <Link className="button-outline-green" href={`/productos/${product.id}`}>Ver detalle</Link>
-                <a className="button-outline-green" href={`/api/public/productos/${product.id}/ficha`}><Download size={16} />Ficha</a>
+                <div className="card-actions-row">
+                  <Link className="action-btn outline" href={`/productos/${product.id}`}>Ver detalle</Link>
+                  <a className="action-btn outline" href={`/api/public/productos/${product.id}/ficha`}><Download size={16} />Ficha</a>
+                </div>
               </div>
             </article>
           ))}
         </div>
       )}
 
-      <div className="contact-banner">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{ background: 'rgba(255,255,255,0.1)', padding: '16px', borderRadius: '50%' }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-lima)" strokeWidth="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-          </span>
-          <div>
-            <h3>¿Buscas un producto específico o presentación especial?</h3>
-            <p>Trabajamos contigo para ofrecer soluciones a la medida de tu negocio.</p>
-          </div>
+      <div className="contact-banner-modern">
+        <div className="banner-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-lima)" strokeWidth="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
         </div>
-        <Link href="/#contact" className="button-lima">Contáctanos ↗</Link>
+        <div className="banner-text">
+          <h3>¿Buscas un producto específico o presentación especial?</h3>
+          <p>Trabajamos contigo para ofrecer soluciones a la medida de tu negocio.</p>
+        </div>
+        <Link href="/#contact" className="button-lima banner-btn">Contáctanos ↗</Link>
+      </div>
+
+      <div className="newsletter-banner-modern">
+        <div className="banner-icon-wrap dark">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-dark)" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </div>
+        <div className="banner-text">
+          <h3>Mantente informado</h3>
+          <p>Recibe novedades, catálogos y noticias del mundo agroexportador.</p>
+        </div>
+        <form className="newsletter-form" onSubmit={(e) => { e.preventDefault(); alert("Gracias por suscribirte!"); }}>
+          <input type="email" placeholder="Ingresa tu correo electrónico" required />
+          <button type="submit" className="button-dark">Suscribirme</button>
+        </form>
       </div>
     </section>
   );
