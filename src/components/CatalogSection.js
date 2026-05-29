@@ -58,17 +58,10 @@ export default function CatalogSection({ t, publicData, hasFallback }) {
               <h3>{product.name}</h3>
               <p className="card-desc">{product.description}</p>
               
-              <div className="presentation-list-minimal">
-                {product.presentations.map((presentation) => (
-                  <div key={presentation.unit}>
-                    <strong>{presentation.unit}</strong>
-                  </div>
-                ))}
-              </div>
-
               <div className="card-actions-row">
-                <Link className="action-btn outline" href={`/productos/${product.id}`}>Ver detalle</Link>
-                <a className="action-btn outline" href={`/api/public/productos/${product.id}/ficha`}><Download size={16} />Ficha</a>
+                <Link className="button-lima full-width" href={`/productos/${product.id}`}>
+                  Ver más información ↗
+                </Link>
               </div>
             </div>
           </article>
