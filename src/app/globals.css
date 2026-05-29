@@ -2307,3 +2307,218 @@ h2 {
     margin: 0 0 0 21px;
   }
 }
+
+/* Phase 4 Tracking Result Modernization */
+.tracking-result-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: -60px; /* Overlap with the background above */
+  position: relative;
+  z-index: 10;
+  padding: 0 20px;
+  margin-bottom: 80px;
+}
+.tracking-result-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  display: grid;
+  grid-template-columns: 2.5fr 1fr;
+  width: 100%;
+  max-width: 1100px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.result-main {
+  padding: 40px;
+  border-right: 1px solid rgba(0,0,0,0.05);
+}
+.eyebrow-orange {
+  color: #cc7722;
+  font-weight: 800;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+.code-label {
+  color: var(--charcoal);
+  font-size: 14px;
+  display: block;
+}
+.code-value {
+  color: var(--green-dark);
+  font-size: 28px;
+  font-weight: bold;
+  margin: 4px 0 24px 0;
+}
+.result-divider {
+  height: 1px;
+  background: rgba(0,0,0,0.05);
+  margin-bottom: 24px;
+}
+.shipment-facts-modern {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+.fact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.fact-icon {
+  color: var(--green-lima);
+}
+.fact-title {
+  display: block;
+  color: var(--charcoal);
+  font-size: 14px;
+}
+.fact-data {
+  display: block;
+  color: var(--ink);
+  font-size: 16px;
+}
+.timeline-modern-history {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 40px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.history-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  flex: 1;
+}
+.step-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e2e8e4;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 2;
+}
+.history-step.current .step-dot {
+  background: var(--green-lima);
+}
+.step-line {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #e2e8e4;
+  z-index: 1;
+}
+.history-step strong {
+  color: var(--ink);
+  font-size: 14px;
+  display: block;
+}
+.history-step span {
+  color: var(--charcoal);
+  font-size: 12px;
+}
+.route-note-modern {
+  background: #f4faed;
+  border: 1px solid #dbecc8;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+  font-size: 14px;
+}
+.route-note-modern p {
+  margin: 0;
+}
+.result-side {
+  padding: 40px;
+  background: #fdfdfc;
+}
+.side-title {
+  color: var(--green-dark);
+  font-size: 18px;
+  margin: 0 0 24px 0;
+}
+.side-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.side-icon {
+  color: var(--charcoal);
+  margin-top: 2px;
+}
+.side-detail span {
+  display: block;
+  color: var(--charcoal);
+  font-size: 14px;
+}
+.side-detail strong {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+}
+.side-status-pill {
+  background: var(--green-lima);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 4px;
+  display: inline-block;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 40px;
+}
+.share-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  justify-content: center;
+}
+@media (max-width: 900px) {
+  .tracking-result-card {
+    grid-template-columns: 1fr;
+  }
+  .result-main {
+    border-right: none;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .shipment-facts-modern {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .timeline-modern-history {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+  }
+  .history-step {
+    flex-direction: row;
+    gap: 16px;
+    text-align: left;
+    width: 100%;
+  }
+  .history-step strong, .history-step span {
+    display: inline;
+    margin-right: 8px;
+  }
+  .step-dot {
+    margin-bottom: 0;
+  }
+  .step-line {
+    top: 40px;
+    left: 19px;
+    width: 2px;
+    height: calc(100% - 10px);
+  }
+}
