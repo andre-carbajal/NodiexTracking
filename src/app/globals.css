@@ -50,7 +50,7 @@ img { max-width: 100%; display: block; }
   left: 50%;
   transform: translateX(-50%);
   width: min(1200px, calc(100% - 40px));
-  z-index: 50;
+  z-index: 1000;
   background: var(--glass-bg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border-radius: 50px;
@@ -2782,12 +2782,3 @@ h2 {
   }
 }
 
-/* Phase 6 Global Sticky Navbar */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: white;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-}
