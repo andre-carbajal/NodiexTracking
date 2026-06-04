@@ -6,5 +6,9 @@ export async function GET(request) {
   return NextResponse.json({
     products: await getVisibleProducts(lang),
     certificates: await getVisibleCertificates()
+  }, {
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate"
+    }
   });
 }

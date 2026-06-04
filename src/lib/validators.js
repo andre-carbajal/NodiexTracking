@@ -29,6 +29,10 @@ export function isValidCertType(type) {
   return ["SENASA", "BRC", "ISO", "BASC"].includes(type);
 }
 
+function todayIsoDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export function validateShipmentFields(body) {
   const errors = {};
   if (!sanitize(body.client)) errors.client = "Cliente es obligatorio";
@@ -71,6 +75,12 @@ export function validateCertificateFields(body) {
   const errors = {};
   if (!isValidCertType(body.certType)) errors.certType = "Tipo de certificacion no valido";
   if (!body.validUntil) errors.validUntil = "Fecha de vencimiento es obligatoria";
+  if (body.publish && body.validUntil && body.validUntil < todayIsoDate()) {
+    errors.validUntil = "No se puede publicar una certificacion vencida";
+  }
+  if (!sanitize(body.evidence)) errors.evidence = "Evidencia documental es obligatoria";
+  if (body.fileError) errors.file = body.fileError;
+  if (body.filePending) errors.file = "Espera a que termine la carga del archivo";
   return { valid: Object.keys(errors).length === 0, errors };
 }
 

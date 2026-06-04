@@ -27,7 +27,7 @@ const initialProduct = {
   previewUrl: "",
   presentations: [{ unit: "TM", prices: [{ currency: "USD", amount: "" }] }]
 };
-const initialCertificate = { certType: "SENASA", validUntil: "2026-12-31", evidence: "", publish: true, imageUrl: "" };
+const initialCertificate = { certType: "SENASA", validUntil: "2026-12-31", evidence: "", publish: true, imageUrl: "", previewUrl: "", fileError: "", filePending: false };
 
 function EditModal({ title, children, onClose }) {
   return (
@@ -66,7 +66,6 @@ async function readJsonResponse(response) {
 
 export default function AdminDashboard({ user, data, token, onLogout, load }) {
   const [activeSection, setActiveSection] = useState("dashboard");
-  const [message, setMessage] = useState("");
   const [toast, setToast] = useState(null);
   const [shipment, setShipment] = useState(initialShipment);
   const [editShipment, setEditShipment] = useState(initialShipment);
@@ -152,7 +151,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
     {
       id: "catalog",
       label: "Catalogo",
-      title: "Catalogo y precios",
+      title: "Gestión del catálogo de productos",
       description: "Administra productos publicados, unidades comerciales y precios.",
       icon: Boxes
     },
@@ -248,7 +247,6 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
       body: JSON.stringify(actualBody)
     });
     const json = await readJsonResponse(res);
-    setMessage(json.message || (res.ok ? "Operacion registrada en bitacora." : "Operacion rechazada."));
     setToast({ message: json.message || (res.ok ? "Operacion exitosa" : "Error"), variant: res.ok ? "success" : "error" });
     if (res.ok) {
       if (body.type === "shipment") {
@@ -353,7 +351,10 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
       validUntil: item.validUntil || "2026-12-31",
       evidence: item.evidence || "",
       publish: item.published,
-      imageUrl: item.imageUrl || ""
+      imageUrl: item.imageUrl || "",
+      previewUrl: item.imageUrl || "",
+      fileError: "",
+      filePending: false
     });
   }
 
@@ -363,7 +364,10 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
       validUntil: item.validUntil || "2026-12-31",
       evidence: item.evidence || "Evidencia documental",
       publish: !item.published,
-      imageUrl: item.imageUrl || ""
+      imageUrl: item.imageUrl || "",
+      previewUrl: item.imageUrl || "",
+      fileError: "",
+      filePending: false
     };
     post({ type: "certificateEdit", id: item.id, certificatePayload: nextCertificate });
   }
@@ -450,7 +454,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
     if (activeSection === "catalog") {
       return (
         <section className="admin-panel">
-          <div className="panel-heading"><Boxes /><h2>Catalogo y precios</h2></div>
+          <div className="panel-heading"><Boxes /><h2>Creación de Productos</h2></div>
           <ProductoForm
             product={product}
             setProduct={setProduct}
@@ -523,6 +527,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
             setCertificate={setCertificate}
             onPost={post}
             errors={certErrors}
+            token={token}
           />
           <CertificacionesList
             certificates={data.certificates}
@@ -539,6 +544,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
                 editingId={editingCertId}
                 onCancel={closeCertificateModal}
                 errors={certErrors}
+                token={token}
               />
             </EditModal>
           )}
@@ -585,7 +591,6 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
           </div>
           <span>{user?.username}</span>
         </header>
-        {(message || toast) && <p className="notice">{message}</p>}
         {toast && <Toast message={toast.message} variant={toast.variant} onClose={() => setToast(null)} duration={3000} />}
         {renderSection()}
       </section>

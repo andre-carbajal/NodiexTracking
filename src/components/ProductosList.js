@@ -37,7 +37,7 @@ export default function ProductosList({ products = [], onEdit, onDelete, onToggl
               <Pencil size={14} />
             </button>
             <button className="ghost-button small" onClick={() => onToggle(item)} title={item.published ? "Ocultar producto" : "Publicar producto"}>
-              {item.published ? <EyeOff size={14} /> : <Eye size={14} />}
+              {item.published ? <Eye size={14} /> : <EyeOff size={14} />}
             </button>
             <button className="ghost-button small danger" onClick={() => onDelete(item)} title="Eliminar producto">
               <Trash2 size={14} />

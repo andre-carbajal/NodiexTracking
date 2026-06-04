@@ -113,6 +113,15 @@ function serializeProduct(product, lang = "es") {
   };
 }
 
+function todayUtcDate() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+}
+
+function isCertificateVisibleOnWeb(certificate, today = todayUtcDate()) {
+  return Boolean(certificate.publicado && certificate.fechaVencimiento >= today);
+}
+
 function serializeCertificate(certificate) {
   return {
     id: certificate.id,
@@ -121,7 +130,8 @@ function serializeCertificate(certificate) {
     validUntil: certificate.fechaVencimiento.toISOString().slice(0, 10),
     evidence: certificate.evidencia ?? certificate.urlEvidencia ?? "",
     imageUrl: certificate.urlEvidencia ?? "",
-    published: certificate.publicado
+    published: certificate.publicado,
+    visibleOnWeb: isCertificateVisibleOnWeb(certificate)
   };
 }
 
@@ -261,11 +271,11 @@ export async function getPublicProduct(id, lang = "es") {
 }
 
 export async function getVisibleCertificates() {
+  const today = todayUtcDate();
   const certificates = await prisma.certificacion.findMany({
     where: {
       publicado: true,
-      estadoVigencia: "vigente",
-      fechaVencimiento: { gte: new Date() }
+      fechaVencimiento: { gte: today }
     },
     orderBy: { fechaVencimiento: "asc" }
   });
@@ -847,7 +857,10 @@ export async function createCertificate(user, body) {
 
   return prisma.$transaction(async (tx) => {
     const validUntil = new Date(`${body.validUntil}T00:00:00.000Z`);
-    const valid = validUntil >= new Date();
+    const valid = validUntil >= todayUtcDate();
+    if (body.publish !== false && !valid) {
+      return { error: "No se puede publicar una certificacion vencida", status: 400 };
+    }
     const certificate = await tx.certificacion.create({
       data: {
         tipo: body.certType,
@@ -874,7 +887,10 @@ export async function updateCertificate(user, body) {
     if (!existing) return { error: "Certificacion no encontrada", status: 404 };
 
     const validUntil = new Date(`${body.validUntil}T00:00:00.000Z`);
-    const valid = validUntil >= new Date();
+    const valid = validUntil >= todayUtcDate();
+    if (body.publish !== false && !valid) {
+      return { error: "No se puede publicar una certificacion vencida", status: 400 };
+    }
     const certificate = await tx.certificacion.update({
       where: { id: body.id },
       data: {

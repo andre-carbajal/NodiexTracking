@@ -3,6 +3,16 @@ import { can, verifyToken } from "@/lib/auth";
 import { generateKey, uploadFile } from "@/lib/storage";
 
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+const UPLOAD_PURPOSES = {
+  certificate: {
+    permission: "certificates:write",
+    prefix: "certificaciones"
+  },
+  product: {
+    permission: "catalog:write",
+    prefix: "productos"
+  }
+};
 
 function deny() {
   return NextResponse.json({ ok: false, message: "No autorizado" }, { status: 403 });
@@ -10,10 +20,13 @@ function deny() {
 
 export async function POST(request) {
   const user = verifyToken(request);
-  if (!user || !can(user.role, "catalog:write")) return deny();
+  if (!user) return deny();
 
   const formData = await request.formData().catch(() => null);
   const file = formData?.get("file");
+  const purpose = UPLOAD_PURPOSES[String(formData?.get("purpose") || "product")] || UPLOAD_PURPOSES.product;
+  if (!can(user.role, purpose.permission)) return deny();
+
   if (!file || typeof file.arrayBuffer !== "function") {
     return NextResponse.json({ ok: false, message: "Archivo no recibido" }, { status: 400 });
   }
@@ -28,7 +41,7 @@ export async function POST(request) {
 
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
-    const key = generateKey("productos", file.name || "producto.jpg");
+    const key = generateKey(purpose.prefix, file.name || "archivo.jpg");
     const url = await uploadFile(key, buffer, file.type || "application/octet-stream");
     return NextResponse.json({ ok: true, url, key });
   } catch (error) {

@@ -26,7 +26,7 @@ export default function HomePage() {
   const hasFallback = useMemo(() => publicData.products.some((product) => product.fallback), [publicData.products]);
 
   useEffect(() => {
-    fetch(`/api/public?lang=${lang}`)
+    fetch(`/api/public?lang=${lang}`, { cache: "no-store" })
       .then((res) => res.json())
       .then(setPublicData);
   }, [lang]);

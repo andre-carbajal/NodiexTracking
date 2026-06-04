@@ -11,28 +11,37 @@ export default function CertificacionesList({ certificates = [], onEdit, onDelet
 
   return (
     <div className="data-table">
-      {certificates.map((item) => (
-        <div className="data-row admin-list-row" key={item.id}>
-          <strong className="list-title">
-            {item.imageUrl && <Image unoptimized src={item.imageUrl} alt="" width={42} height={42} />}
-            {item.type}
-          </strong>
-          <span>Vence: {item.validUntil}</span>
-          <span className="status-pill">{item.status}</span>
-          <span className="status-pill">{item.published ? "Publicada" : "Oculta"}</span>
-          <div className="row-actions">
-            <button className="ghost-button small" onClick={() => onEdit(item)} title="Editar certificacion">
-              <Pencil size={14} />
-            </button>
-            <button className="ghost-button small" onClick={() => onToggle(item)} title={item.published ? "Ocultar certificacion" : "Publicar certificacion"}>
-              {item.published ? <EyeOff size={14} /> : <Eye size={14} />}
-            </button>
-            <button className="ghost-button small danger" onClick={() => onDelete(item)} title="Eliminar certificacion">
-              <Trash2 size={14} />
-            </button>
+      {certificates.map((item) => {
+        const canTogglePublication = item.published || item.status === "vigente";
+
+        return (
+          <div className="data-row admin-list-row" key={item.id}>
+            <strong className="list-title">
+              {item.imageUrl && <Image unoptimized src={item.imageUrl} alt="" width={42} height={42} />}
+              {item.type}
+            </strong>
+            <span>Vence: {item.validUntil}</span>
+            <span className="status-pill">{item.status}</span>
+            <span className="status-pill">{item.published ? "Publicada" : "Oculta"}</span>
+            <div className="row-actions">
+              <button className="ghost-button small" onClick={() => onEdit(item)} title="Editar certificacion">
+                <Pencil size={14} />
+              </button>
+              <button
+                className="ghost-button small"
+                disabled={!canTogglePublication}
+                onClick={() => onToggle(item)}
+                title={!canTogglePublication ? "No se puede publicar una certificacion vencida" : item.published ? "Ocultar certificacion" : "Publicar certificacion"}
+              >
+                {item.published ? <Eye size={14} /> : <EyeOff size={14} />}
+              </button>
+              <button className="ghost-button small danger" onClick={() => onDelete(item)} title="Eliminar certificacion">
+                <Trash2 size={14} />
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

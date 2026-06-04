@@ -45,6 +45,7 @@ export default function ProductForm({ product, setProduct, onPost, onEdit, editi
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("purpose", "product");
     const res = await fetch("/api/admin/upload", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
