@@ -39,12 +39,16 @@ export default function DespachoForm({ shipment, setShipment, onPost, onEdit, ed
         </select>
         {errors?.product && <span className="field-error">{errors.product}</span>}
       </div>
-      <input
-        placeholder="Email cliente (notificaciones)"
-        type="email"
-        value={shipment.emailCliente || ""}
-        onChange={(e) => setShipment({ ...shipment, emailCliente: e.target.value })}
-      />
+      <div>
+        <input
+          placeholder="Email cliente (obligatorio)"
+          type="email"
+          value={shipment.emailCliente || ""}
+          onChange={(e) => setShipment({ ...shipment, emailCliente: e.target.value })}
+          className={errors?.emailCliente ? "input-error" : ""}
+        />
+        {errors?.emailCliente && <span className="field-error">{errors.emailCliente}</span>}
+      </div>
       <select
         value={shipment.idiomaPreferido || "es"}
         onChange={(e) => setShipment({ ...shipment, idiomaPreferido: e.target.value })}

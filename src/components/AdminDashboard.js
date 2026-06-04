@@ -222,7 +222,12 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
     };
 
     if (body.type === "shipment" || body.type === "shipmentEdit") {
-      const { valid, errors } = validateShipmentFields({ client: shipmentPayload.client, destination: shipmentPayload.destination, product: shipmentPayload.product });
+      const { valid, errors } = validateShipmentFields({
+        client: shipmentPayload.client,
+        destination: shipmentPayload.destination,
+        product: shipmentPayload.product,
+        emailCliente: shipmentPayload.emailCliente
+      });
       if (!valid) { setShipmentErrors(errors); return; }
       setShipmentErrors(null);
     }

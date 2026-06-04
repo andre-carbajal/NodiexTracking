@@ -34,6 +34,7 @@ export function validateShipmentFields(body) {
   if (!sanitize(body.client)) errors.client = "Cliente es obligatorio";
   if (!sanitize(body.destination)) errors.destination = "Destino es obligatorio";
   if (!sanitize(body.product)) errors.product = "Producto es obligatorio";
+  if (!isValidEmail(String(body.emailCliente || "").trim())) errors.emailCliente = "Correo cliente valido es obligatorio";
   return { valid: Object.keys(errors).length === 0, errors };
 }
 

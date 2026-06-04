@@ -2,11 +2,22 @@
 
 import { CheckCircle2, ClipboardCheck, PackageSearch, Search, Truck } from "lucide-react";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
-import { isValidTrackingCode } from "@/lib/validators";
+import { isValidEmail, isValidTrackingCode } from "@/lib/validators";
 import { useState } from "react";
 
-export default function TrackingWidget({ t, trackingCode, setTrackingCode, loading, trackingError, submitTracking }) {
+export default function TrackingWidget({
+  t,
+  trackingCode,
+  setTrackingCode,
+  trackingEmail,
+  setTrackingEmail,
+  trackingStep,
+  loading,
+  trackingError,
+  submitTracking
+}) {
   const [localError, setLocalError] = useState("");
+  const isEmailStep = trackingStep === "email";
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -20,7 +31,11 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
       setLocalError("Formato de codigo invalido. Ejemplo: NDX-8Q4M-2026");
       return;
     }
-    submitTracking(e);
+    if (isEmailStep && !isValidEmail(String(trackingEmail || "").trim())) {
+      setLocalError("Ingrese el correo registrado para este pedido.");
+      return;
+    }
+    submitTracking({ step: isEmailStep ? "email" : "code" });
   }
 
   return (
@@ -33,12 +48,13 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
         </div>
       </div>
       <label>
-        {t.trackingHelp || "Ingrese su codigo de seguimiento"}
+        {isEmailStep ? "Ingrese el correo registrado para verificar el pedido" : (t.trackingHelp || "Ingrese su codigo de seguimiento")}
         <div className="tracking-input-row">
           <input
-            value={trackingCode}
-            onChange={(event) => setTrackingCode(event.target.value)}
-            placeholder={t.trackingPlaceholder}
+            value={isEmailStep ? trackingEmail : trackingCode}
+            onChange={(event) => (isEmailStep ? setTrackingEmail(event.target.value) : setTrackingCode(event.target.value))}
+            placeholder={isEmailStep ? "correo@empresa.com" : t.trackingPlaceholder}
+            type={isEmailStep ? "email" : "text"}
             className={localError ? "input-error" : ""}
           />
           <button className="icon-button" disabled={loading} aria-label="Consultar tracking">
@@ -50,6 +66,11 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
           </button>
         </div>
       </label>
+      {isEmailStep && (
+        <p className="tracking-step-note">
+          Codigo validado: {String(trackingCode || "").trim().toUpperCase()}
+        </p>
+      )}
       <div className="mini-status">
         <span className="complete"><ClipboardCheck size={18} />Registrado</span>
         <span className="active"><Truck size={18} />En transito</span>

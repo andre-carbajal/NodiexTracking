@@ -1,16 +1,17 @@
 "use client";
 
 import { Home } from "lucide-react";
+import Link from "next/link";
 
 export default function Header({ lang, setLang, menuOpen, setMenuOpen, languages, t }) {
   return (
     <header className="site-header">
       <div className="header-inner">
-        <a className="brand-logo" href="#top" aria-label="NODIEX inicio">
+        <Link className="brand-logo" href="/" aria-label="NODIEX inicio">
           <strong>NODIEX</strong>
           <span>DEL PERU</span>
           <small>Agroexportacion con calidad y confianza</small>
-        </a>
+        </Link>
         <div className="header-actions">
           <div className="language-switch" aria-label="Selector de idioma">
             {languages.map((item) => (
@@ -26,12 +27,12 @@ export default function Header({ lang, setLang, menuOpen, setMenuOpen, languages
         </div>
       </div>
       <nav className={`main-nav ${menuOpen ? "open" : ""}`} id="main-menu">
-        <a href="#top" onClick={() => setMenuOpen(false)}><Home size={16} />Inicio</a>
-        <a href="#about" onClick={() => setMenuOpen(false)}>Empresa</a>
-        <a href="#catalog" onClick={() => setMenuOpen(false)}>{t.nav.catalog}</a>
-        <a href="#tracking" onClick={() => setMenuOpen(false)}>{t.nav.tracking}</a>
-        <a href="#certificates" onClick={() => setMenuOpen(false)}>{t.nav.certificates}</a>
-        <a href="#contact" onClick={() => setMenuOpen(false)}>{t.nav.contact}</a>
+        <Link href="/" onClick={() => setMenuOpen(false)}><Home size={16} />Inicio</Link>
+        <Link href="/#about" onClick={() => setMenuOpen(false)}>Empresa</Link>
+        <Link href="/#catalog" onClick={() => setMenuOpen(false)}>{t.nav.catalog}</Link>
+        <Link href="/#tracking" onClick={() => setMenuOpen(false)}>{t.nav.tracking}</Link>
+        <Link href="/#certificates" onClick={() => setMenuOpen(false)}>{t.nav.certificates}</Link>
+        <Link href="/#contact" onClick={() => setMenuOpen(false)}>{t.nav.contact}</Link>
       </nav>
     </header>
   );

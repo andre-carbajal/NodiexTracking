@@ -47,6 +47,7 @@ export default function DespachosList({ shipments = [], onPost, onEdit }) {
             <div className="data-row admin-list-row">
               <strong>{item.code}</strong>
               <span>{item.client}</span>
+              <span>{item.emailCliente || "Sin correo"}</span>
               <span>{item.destination}</span>
               <span className="status-pill">{item.currentStatus}</span>
               <div className="row-actions">

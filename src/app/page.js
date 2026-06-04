@@ -16,6 +16,8 @@ export default function HomePage() {
   const [lang, setLang] = useState("es");
   const [publicData, setPublicData] = useState({ products: [], certificates: [] });
   const [trackingCode, setTrackingCode] = useState("NDX-8Q4M-2026");
+  const [trackingEmail, setTrackingEmail] = useState("");
+  const [trackingStep, setTrackingStep] = useState("code");
   const [tracking, setTracking] = useState(null);
   const [trackingError, setTrackingError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,20 +31,23 @@ export default function HomePage() {
       .then(setPublicData);
   }, [lang]);
 
-  async function submitTracking(event) {
-    event.preventDefault();
+  async function submitTracking({ step }) {
     setLoading(true);
     setTracking(null);
     setTrackingError("");
     const res = await fetch("/api/tracking", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: trackingCode })
+      body: JSON.stringify({ code: trackingCode, email: trackingEmail, step })
     });
     const json = await res.json();
     setLoading(false);
     if (!res.ok) {
       setTrackingError(json.message || t.invalidTracking);
+      return;
+    }
+    if (step === "code") {
+      setTrackingStep("email");
       return;
     }
     setTracking(json.shipment);
@@ -55,7 +60,15 @@ export default function HomePage() {
         <Hero
           t={t}
           trackingCode={trackingCode}
-          setTrackingCode={setTrackingCode}
+          setTrackingCode={(value) => {
+            setTrackingCode(value);
+            setTrackingStep("code");
+            setTrackingEmail("");
+            setTracking(null);
+          }}
+          trackingEmail={trackingEmail}
+          setTrackingEmail={setTrackingEmail}
+          trackingStep={trackingStep}
           loading={loading}
           trackingError={trackingError}
           submitTracking={submitTracking}

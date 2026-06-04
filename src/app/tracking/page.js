@@ -4,7 +4,7 @@ import { CheckCircle2, ClipboardCheck, MapPin, PackageSearch, Search, Ship, Truc
 import Link from "next/link";
 import { useState } from "react";
 import { copy, languages } from "@/lib/i18n";
-import { isValidTrackingCode } from "@/lib/validators";
+import { isValidEmail, isValidTrackingCode } from "@/lib/validators";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import Header from "@/components/Header";
 
@@ -16,6 +16,8 @@ export default function TrackingPage() {
   const [lang, setLang] = useState("es");
   const [menuOpen, setMenuOpen] = useState(false);
   const [code, setCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [step, setStep] = useState("code");
   const [tracking, setTracking] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,12 +26,17 @@ export default function TrackingPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     const trimmed = code.trim();
+    const trimmedEmail = email.trim();
     if (!trimmed) {
       setError("Ingrese un codigo de seguimiento.");
       return;
     }
     if (!isValidTrackingCode(trimmed)) {
       setError("Formato de codigo invalido. Ejemplo: NDX-8Q4M-2026");
+      return;
+    }
+    if (step === "email" && !isValidEmail(trimmedEmail)) {
+      setError("Ingrese el correo registrado para este pedido.");
       return;
     }
 
@@ -40,13 +47,18 @@ export default function TrackingPage() {
     const res = await fetch("/api/tracking", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: trimmed })
+      body: JSON.stringify({ code: trimmed, email: trimmedEmail, step })
     });
     const json = await res.json();
     setLoading(false);
 
     if (!res.ok) {
       setError(json.message || t.invalidTracking);
+      return;
+    }
+
+    if (step === "code") {
+      setStep("email");
       return;
     }
 
@@ -71,16 +83,27 @@ export default function TrackingPage() {
           <form className="tracking-widget standalone" onSubmit={handleSubmit}>
             <div className="tracking-input-row large">
               <input
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder={t.trackingPlaceholder}
+                value={step === "email" ? email : code}
+                onChange={(e) => {
+                  if (step === "email") {
+                    setEmail(e.target.value);
+                    return;
+                  }
+                  setCode(e.target.value);
+                  setStep("code");
+                  setEmail("");
+                  setTracking(null);
+                }}
+                placeholder={step === "email" ? "correo@empresa.com" : t.trackingPlaceholder}
+                type={step === "email" ? "email" : "text"}
                 className={error ? "input-error" : ""}
               />
               <button className="button primary" disabled={loading} type="submit">
                 {loading ? <span className="spinner-small" /> : <Search size={22} />}
-                Consultar
+                {step === "email" ? "Verificar" : "Consultar"}
               </button>
             </div>
+            {step === "email" && <p className="tracking-step-note">Codigo validado: {code.trim().toUpperCase()}</p>}
             {error && <p className="form-error">{error}</p>}
           </form>
         </div>

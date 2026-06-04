@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sendTrackingUpdate } from "@/lib/notifications";
+import { isValidEmail } from "@/lib/validators";
 
 const globalRateLimit = globalThis.__nodiexRateLimit ?? new Map();
 globalThis.__nodiexRateLimit = globalRateLimit;
@@ -66,6 +67,10 @@ function shipmentSelect(includeNotifications = false) {
 function validPriceValue(value) {
   const raw = String(value ?? "").trim();
   return /^\d+(\.\d{1,2})?$/.test(raw) && Number(raw) > 0;
+}
+
+function normalizeEmail(value) {
+  return String(value ?? "").trim().toLowerCase();
 }
 
 function productCompleteness(product) {
@@ -321,6 +326,22 @@ export async function findActiveShipmentByCode(code) {
   return shipment ? serializeShipment(shipment) : null;
 }
 
+export async function findActiveShipmentByCodeAndEmail(code, email) {
+  const includeNotifications = await hasShipmentNotificationColumns();
+  if (!includeNotifications) return null;
+
+  const normalizedEmail = normalizeEmail(email);
+  const shipment = await prisma.despacho.findFirst({
+    where: {
+      codigoTracking: code,
+      activo: true,
+      emailCliente: { equals: normalizedEmail, mode: "insensitive" }
+    },
+    select: shipmentSelect(includeNotifications)
+  });
+  return shipment ? serializeShipment(shipment) : null;
+}
+
 export async function getAdminData(user, page = 1, pageSize = 8, filters = {}) {
   const includeNotifications = await hasShipmentNotificationColumns();
   const productPage = Number(filters.productPage || 1);
@@ -416,13 +437,18 @@ export async function createUser(user, body) {
 
 export async function createShipment(user, body) {
   const includeNotifications = await hasShipmentNotificationColumns();
+  const emailCliente = normalizeEmail(body.emailCliente);
+  if (!isValidEmail(emailCliente)) {
+    return { error: "Correo cliente valido es obligatorio", status: 400 };
+  }
+
   return prisma.$transaction(async (tx) => {
     const code = await generateTrackingCode(tx);
     const now = new Date();
     const shipmentId = crypto.randomUUID();
     const notificationData = includeNotifications
       ? {
-        emailCliente: body.emailCliente || null,
+        emailCliente,
         idiomaPreferido: body.idiomaPreferido || "es"
       }
       : {};
@@ -502,6 +528,10 @@ export async function updateShipment(user, body) {
   const includeNotifications = await hasShipmentNotificationColumns();
   const allowed = ["registrado", "en tránsito", "entregado/cerrado"];
   const nextStatus = body.currentStatus || body.status;
+  const emailCliente = normalizeEmail(body.emailCliente);
+  if (!isValidEmail(emailCliente)) {
+    return { error: "Correo cliente valido es obligatorio", status: 400 };
+  }
   if (nextStatus && !allowed.includes(nextStatus)) {
     return { error: "Estado no permitido", status: 400 };
   }
@@ -517,7 +547,7 @@ export async function updateShipment(user, body) {
     if (body.client !== undefined) data.cliente = body.client;
     if (body.destination !== undefined) data.destino = body.destination;
     if (body.product !== undefined) data.producto = body.product;
-    if (includeNotifications && body.emailCliente !== undefined) data.emailCliente = body.emailCliente || null;
+    if (includeNotifications) data.emailCliente = emailCliente;
     if (includeNotifications && body.idiomaPreferido !== undefined) data.idiomaPreferido = body.idiomaPreferido;
     if (nextStatus && nextStatus !== existing.estadoActual) {
       data.estadoActual = nextStatus;

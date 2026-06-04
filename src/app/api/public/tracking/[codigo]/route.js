@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { audit, findActiveShipmentByCode } from "@/lib/store";
 import { isValidTrackingCode } from "@/lib/validators";
 
-export async function GET(request, { params }) {
+export async function GET(_request, { params }) {
   const { codigo } = await params;
   const normalized = String(codigo).trim().toUpperCase();
 
@@ -15,7 +15,7 @@ export async function GET(request, { params }) {
 
   const shipment = await findActiveShipmentByCode(normalized);
 
-  await audit("public", shipment ? "tracking_consultado" : "tracking_fallido", "despacho", normalized);
+  await audit("public", shipment ? "tracking_codigo_validado" : "tracking_fallido", "despacho", normalized);
 
   if (!shipment) {
     return NextResponse.json({
@@ -24,15 +24,17 @@ export async function GET(request, { params }) {
     }, { status: 404 });
   }
 
+  if (!shipment.emailCliente) {
+    return NextResponse.json({
+      ok: false,
+      message: "Este despacho no tiene correo registrado. Contacte a NODIEX para habilitar la consulta."
+    }, { status: 403 });
+  }
+
   return NextResponse.json({
     ok: true,
-    shipment: {
-      code: shipment.code,
-      destination: shipment.destination,
-      product: shipment.product,
-      currentStatus: shipment.currentStatus,
-      updatedAt: shipment.updatedAt,
-      history: shipment.history
-    }
+    verifiedCode: true,
+    code: shipment.code,
+    message: "Codigo validado. Ingrese el correo registrado para ver el detalle."
   });
 }

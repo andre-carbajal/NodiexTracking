@@ -64,6 +64,7 @@ export async function POST(request) {
     if (body.type === "shipment") {
       if (!can(user.role, "shipments:write")) return deny();
       const shipment = await createShipment(user, body);
+      if (shipment.error) return NextResponse.json({ ok: false, message: shipment.error }, { status: shipment.status });
       return NextResponse.json({ ok: true, item: shipment, message: "Despacho creado exitosamente." });
     }
 

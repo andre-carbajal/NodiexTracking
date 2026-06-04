@@ -3,7 +3,17 @@
 import { Leaf, Search } from "lucide-react";
 import TrackingWidget from "@/components/TrackingWidget";
 
-export default function Hero({ t, trackingCode, setTrackingCode, loading, trackingError, submitTracking }) {
+export default function Hero({
+  t,
+  trackingCode,
+  setTrackingCode,
+  trackingEmail,
+  setTrackingEmail,
+  trackingStep,
+  loading,
+  trackingError,
+  submitTracking
+}) {
   return (
     <section className="hero" id="top">
       <div className="hero-copy">
@@ -20,6 +30,9 @@ export default function Hero({ t, trackingCode, setTrackingCode, loading, tracki
         t={t}
         trackingCode={trackingCode}
         setTrackingCode={setTrackingCode}
+        trackingEmail={trackingEmail}
+        setTrackingEmail={setTrackingEmail}
+        trackingStep={trackingStep}
         loading={loading}
         trackingError={trackingError}
         submitTracking={submitTracking}

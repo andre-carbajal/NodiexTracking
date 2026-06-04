@@ -1,12 +1,13 @@
 "use client";
 
-import { CheckCircle2, ClipboardCheck, Copy, MapPin, Ship, Truck } from "lucide-react";
+import { CheckCircle2, ClipboardCheck, Copy, MapPin, Search, Ship, Truck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { use } from "react";
 import Header from "@/components/Header";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import { copy, languages } from "@/lib/i18n";
+import { isValidEmail } from "@/lib/validators";
 
 function fmtDate(value) {
   return new Intl.DateTimeFormat("es-PE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
@@ -16,14 +17,20 @@ export default function TrackingCodePage({ params }) {
   const { codigo } = use(params);
   const [lang, setLang] = useState("es");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [codeVerified, setCodeVerified] = useState(false);
   const [tracking, setTracking] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const t = copy[lang];
 
   useEffect(() => {
-    async function fetchTracking() {
+    async function validateCode() {
       setLoading(true);
+      setCodeVerified(false);
+      setTracking(null);
+      setEmail("");
+      setError("");
       const res = await fetch(`/api/public/tracking/${codigo}`);
       const json = await res.json();
       setLoading(false);
@@ -33,11 +40,38 @@ export default function TrackingCodePage({ params }) {
         return;
       }
 
-      setTracking(json.shipment);
+      setCodeVerified(true);
     }
 
-    fetchTracking();
+    validateCode();
   }, [codigo]);
+
+  async function verifyEmail(event) {
+    event.preventDefault();
+    const trimmedEmail = email.trim();
+    if (!isValidEmail(trimmedEmail)) {
+      setError("Ingrese el correo registrado para este pedido.");
+      return;
+    }
+
+    setLoading(true);
+    setTracking(null);
+    setError("");
+    const res = await fetch("/api/tracking", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: codigo, email: trimmedEmail, step: "email" })
+    });
+    const json = await res.json();
+    setLoading(false);
+
+    if (!res.ok) {
+      setError(json.message || "El correo no coincide con este pedido.");
+      return;
+    }
+
+    setTracking(json.shipment);
+  }
 
   function copyLink() {
     const url = window.location.href;
@@ -61,9 +95,40 @@ export default function TrackingCodePage({ params }) {
         </section>
       )}
 
-      {error && !loading && (
+      {error && !loading && !codeVerified && (
         <section className="tracking-summary">
           <p className="form-error" style={{ textAlign: "center" }}>{error}</p>
+        </section>
+      )}
+
+      {codeVerified && !tracking && !loading && (
+        <section className="tracking-summary">
+          <div className="summary-main">
+            <p className="eyebrow">Codigo validado</p>
+            <h2>{String(codigo).trim().toUpperCase()}</h2>
+            <form className="tracking-widget standalone" onSubmit={verifyEmail}>
+              <label>
+                Ingrese el correo registrado para verificar el pedido
+                <div className="tracking-input-row large">
+                  <input
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="correo@empresa.com"
+                    type="email"
+                    className={error ? "input-error" : ""}
+                  />
+                  <button className="button primary" disabled={loading} type="submit">
+                    <Search size={22} /> Verificar
+                  </button>
+                </div>
+              </label>
+              {error && <p className="form-error">{error}</p>}
+            </form>
+          </div>
+          <aside className="summary-side">
+            <h3>Verificacion requerida</h3>
+            <p><ClipboardCheck size={18} />El detalle se mostrara solo si el correo coincide con el registrado.</p>
+          </aside>
         </section>
       )}
 
