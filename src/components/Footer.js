@@ -1,28 +1,59 @@
 "use client";
 
-import { LockKeyhole, Mail, MapPin, Phone } from "lucide-react";
+import { LockKeyhole, Mail, MapPin, Phone, Twitter, Facebook, Instagram, Youtube } from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="site-footer">
-      <div className="footer-inner">
-        <div className="footer-logo">
-          <strong>NODIEX</strong>
-          <span>DEL PERU</span>
-          <small>Agroexportacion con calidad y confianza</small>
+    <footer className="site-footer-modern">
+
+      {/* Nueva Franja de Información de Contacto */}
+
+      <div className="footer-grid">
+        {/* Brand Column */}
+        <div className="footer-brand">
+          <Link href="/#top" className="footer-logo">
+            <span className="logo-text">NODIEX</span>
+            <span className="logo-subtext">DEL PERU</span>
+          </Link>
+          <div className="footer-socials">
+            <a href="#" aria-label="Twitter"><Twitter size={20} /></a>
+            <a href="#" aria-label="Facebook"><Facebook size={20} /></a>
+            <a href="#" aria-label="Instagram"><Instagram size={20} /></a>
+            <a href="#" aria-label="YouTube"><Youtube size={20} /></a>
+          </div>
         </div>
-        <div>
-          <h3>Contacto</h3>
-          <p><MapPin size={16} />Parque Industrial, Tacna - Peru</p>
-          <p><Mail size={16} />comercial@nodiex.com.pe</p>
-          <p><Phone size={16} />+51 952 341 231</p>
+
+        {/* Links Column 1 */}
+        <div className="footer-links-col">
+          <h4>Empresa</h4>
+          <Link href="/#about">Nosotros</Link>
+          <Link href="/empresa/certificaciones">Certificaciones</Link>
+          <Link href="/#catalog">Catálogo</Link>
+          <Link href="/galeria">Galería</Link>
         </div>
-        <div>
-          <h3>Acceso seguro</h3>
-          <p>Ingreso exclusivo para usuarios autorizados.</p>
-          <Link className="admin-access" href="/admin"><LockKeyhole size={16} />Ingresar al Administrador</Link>
+
+        {/* Links Column 2 */}
+        <div className="footer-links-col">
+          <h4>Ayuda</h4>
+          <Link href="/#contact">Contacto</Link>
+          <Link href="/#tracking">Tracking de Pedidos</Link>
+          <a href="mailto:comercial@nodiex.com.pe">Soporte</a>
         </div>
+
+        {/* Links Column 3 */}
+        <div className="footer-links-col">
+          <h4>Legal</h4>
+          <Link href="#">Términos de Uso</Link>
+          <Link href="#">Política de Privacidad</Link>
+          <Link href="/admin" className="admin-link">
+            <LockKeyhole size={14} /> Acceso Administrador
+          </Link>
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        <p>&copy; {new Date().getFullYear()} Nodiex del Peru. Todos los derechos reservados.</p>
       </div>
     </footer>
   );

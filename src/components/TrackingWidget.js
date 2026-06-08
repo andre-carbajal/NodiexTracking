@@ -27,7 +27,7 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
     <div className="tracking-card-modern">
       <form className="tracking-form-modern" id="tracking" onSubmit={handleSubmit}>
         <div className="tracking-header-modern">
-          <div className="icon-circle">
+          <div className="icon-circle icon-green-mockup">
             <PackageSearch size={28} color="white" />
           </div>
           <div>
@@ -38,15 +38,15 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
 
         <div className="tracking-input-area">
           <label htmlFor="tracking-code-input">Ingrese el código opaco entregado por NODIEX</label>
-          <div className="tracking-input-group">
+          <div className="tracking-input-wrapper-mockup">
             <input
               id="tracking-code-input"
               value={trackingCode}
               onChange={(event) => setTrackingCode(event.target.value)}
               placeholder="NDX-8Q4M-2026"
-              className={localError ? "input-error" : ""}
+              className={localError ? "input-error" : "tracking-input"}
             />
-            <button className="button-lima" disabled={loading} aria-label="Consultar tracking" type="submit">
+            <button className="button-buscar-mockup" disabled={loading} aria-label="Consultar tracking" type="submit">
               {loading ? (
                 <span className="spinner-small" />
               ) : (
@@ -85,14 +85,6 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
           </div>
         </div>
       </form>
-
-      <div className="tracking-promo-box">
-        <div className="promo-content">
-          <h3>¿Dónde está tu pedido?</h3>
-          <p>Consulta el estado en tiempo real de tu carga de forma rápida y segura.</p>
-        </div>
-        <div className="promo-globe"></div>
-      </div>
     </div>
   );
 }

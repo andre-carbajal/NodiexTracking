@@ -22,6 +22,7 @@
     "@prisma/client": "^7.8.0",
     "bcryptjs": "^2.4.3",
     "dotenv": "^17.4.2",
+    "framer-motion": "^12.40.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.468.0",
     "next": "^16.2.6",

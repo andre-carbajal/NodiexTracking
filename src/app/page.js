@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { copy, languages } from "@/lib/i18n";
 import Hero from "@/components/Hero";
+import StatsBanner from "@/components/StatsBanner";
 import TrackingWidget from "@/components/TrackingWidget";
 import TrackingResult from "@/components/TrackingResult";
-import AboutBand from "@/components/AboutBand";
 import CatalogSection from "@/components/CatalogSection";
 import CertificatesStrip from "@/components/CertificatesStrip";
 import ContactForm from "@/components/ContactForm";
@@ -60,6 +60,7 @@ export default function HomePage() {
     <ErrorBoundary>
       <main className="public-site">
         <Hero t={t} />
+        <StatsBanner />
         <section id="tracking" className="tracking-wrapper-modern">
           <TrackingWidget
             t={t}
@@ -71,7 +72,6 @@ export default function HomePage() {
           />
         </section>
         <TrackingResult tracking={tracking} t={t} />
-        <AboutBand t={t} />
         <CatalogSection t={t} publicData={publicData} hasFallback={hasFallback} />
         <CertificatesStrip publicData={publicData} />
         <ContactForm t={t} />
