@@ -3,6 +3,8 @@
 import { ArrowUpRight } from "lucide-react";
 import { useState, useEffect } from "react";
 
+import { motion, AnimatePresence } from "framer-motion";
+
 const slides = [
   {
     id: 1,
@@ -51,18 +53,27 @@ export default function Hero({ t }) {
       id="top"
       style={{ backgroundImage: `url(${slide.image})`, transition: 'background-image 0.5s ease-in-out' }}
     >
-      <div className="hero-copy" key={slide.id}>
-        <h1>
-          {slide.title1}
-          <span className="cursive-green">{slide.title2}</span>
-        </h1>
-        <p>{slide.description}</p>
-        <div className="hero-actions">
-          <a className="button-lima" href={slide.buttonLink} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', fontSize: '16px' }}>
-            {slide.buttonText} <ArrowUpRight size={18} />
-          </a>
-        </div>
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div 
+          className="hero-copy" 
+          key={slide.id}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -30 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1>
+            {slide.title1}
+            <span className="cursive-green">{slide.title2}</span>
+          </h1>
+          <p>{slide.description}</p>
+          <div className="hero-actions">
+            <a className="button-lima" href={slide.buttonLink} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', fontSize: '16px' }}>
+              {slide.buttonText} <ArrowUpRight size={18} />
+            </a>
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
       <div className="carousel-indicators">
         {slides.map((s, idx) => (

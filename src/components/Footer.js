@@ -2,10 +2,17 @@
 
 import { LockKeyhole, Mail, MapPin, Phone, Twitter, Facebook, Instagram, Youtube } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function Footer() {
   return (
-    <footer className="site-footer-modern">
+    <motion.footer 
+      className="site-footer-modern"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
+    >
 
       {/* Nueva Franja de Información de Contacto */}
 
@@ -55,6 +62,6 @@ export default function Footer() {
       <div className="footer-bottom">
         <p>&copy; {new Date().getFullYear()} Nodiex del Peru. Todos los derechos reservados.</p>
       </div>
-    </footer>
+    </motion.footer>
   );
 }

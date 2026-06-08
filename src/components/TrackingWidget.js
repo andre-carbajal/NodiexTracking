@@ -3,10 +3,21 @@
 import { CheckCircle2, ClipboardCheck, PackageSearch, Search, Truck } from "lucide-react";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import { isValidTrackingCode } from "@/lib/validators";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function TrackingWidget({ t, trackingCode, setTrackingCode, loading, trackingError, submitTracking }) {
   const [localError, setLocalError] = useState("");
+  const [currentStep, setCurrentStep] = useState(0);
+
+  useEffect(() => {
+    if (!loading && !trackingCode) {
+      const timer1 = setTimeout(() => setCurrentStep(1), 800);
+      const timer2 = setTimeout(() => setCurrentStep(2), 2400);
+      return () => { clearTimeout(timer1); clearTimeout(timer2); };
+    } else if (trackingCode) {
+      setCurrentStep(0); // reset when they start typing
+    }
+  }, [loading, trackingCode]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -60,15 +71,15 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
         </div>
 
         <div className="tracking-timeline-modern">
-          <div className="timeline-step">
+          <div className={`timeline-step ${currentStep >= 1 ? "active" : ""}`}>
             <div className="step-icon"><ClipboardCheck size={20} /></div>
             <div>
               <strong>Registrado</strong>
               <span>Hemos recibido tu pedido</span>
             </div>
           </div>
-          <div className="timeline-divider"></div>
-          <div className="timeline-step">
+          <div className={`timeline-divider ${currentStep >= 2 ? "filled" : ""}`}></div>
+          <div className={`timeline-step ${currentStep >= 2 ? "active" : ""}`}>
             <div className="step-icon"><Truck size={20} /></div>
             <div>
               <strong>En tránsito</strong>

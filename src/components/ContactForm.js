@@ -4,6 +4,7 @@ import { Send, Phone, Mail, MapPin } from "lucide-react";
 import Toast from "@/components/Toast";
 import { validateContactFields } from "@/lib/validators";
 import { useState, useRef } from "react";
+import { motion } from "framer-motion";
 
 export default function ContactForm({ t }) {
   const [form, setForm] = useState({ name: "", company: "", email: "", country: "", message: "" });
@@ -57,12 +58,24 @@ export default function ContactForm({ t }) {
   return (
     <section id="contact" className="contact-section-modern">
       <div className="contact-split-layout">
-        <div className="contact-text-side">
+        <motion.div 
+          className="contact-text-side"
+          initial={{ opacity: 0, x: -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-100px" }}
+        >
           <h2>Información de Contacto</h2>
           <p>¿Interesado en nuestros productos o requiere una cotización personalizada? Nuestro equipo comercial está listo para atender sus requerimientos.</p>
-        </div>
+        </motion.div>
 
-        <div className="contact-form-panel">
+        <motion.div 
+          className="contact-form-panel"
+          initial={{ opacity: 0, x: 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+          viewport={{ once: true, margin: "-100px" }}
+        >
           <form className="modern-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Tu Nombre</label>
@@ -127,7 +140,7 @@ export default function ContactForm({ t }) {
               Enviar Mensaje
             </button>
           </form>
-        </div>
+        </motion.div>
       </div>
       {toast && <Toast message={toast.message} variant={toast.variant} onClose={() => setToast(null)} />}
     </section>

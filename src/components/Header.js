@@ -1,22 +1,31 @@
 "use client";
 
 import { Facebook, Youtube } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { copy } from "@/lib/i18n";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const t = copy["es"]; // Default language to ES since no selector is present
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   if (pathname.startsWith("/admin")) {
     return null;
   }
 
   return (
-    <header className="site-header">
+    <header className={`site-header ${isScrolled ? "scrolled" : ""}`}>
       <div className="header-inner">
         <Link className="brand-logo" href="/#top" aria-label="NODIEX inicio">
           <img src="/logo1.png" alt="Nodiex Logo" />
