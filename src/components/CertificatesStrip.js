@@ -2,6 +2,24 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+};
 
 export default function CertificatesStrip({ publicData }) {
   return (
@@ -11,23 +29,31 @@ export default function CertificatesStrip({ publicData }) {
         <p className="certificates-subtitle">Inocuidad, calidad y seguridad en la cadena de suministro internacional.</p>
       </div>
       
-      <div className="certificates-logos">
+      <motion.div 
+        className="certificates-logos"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
         {publicData.certificates.map((certificate) => (
-          <Link href="/empresa/certificaciones" key={certificate.id} className="certificate-logo-link">
-            {certificate.imageUrl && (
-              <Image 
-                unoptimized 
-                src={certificate.imageUrl} 
-                alt={certificate.type} 
-                width={160} 
-                height={80} 
-                style={{ objectFit: "contain" }}
-              />
-            )}
-            <span className="sr-only">{certificate.type}</span>
-          </Link>
+          <motion.div variants={itemVariants} key={certificate.id}>
+            <Link href="/empresa/certificaciones" className="certificate-logo-link">
+              {certificate.imageUrl && (
+                <Image 
+                  unoptimized 
+                  src={certificate.imageUrl} 
+                  alt={certificate.type} 
+                  width={160} 
+                  height={80} 
+                  style={{ objectFit: "contain" }}
+                />
+              )}
+              <span className="sr-only">{certificate.type}</span>
+            </Link>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 }
