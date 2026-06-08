@@ -19,12 +19,18 @@ export default function Header() {
     <header className="site-header">
       <div className="header-inner">
         <Link className="brand-logo" href="/#top" aria-label="NODIEX inicio">
-          <img src="/nodiex_logo.jpg" alt="Nodiex Logo" />
+          <img src="/logo1.png" alt="Nodiex Logo" />
         </Link>
 
         <nav className={`main-nav ${menuOpen ? "open" : ""}`} id="main-menu">
           <Link href="/#top" onClick={() => setMenuOpen(false)}>Inicio</Link>
-          <Link href="/#about" onClick={() => setMenuOpen(false)}>Empresa</Link>
+          <div className="nav-dropdown">
+            <div className="dropdown-toggle" aria-haspopup="true">Empresa</div>
+            <div className="dropdown-menu">
+              <Link href="/#about" onClick={() => setMenuOpen(false)}>Nosotros</Link>
+              <Link href="/empresa/certificaciones" onClick={() => setMenuOpen(false)}>Certificaciones</Link>
+            </div>
+          </div>
           <Link href="/productos" onClick={() => setMenuOpen(false)}>{t.nav.catalog || "Productos"}</Link>
           <Link href="/#certificates" onClick={() => setMenuOpen(false)}>Galería</Link>
           <Link href="/#contact" onClick={() => setMenuOpen(false)}>{t.nav.contact || "Contacto"}</Link>

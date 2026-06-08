@@ -1,7 +1,14 @@
 const { PrismaClient } = require("@prisma/client");
+const { PrismaPg } = require("@prisma/adapter-pg");
+const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 
-const prisma = new PrismaClient();
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL ?? "",
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : undefined
+});
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 const roles = [
   {
@@ -38,23 +45,49 @@ const roles = [
 
 const products = [
   {
-    id: "prod-olive",
+    id: "prod-paprika",
     active: true,
     published: true,
+    imagenUrl: "https://pub-b8368783935b452db4d37c617979f165.r2.dev/seed/paprika.jpg",
     translations: {
-      es: { name: "Aceituna de mesa", description: "Producto seleccionado para exportación, calibrado y preparado para compradores internacionales." },
-      en: { name: "Table olives", description: "Selected export-ready product, graded and prepared for international buyers." },
-      pt: { name: "Azeitona de mesa", description: "Produto selecionado para exportação, calibrado e preparado para compradores internacionais." }
+      es: { name: "Páprika", description: "Fruto maduro deshidratado del \"Capsicum annuum\". Aporta color, sabor y un toque picante único." },
+      en: { name: "Paprika", description: "Dehydrated mature fruit of \"Capsicum annuum\". Adds color, flavor, and a unique spicy touch." }
     },
     presentations: [
-      { unit: "TM", prices: { PEN: 4200, USD: 1125, EUR: 1035 } },
-      { unit: "Contenedor 20'", prices: { USD: 21400, EUR: 19600 } }
+      { unit: "TM", prices: { PEN: 8500, USD: 2200, EUR: 2000 } }
+    ]
+  },
+  {
+    id: "prod-quinua",
+    active: true,
+    published: true,
+    imagenUrl: "https://pub-b8368783935b452db4d37c617979f165.r2.dev/seed/quinua.jpg",
+    translations: {
+      es: { name: "Quinua", description: "Grano andino de alto valor nutricional. Rica en proteínas, fibra y minerales esenciales." },
+      en: { name: "Quinoa", description: "Andean grain of high nutritional value. Rich in proteins, fiber, and essential minerals." }
+    },
+    presentations: [
+      { unit: "TM", prices: { PEN: 9000, USD: 2400, EUR: 2150 } }
+    ]
+  },
+  {
+    id: "prod-hongos",
+    active: true,
+    published: true,
+    imagenUrl: "https://pub-b8368783935b452db4d37c617979f165.r2.dev/seed/hongos.png",
+    translations: {
+      es: { name: "Hongo/Setas Comestibles", description: "Setas deshidratadas de excelente calidad. Ideales para una alimentación saludable." },
+      en: { name: "Edible Mushrooms", description: "Excellent quality dehydrated mushrooms. Ideal for a healthy diet." }
+    },
+    presentations: [
+      { unit: "TM", prices: { PEN: 15000, USD: 4000, EUR: 3600 } }
     ]
   },
   {
     id: "prod-oregano",
     active: true,
     published: true,
+    imagenUrl: "https://pub-b8368783935b452db4d37c617979f165.r2.dev/seed/oregano.jpg",
     translations: {
       es: { name: "Orégano seco", description: "Lote agroexportable con control de calidad y documentación comercial disponible." },
       en: { name: "Dried oregano", description: "Exportable agricultural lot with quality control and commercial documentation available." }
@@ -62,6 +95,32 @@ const products = [
     presentations: [
       { unit: "TM", prices: { PEN: 8800, USD: 2350, EUR: 2160 } },
       { unit: "Contenedor 40'", prices: { USD: 46800 } }
+    ]
+  },
+  {
+    id: "prod-curcuma",
+    active: true,
+    published: true,
+    imagenUrl: "https://pub-b8368783935b452db4d37c617979f165.r2.dev/seed/curcuma.png",
+    translations: {
+      es: { name: "Cúrcuma", description: "Raíz deshidratada y molida. Conocida por sus propiedades antioxidantes y color vibrante." },
+      en: { name: "Turmeric", description: "Dehydrated and ground root. Known for its antioxidant properties and vibrant color." }
+    },
+    presentations: [
+      { unit: "TM", prices: { PEN: 10500, USD: 2800, EUR: 2500 } }
+    ]
+  },
+  {
+    id: "prod-tarwi",
+    active: true,
+    published: true,
+    imagenUrl: "https://pub-b8368783935b452db4d37c617979f165.r2.dev/seed/tarwi.png",
+    translations: {
+      es: { name: "Tarwi", description: "Leguminosa andina excepcional, alta en proteínas y grasas saludables." },
+      en: { name: "Tarwi", description: "Exceptional Andean legume, high in proteins and healthy fats." }
+    },
+    presentations: [
+      { unit: "TM", prices: { PEN: 7500, USD: 2000, EUR: 1800 } }
     ]
   }
 ];
@@ -164,6 +223,7 @@ async function main() {
           id: product.id,
           activo: product.active,
           estadoPublicacion: product.published ? "publicado" : "borrador",
+          imagenUrl: product.imagenUrl,
           traducciones: {
             create: Object.entries(product.translations).map(([idioma, value]) => ({
               id: `tr-${product.id}-${idioma}`,
@@ -237,7 +297,7 @@ async function main() {
         detalle: { detail: "Datos iniciales cargados desde Prisma seed." }
       }
     });
-  });
+  }, { maxWait: 15000, timeout: 30000 });
 }
 
 main()

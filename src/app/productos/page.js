@@ -21,7 +21,6 @@ export default async function ProductosPage() {
           <h1>Nuestros<br /><span className="cursive-light">Productos.</span></h1>
           <p className="hero-desc">Exportamos orégano, especias y hierbas aromáticas con los más altos estándares de calidad. Cultivados, seleccionados y procesados para llevar lo mejor del Perú al mundo.</p>
         </div>
-
       </section>
 
       <ProductCatalogBrowser products={products} />

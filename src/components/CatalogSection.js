@@ -1,71 +1,76 @@
 "use client";
 
-import { Award, CheckCircle2, Download, Search } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
 
-const productImages = [
-  "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=900&q=80"
-];
-
-function normalizeSearch(value) {
-  return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
-
-export default function CatalogSection({ t, publicData, hasFallback }) {
-  const [search, setSearch] = useState("");
-  const filteredProducts = useMemo(() => {
-    const query = normalizeSearch(search.trim());
-    if (!query) return publicData.products;
-    return publicData.products.filter((product) => normalizeSearch(product.name).includes(query));
-  }, [publicData.products, search]);
-  const selectedProduct = filteredProducts[0];
+export default function CatalogSection({ t, publicData }) {
+  const products = publicData.products.slice(0, 4);
 
   return (
     <section className="catalog-section" id="catalog">
-      <div className="section-heading catalog-heading">
-        <div>
-          <p className="eyebrow">Catalogo de productos</p>
-          <h2>{t.catalogTitle}</h2>
-          {hasFallback && <p className="fallback-note">{t.fallback}</p>}
-        </div>
-        <div className="filter-bar">
-          <label>
-            <Search size={18} />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar producto"
-              aria-label="Buscar producto"
-            />
-          </label>
-          <button type="button" onClick={() => setSearch("")}>Todos</button>
-          <Link href="/productos" className="button-lima" style={{ color: 'var(--green-dark)', background: '#fff', border: '1px solid #dcebce' }}>Ver pagina completa</Link>
-        </div>
-      </div>
+      <div className="catalog-grid-v">
+        
+        {/* Elemento 1: Imagen Extremo Izquierdo (Alta) */}
+        {products[0] && (
+          <Link href={`/productos/${products[0].id}`} className="gallery-item-card card-left">
+            <div className="gallery-image-wrap">
+              <Image unoptimized alt={products[0].name} src={products[0].imageUrl} fill style={{ objectFit: 'cover' }} />
+            </div>
+            <div className="gallery-floating-card">
+              <h3>{products[0].name}</h3>
+            </div>
+          </Link>
+        )}
 
-      <div className="catalog-grid-modern">
-        {filteredProducts.slice(0, 3).map((product, index) => (
-          <article className="product-card-modern" key={product.id}>
-            <div className="card-image-wrap">
-              <Image unoptimized alt={product.name} src={product.imageUrl || productImages[index % productImages.length]} fill style={{ objectFit: 'cover' }} />
+        {/* Elemento 2: Bloque de Texto Central (Ubicado entre Col 2 y 3, Fila 1) */}
+        <div className="catalog-header-v">
+          <span className="catalog-subtitle">■ Del Campo al Mundo</span>
+          <h2 className="catalog-title-main">Descubre el Arte de la Exportación a través de nuestros Productos</h2>
+          <p className="catalog-desc-main">Ofrecemos productos orgánicos de la más alta calidad, seleccionados bajo estrictos estándares internacionales para garantizar el mejor sabor en cada envío.</p>
+          <div className="catalog-cta-wrapper">
+            <Link href="/productos" className="button-lima">
+              Ver Productos
+            </Link>
+          </div>
+        </div>
+
+        {/* Elemento 3: Imagen Centro Izquierda (Baja) */}
+        {products[1] && (
+          <Link href={`/productos/${products[1].id}`} className="gallery-item-card card-center-left">
+            <div className="gallery-image-wrap">
+              <Image unoptimized alt={products[1].name} src={products[1].imageUrl} fill style={{ objectFit: 'cover' }} />
             </div>
-            
-            <div className="card-content">
-              <h3>{product.name}</h3>
-              <p className="card-desc">{product.description}</p>
-              
-              <div className="card-actions-row">
-                <Link className="button-lima full-width" href={`/productos/${product.id}`}>
-                  Ver más información ↗
-                </Link>
-              </div>
+            <div className="gallery-floating-card">
+              <h3>{products[1].name}</h3>
             </div>
-          </article>
-        ))}
+          </Link>
+        )}
+
+        {/* Elemento 4: Imagen Centro Derecha (Baja) */}
+        {products[2] && (
+          <Link href={`/productos/${products[2].id}`} className="gallery-item-card card-center-right">
+            <div className="gallery-image-wrap">
+              <Image unoptimized alt={products[2].name} src={products[2].imageUrl} fill style={{ objectFit: 'cover' }} />
+            </div>
+            <div className="gallery-floating-card">
+              <h3>{products[2].name}</h3>
+            </div>
+          </Link>
+        )}
+
+        {/* Elemento 5: Imagen Extremo Derecho (Alta) */}
+        {products[3] && (
+          <Link href={`/productos/${products[3].id}`} className="gallery-item-card card-right">
+            <div className="gallery-image-wrap">
+              <Image unoptimized alt={products[3].name} src={products[3].imageUrl} fill style={{ objectFit: 'cover' }} />
+            </div>
+            <div className="gallery-floating-card">
+              <h3>{products[3].name}</h3>
+            </div>
+          </Link>
+        )}
+
       </div>
     </section>
   );

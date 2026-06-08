@@ -11,7 +11,7 @@ const slides = [
     description: "Hojas seleccionadas con altos niveles de aceites esenciales. Adaptamos la mejora de calidad a las necesidades de nuestros clientes internacionales.",
     buttonText: "Realiza tu Pedido",
     buttonLink: "#catalog",
-    image: "https://images.unsplash.com/photo-1595855761361-b4f0b2f1e29c?auto=format&fit=crop&w=1920&q=80"
+    image: "https://plus.unsplash.com/premium_photo-1700064759190-f8a6b2b27f7f?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     id: 2,
@@ -46,9 +46,9 @@ export default function Hero({ t }) {
   const slide = slides[currentSlide];
 
   return (
-    <section 
-      className="hero" 
-      id="top" 
+    <section
+      className="hero"
+      id="top"
       style={{ backgroundImage: `url(${slide.image})`, transition: 'background-image 0.5s ease-in-out' }}
     >
       <div className="hero-copy" key={slide.id}>
@@ -63,10 +63,10 @@ export default function Hero({ t }) {
           </a>
         </div>
       </div>
-      
+
       <div className="carousel-indicators">
         {slides.map((s, idx) => (
-          <button 
+          <button
             key={s.id}
             className={`indicator-dot ${idx === currentSlide ? 'active' : ''}`}
             onClick={() => setCurrentSlide(idx)}

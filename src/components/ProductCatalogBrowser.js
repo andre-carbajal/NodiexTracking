@@ -6,11 +6,6 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import EmptyState from "@/components/EmptyState";
 
-const productImages = [
-  "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=900&q=80"
-];
 
 function priceText(prices) {
   return Object.entries(prices || {})
@@ -32,26 +27,6 @@ export default function ProductCatalogBrowser({ products = [] }) {
 
   return (
     <section className="products-page">
-      <div className="catalog-hero-modern">
-        <div className="catalog-hero-text">
-          <p className="eyebrow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ width: '16px', height: '16px', borderRadius: '50%', border: '2px solid var(--green)', display: 'inline-block' }}></span>
-            Catálogo de productos
-          </p>
-          <h2>
-            Origen Peruano, <br/>
-            <span className="cursive-green">Calidad</span> que el mundo valora.
-          </h2>
-          <p>
-            Conoce nuestra selección de productos naturales, cultivados y procesados con dedicación para ofrecerte lo mejor de nuestra tierra.
-          </p>
-        </div>
-        <div className="catalog-hero-image">
-          <div className="blob-bg"></div>
-          <Image unoptimized src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80" alt="Oregano" width={400} height={400} style={{ objectFit: 'contain' }} />
-        </div>
-      </div>
-
       <div className="products-toolbar">
         <label>
           <Search size={18} />
@@ -72,15 +47,15 @@ export default function ProductCatalogBrowser({ products = [] }) {
           {filteredProducts.map((product, index) => (
             <article className="product-card-modern" key={product.id}>
               <div className="card-image-wrap">
-                <Image unoptimized alt={product.name} src={product.imageUrl || productImages[index % productImages.length]} fill style={{ objectFit: 'cover' }} />
+                <Image unoptimized alt={product.name} src={product.imageUrl} fill style={{ objectFit: 'cover' }} />
               </div>
               
               <div className="card-content">
                 <h3>{product.name}</h3>
                 <p className="card-desc">{product.description}</p>
                 
-                <div className="card-actions-row">
-                  <Link className="button-lima full-width" href={`/productos/${product.id}`}>
+                <div className="card-actions-row" style={{ display: 'flex', justifyContent: 'center' }}>
+                  <Link className="button-lima" href={`/productos/${product.id}`}>
                     Ver más información ↗
                   </Link>
                 </div>
