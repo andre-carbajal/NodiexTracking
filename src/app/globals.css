@@ -1404,6 +1404,20 @@ h2 {
   gap: 12px;
 }
 
+.user-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.user-form input,
+.user-form select {
+  width: 100%;
+}
+
+.user-form .button {
+  align-self: end;
+}
+
 .product-form {
   display: grid;
   gap: 16px;
