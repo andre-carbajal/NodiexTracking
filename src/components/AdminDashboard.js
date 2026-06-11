@@ -617,7 +617,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
           </div>
 
           <div style={{ background: "#f9f9f9", padding: "1rem", borderRadius: "8px", marginBottom: "2rem" }}>
-            <h3>4. Sección "Nosotros"</h3>
+            <h3>4. Sección &quot;Nosotros&quot;</h3>
             <ContentForm sectionId="about" contentData={getContent("about")} onPost={post} />
           </div>
         </section>
