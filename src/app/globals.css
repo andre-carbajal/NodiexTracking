@@ -1834,12 +1834,13 @@ h2 {
     padding: 8px 16px;
     border-radius: 20px;
     transition: all 0.2s;
+    color: var(--ink) !important;
   }
 
   .main-nav a:hover,
   .main-nav a.active {
     background: rgba(197, 241, 29, 0.15);
-    color: var(--green-dark);
+    color: var(--green-dark) !important;
     font-weight: 600;
   }
 
@@ -3993,21 +3994,30 @@ h2 {
 }
 
 @media (max-width: 900px) {
-  .contact-container {
+  .contact-split-layout {
     flex-direction: column;
+    align-items: stretch;
+    gap: 30px;
   }
 
-  .contact-info-panel {
-    padding: 40px 30px;
+  .contact-text-side {
+    flex: none;
+    width: 100%;
+    text-align: center;
+  }
+
+  .contact-text-side h2 {
+    font-size: 32px;
   }
 
   .contact-form-panel {
-    padding: 40px 30px;
+    padding: 30px 20px;
+    width: 100%;
   }
 
   .form-row {
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
   }
 }
 
@@ -4479,6 +4489,7 @@ h2 {
     width: 100%;
     padding: 12px 0;
     border-bottom: 1px solid var(--line);
+    color: var(--ink) !important;
   }
   .main-nav a:last-child {
     border-bottom: none;
@@ -4647,10 +4658,29 @@ h2 {
   .header-actions {
     gap: 10px !important;
   }
+  .product-detail {
+    margin-top: 100px !important;
+  }
 }
 
 @media (max-width: 480px) {
   .admin-stats {
     grid-template-columns: 1fr !important;
+  }
+  .tracking-input-wrapper-mockup {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .tracking-input-wrapper-mockup input {
+    padding: 14px 20px !important;
+    border-radius: 8px !important;
+  }
+  .button-buscar-mockup {
+    position: static !important;
+    width: 100% !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    padding: 14px 20px !important;
   }
 }
