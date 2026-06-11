@@ -1,6 +1,20 @@
 import { NextResponse } from "next/server";
 import { getPublicProduct } from "@/lib/store";
 
+const rateLimitMap = globalThis.__nodiexFichaRateLimit ?? new Map();
+globalThis.__nodiexFichaRateLimit = rateLimitMap;
+
+function clientIp(request) {
+  if (request.ip) return request.ip;
+  const cfIp = request.headers.get("cf-connecting-ip");
+  if (cfIp) return cfIp.trim();
+  const realIp = request.headers.get("x-real-ip");
+  if (realIp) return realIp.trim();
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) return forwardedFor.split(",")[0].trim();
+  return "local";
+}
+
 function ascii(value) {
   return String(value || "")
     .normalize("NFD")
@@ -12,15 +26,35 @@ function escapePdf(value) {
   return ascii(value).replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
 }
 
+function wrapText(text, maxChars = 75) {
+  const words = String(text || "").split(/\s+/);
+  const lines = [];
+  let currentLine = "";
+
+  words.forEach((word) => {
+    if ((currentLine + word).length > maxChars) {
+      if (currentLine.trim()) lines.push(currentLine.trim());
+      currentLine = word + " ";
+    } else {
+      currentLine += word + " ";
+    }
+  });
+  if (currentLine.trim()) {
+    lines.push(currentLine.trim());
+  }
+  return lines;
+}
+
 function makePdf(product) {
   const lines = [
     "NODIEX DEL PERU S.A.C.",
     `Ficha tecnica - ${product.name}`,
-    "",
-    product.description,
-    "",
-    "Presentaciones y precios:"
+    ""
   ];
+
+  const descLines = wrapText(product.description, 70);
+  lines.push(...descLines);
+  lines.push("", "Presentaciones y precios:");
 
   product.presentations.forEach((presentation) => {
     const prices = Object.entries(presentation.prices)
@@ -62,6 +96,16 @@ function makePdf(product) {
 }
 
 export async function GET(request, { params }) {
+  const ip = clientIp(request);
+  const bucket = rateLimitMap.get(ip) ?? [];
+  const now = Date.now();
+  const recent = bucket.filter((stamp) => now - stamp < 10 * 60 * 1000);
+  if (recent.length >= 15) {
+    return NextResponse.json({ ok: false, message: "Demasiadas descargas. Intente en unos minutos." }, { status: 429 });
+  }
+  recent.push(now);
+  rateLimitMap.set(ip, recent);
+
   const url = new URL(request.url);
   const { id } = await params;
   const product = await getPublicProduct(id, url.searchParams.get("lang") || "es");

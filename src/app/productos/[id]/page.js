@@ -37,7 +37,7 @@ export default async function ProductoDetallePage({ params }) {
 
   return (
     <main className="public-site">
-      <section className="product-detail" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'start', maxWidth: '1000px', margin: '160px auto 100px auto', padding: '0 20px' }}>
+      <section className="product-detail" style={{ maxWidth: '1000px', margin: '160px auto 100px auto', padding: '0 20px' }}>
         <div className="product-detail-media" style={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 30px rgba(0,0,0,0.08)' }}>
           <Image unoptimized src={product.imageUrl || fallbackImage} alt={product.name} width={920} height={520} style={{ display: 'block', width: '100%', height: 'auto' }} />
         </div>

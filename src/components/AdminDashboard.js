@@ -553,6 +553,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
             setCertificate={setCertificate}
             onPost={post}
             errors={certErrors}
+            token={token}
           />
           <CertificacionesList
             certificates={data.certificates}
@@ -569,6 +570,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
                 editingId={editingCertId}
                 onCancel={closeCertificateModal}
                 errors={certErrors}
+                token={token}
               />
             </EditModal>
           )}
