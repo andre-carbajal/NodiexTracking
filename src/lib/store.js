@@ -889,9 +889,12 @@ export async function createCertificate(user, body) {
   if (!["SENASA", "BRC", "ISO", "BASC"].includes(body.certType) || !body.validUntil || !body.evidence) {
     return { error: "Certificacion incompleta", status: 400 };
   }
+  const validUntil = new Date(`${body.validUntil}T00:00:00.000Z`);
+  if (isNaN(validUntil.getTime())) {
+    return { error: "Fecha de vencimiento invalida", status: 400 };
+  }
 
   return prisma.$transaction(async (tx) => {
-    const validUntil = new Date(`${body.validUntil}T00:00:00.000Z`);
     const valid = validUntil >= new Date();
     const certificate = await tx.certificacion.create({
       data: {
@@ -913,12 +916,15 @@ export async function updateCertificate(user, body) {
   if (!["SENASA", "BRC", "ISO", "BASC"].includes(body.certType) || !body.validUntil || !body.evidence) {
     return { error: "Certificacion incompleta", status: 400 };
   }
+  const validUntil = new Date(`${body.validUntil}T00:00:00.000Z`);
+  if (isNaN(validUntil.getTime())) {
+    return { error: "Fecha de vencimiento invalida", status: 400 };
+  }
 
   return prisma.$transaction(async (tx) => {
     const existing = await tx.certificacion.findUnique({ where: { id: body.id } });
     if (!existing) return { error: "Certificacion no encontrada", status: 404 };
 
-    const validUntil = new Date(`${body.validUntil}T00:00:00.000Z`);
     const valid = validUntil >= new Date();
     const certificate = await tx.certificacion.update({
       where: { id: body.id },

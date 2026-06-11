@@ -69,7 +69,13 @@ export function validateProductFields(body) {
 export function validateCertificateFields(body) {
   const errors = {};
   if (!isValidCertType(body.certType)) errors.certType = "Tipo de certificacion no valido";
-  if (!body.validUntil) errors.validUntil = "Fecha de vencimiento es obligatoria";
+  const dateVal = body.validUntil ? new Date(`${body.validUntil}T00:00:00.000Z`) : null;
+  if (!body.validUntil || !dateVal || isNaN(dateVal.getTime())) {
+    errors.validUntil = "Fecha de vencimiento no valida";
+  }
+  if (!body.evidence || !body.evidence.trim()) {
+    errors.evidence = "Evidencia documental es obligatoria";
+  }
   return { valid: Object.keys(errors).length === 0, errors };
 }
 

@@ -14,30 +14,33 @@ export default function AdminPage() {
   const [login, setLogin] = useState({ username: "admin", password: "Nodiex2026!" });
 
   const load = useCallback(async (currentToken = token, params = {}) => {
-    if (!currentToken) return;
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== "") query.set(key, String(value));
     });
     const path = query.toString() ? `/api/admin?${query.toString()}` : "/api/admin";
-    const res = await fetch(path, { headers: { Authorization: `Bearer ${currentToken}` } });
+    const headers = {};
+    if (currentToken && currentToken !== "cookie-authenticated") {
+      headers.Authorization = `Bearer ${currentToken}`;
+    }
+    const res = await fetch(path, { headers });
     const json = await res.json();
     if (res.ok) {
       setData(json.data);
       setUser(json.user);
+      setToken(json.token || currentToken || "cookie-authenticated");
     } else {
-      localStorage.removeItem("nodiex-token");
       setToken("");
     }
   }, [token]);
 
   useEffect(() => {
     setHydrated(true);
-    setToken(localStorage.getItem("nodiex-token") || "");
+    load("");
   }, []);
 
   useEffect(() => {
-    if (token) load(token);
+    if (token && token !== "cookie-authenticated") load(token);
   }, [load, token]);
 
   async function doLogin(event) {
@@ -55,12 +58,11 @@ export default function AdminPage() {
     }
     setToken(json.token);
     setUser(json.user);
-    localStorage.setItem("nodiex-token", json.token);
     await load(json.token);
   }
 
-  function handleLogout() {
-    localStorage.removeItem("nodiex-token");
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
     setToken("");
     setUser(null);
   }

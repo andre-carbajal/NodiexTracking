@@ -1,6 +1,6 @@
 "use client";
 
-import { LockKeyhole, Mail, MapPin, Phone, Twitter, Facebook, Instagram, Youtube } from "lucide-react";
+import { LockKeyhole, Mail, MapPin, Phone, Twitter, Instagram } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -25,9 +25,7 @@ export default function Footer() {
           </Link>
           <div className="footer-socials">
             <a href="#" aria-label="Twitter"><Twitter size={20} /></a>
-            <a href="#" aria-label="Facebook"><Facebook size={20} /></a>
             <a href="#" aria-label="Instagram"><Instagram size={20} /></a>
-            <a href="#" aria-label="YouTube"><Youtube size={20} /></a>
           </div>
         </div>
 

@@ -1,16 +1,32 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus, ImageUp } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
-function imageToDataUrl(file, onReady) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => onReady(String(reader.result || ""));
-  reader.readAsDataURL(file);
-}
+export default function CertificacionForm({ certificate, setCertificate, onPost, onEdit, editingId, onCancel, errors, token }) {
+  const [uploadState, setUploadState] = useState("");
 
-export default function CertificacionForm({ certificate, setCertificate, onPost, onEdit, editingId, onCancel, errors }) {
+  async function uploadImage(file) {
+    if (!file) return;
+    setUploadState("Subiendo...");
+
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/admin/upload", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setUploadState(json.message || "No se pudo subir");
+      return;
+    }
+    setCertificate({ ...certificate, imageUrl: json.url });
+    setUploadState("Cargada");
+  }
+
   return (
     <div className="form-grid">
       <div>
@@ -26,7 +42,10 @@ export default function CertificacionForm({ certificate, setCertificate, onPost,
         <input type="date" value={certificate.validUntil} onChange={(e) => setCertificate({ ...certificate, validUntil: e.target.value })} className={errors?.validUntil ? "input-error" : ""} />
         {errors?.validUntil && <span className="field-error">{errors.validUntil}</span>}
       </div>
-      <input placeholder="Evidencia documental" value={certificate.evidence} onChange={(e) => setCertificate({ ...certificate, evidence: e.target.value })} />
+      <div>
+        <input placeholder="Evidencia documental" value={certificate.evidence} onChange={(e) => setCertificate({ ...certificate, evidence: e.target.value })} className={errors?.evidence ? "input-error" : ""} />
+        {errors?.evidence && <span className="field-error">{errors.evidence}</span>}
+      </div>
       <label className="check-row">
         <input
           type="checkbox"
@@ -35,14 +54,17 @@ export default function CertificacionForm({ certificate, setCertificate, onPost,
         />
         Publicada
       </label>
-      <label className="file-field">
-        Imagen o respaldo
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => imageToDataUrl(e.target.files?.[0], (imageUrl) => setCertificate({ ...certificate, imageUrl }))}
-        />
-      </label>
+      <div className="product-media-row" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <label className="file-field">
+          Imagen o respaldo
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => uploadImage(e.target.files?.[0])}
+          />
+        </label>
+        {uploadState && <span className="upload-status" style={{ fontSize: "0.85rem", color: "#666" }}><ImageUp size={14} /> {uploadState}</span>}
+      </div>
       {certificate.imageUrl && (
         <div className="image-preview">
           <Image unoptimized src={certificate.imageUrl} alt="Vista previa certificacion" width={84} height={64} />
