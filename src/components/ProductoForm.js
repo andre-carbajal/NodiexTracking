@@ -36,6 +36,7 @@ function statusLabel(product) {
 
 export default function ProductForm({ product, setProduct, onPost, onEdit, editingId, onCancel, errors, token }) {
   const [uploadState, setUploadState] = useState("");
+  const [lang, setLang] = useState("es");
   const [label, variant] = statusLabel(product);
 
   async function uploadImage(file) {
@@ -76,27 +77,36 @@ export default function ProductForm({ product, setProduct, onPost, onEdit, editi
     });
   }
 
+  const currentName = lang === "es" ? "name" : lang === "en" ? "nameEn" : "namePt";
+  const currentDesc = lang === "es" ? "description" : lang === "en" ? "descriptionEn" : "descriptionPt";
+
   return (
     <div className="product-form">
+      <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+        <button type="button" className={`ghost-button ${lang === "es" ? "active" : ""}`} onClick={() => setLang("es")}>🇪🇸 Español</button>
+        <button type="button" className={`ghost-button ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>🇺🇸 Inglés</button>
+        <button type="button" className={`ghost-button ${lang === "pt" ? "active" : ""}`} onClick={() => setLang("pt")}>🇧🇷 Portugués</button>
+      </div>
+
       <div className="product-form-main">
         <div>
           <input
-            placeholder="Nombre producto"
-            value={product.name}
-            onChange={(e) => setProduct({ ...product, name: e.target.value })}
+            placeholder={`Nombre producto (${lang.toUpperCase()})`}
+            value={product[currentName]}
+            onChange={(e) => setProduct({ ...product, [currentName]: e.target.value })}
             className={errors?.name ? "input-error" : ""}
           />
-          {errors?.name && <span className="field-error">{errors.name}</span>}
+          {errors?.name && lang === "es" && <span className="field-error">{errors.name}</span>}
         </div>
         <div className="full-span">
           <textarea
-            placeholder="Descripcion"
-            value={product.description}
-            onChange={(e) => setProduct({ ...product, description: e.target.value })}
+            placeholder={`Descripcion (${lang.toUpperCase()})`}
+            value={product[currentDesc]}
+            onChange={(e) => setProduct({ ...product, [currentDesc]: e.target.value })}
             className={errors?.description ? "input-error" : ""}
             rows={3}
           />
-          {errors?.description && <span className="field-error">{errors.description}</span>}
+          {errors?.description && lang === "es" && <span className="field-error">{errors.description}</span>}
         </div>
       </div>
 

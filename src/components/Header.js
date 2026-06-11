@@ -4,13 +4,15 @@ import { Facebook, Youtube } from "lucide-react";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { copy } from "@/lib/i18n";
+import { copy, languages } from "@/lib/i18n";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
-  const t = copy["es"]; // Default language to ES since no selector is present
+  const { lang, changeLang } = useI18n();
+  const t = copy[lang] || copy["es"];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,15 +35,10 @@ export default function Header() {
 
         <nav className={`main-nav ${menuOpen ? "open" : ""}`} id="main-menu">
           <Link href="/#top" onClick={() => setMenuOpen(false)}>Inicio</Link>
-          <div className="nav-dropdown">
-            <div className="dropdown-toggle" aria-haspopup="true">Empresa</div>
-            <div className="dropdown-menu">
-              <Link href="/#about" onClick={() => setMenuOpen(false)}>Nosotros</Link>
-              <Link href="/empresa/certificaciones" onClick={() => setMenuOpen(false)}>Certificaciones</Link>
-            </div>
-          </div>
+          <Link href="/#about" onClick={() => setMenuOpen(false)}>Nosotros</Link>
           <Link href="/productos" onClick={() => setMenuOpen(false)}>{t.nav.catalog || "Productos"}</Link>
           <Link href="/#certificates" onClick={() => setMenuOpen(false)}>Galería</Link>
+          <Link href="/empresa/certificaciones" onClick={() => setMenuOpen(false)}>Certificaciones</Link>
           <Link href="/#contact" onClick={() => setMenuOpen(false)}>{t.nav.contact || "Contacto"}</Link>
         </nav>
 
@@ -50,7 +47,32 @@ export default function Header() {
             <a href="#" aria-label="Facebook"><Facebook size={16} /></a>
             <a href="#" aria-label="YouTube"><Youtube size={16} /></a>
           </div>
-          <Link href="/#tracking" className="button-lima">Seguimiento</Link>
+          <div className="lang-selector">
+            <select 
+              value={lang} 
+              onChange={(e) => changeLang(e.target.value)} 
+              className="lang-select-modern"
+              style={{ 
+                padding: "8px 12px", 
+                borderRadius: "8px", 
+                border: "1px solid #e2e8f0", 
+                background: "#f8fafc", 
+                cursor: "pointer", 
+                color: "#0f172a", 
+                fontWeight: "600",
+                fontSize: "14px",
+                outline: "none",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+              }}
+            >
+              {languages.map(l => (
+                <option key={l.code} value={l.code} style={{ color: "black" }}>
+                  {l.country} {l.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Link href="/#tracking" className="button-lima">{t.nav?.tracking || "Seguimiento"}</Link>
 
           <button className="mobile-menu-button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-controls="main-menu">
             <span />

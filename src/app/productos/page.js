@@ -2,6 +2,7 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 import ProductCatalogBrowser from "@/components/ProductCatalogBrowser";
 import { getVisibleProducts } from "@/lib/store";
+import { cookies } from "next/headers";
 
 export const metadata = {
   title: "Productos | NODIEX",
@@ -11,7 +12,9 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function ProductosPage() {
-  const products = await getVisibleProducts("es");
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("nodiex_lang")?.value || "es";
+  const products = await getVisibleProducts(lang);
 
   return (
     <main className="public-site">

@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { copy, languages } from "@/lib/i18n";
+import { useI18n } from "@/components/I18nProvider";
 import Hero from "@/components/Hero";
 import StatsBanner from "@/components/StatsBanner";
 import TrackingWidget from "@/components/TrackingWidget";
 import TrackingResult from "@/components/TrackingResult";
+import AboutBand from "@/components/AboutBand";
 import CatalogSection from "@/components/CatalogSection";
 import CertificatesStrip from "@/components/CertificatesStrip";
 import ContactForm from "@/components/ContactForm";
@@ -13,8 +15,8 @@ import Footer from "@/components/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function HomePage() {
-  const [lang, setLang] = useState("es");
-  const [publicData, setPublicData] = useState({ products: [], certificates: [] });
+  const { lang } = useI18n();
+  const [publicData, setPublicData] = useState({ products: [], certificates: [], content: {} });
   const [trackingCode, setTrackingCode] = useState("NDX-8Q4M-2026");
   const [tracking, setTracking] = useState(null);
   const [trackingError, setTrackingError] = useState("");
@@ -59,7 +61,7 @@ export default function HomePage() {
   return (
     <ErrorBoundary>
       <main className="public-site">
-        <Hero t={t} />
+        <Hero t={t} content={publicData.content} />
         <StatsBanner />
         <section id="tracking" className="tracking-wrapper-modern">
           <TrackingWidget
@@ -74,6 +76,7 @@ export default function HomePage() {
         <TrackingResult tracking={tracking} t={t} />
         <CatalogSection t={t} publicData={publicData} hasFallback={hasFallback} />
         <CertificatesStrip publicData={publicData} />
+        <AboutBand t={t} content={publicData.content} />
         <ContactForm t={t} />
         <Footer />
       </main>

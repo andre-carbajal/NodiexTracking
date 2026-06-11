@@ -1,34 +1,52 @@
 "use client";
 
 import { FileClock } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Pagination from "@/components/Pagination";
 import EmptyState from "@/components/EmptyState";
 
 const PAGE_SIZE = 10;
 
-export default function BitacoraView({ events = [] }) {
+export default function BitacoraView({ token }) {
+  const [events, setEvents] = useState([]);
   const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState("");
+  const [filterUser, setFilterUser] = useState("");
+  const [filterEntity, setFilterEntity] = useState("todos");
+  const [filterDateStart, setFilterDateStart] = useState("");
+  const [filterDateEnd, setFilterDateEnd] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const filtered = filter
-    ? events.filter((e) =>
-        e.operation?.toLowerCase().includes(filter.toLowerCase()) ||
-        e.entity?.toLowerCase().includes(filter.toLowerCase()) ||
-        e.user?.toLowerCase().includes(filter.toLowerCase())
-      )
-    : events;
+  useEffect(() => {
+    async function fetchAudit() {
+      setLoading(true);
+      try {
+        const query = new URLSearchParams({
+          user: filterUser,
+          entity: filterEntity,
+          start: filterDateStart,
+          end: filterDateEnd
+        });
+        const res = await fetch(`/api/admin/audit?${query.toString()}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const json = await res.json();
+        if (json.ok) {
+          setEvents(json.data);
+        }
+      } catch (error) {
+        console.error("Error fetching audit logs", error);
+      }
+      setLoading(false);
+    }
+    fetchAudit();
+  }, [filterUser, filterEntity, filterDateStart, filterDateEnd, token]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  if (events.length === 0) {
-    return <EmptyState title="Sin eventos de auditoria" description="Los eventos se registraran automaticamente al usar el sistema." />;
-  }
+  const totalPages = Math.max(1, Math.ceil(events.length / PAGE_SIZE));
+  const paginated = events.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   function exportCSV() {
     const headers = ["Fecha", "Usuario", "Entidad", "Operacion", "Detalle"];
-    const rows = filtered.map((e) => [
+    const rows = events.map((e) => [
       new Date(e.createdAt).toLocaleString("es-PE"),
       e.user,
       e.entity,
@@ -47,24 +65,58 @@ export default function BitacoraView({ events = [] }) {
 
   return (
     <>
-      <div className="audit-controls">
+      <div className="audit-filters-panel" style={{ display: "flex", gap: "10px", marginBottom: "20px", flexWrap: "wrap", alignItems: "center" }}>
         <input
-          placeholder="Filtrar por usuario, entidad u operacion..."
-          value={filter}
-          onChange={(e) => { setFilter(e.target.value); setPage(1); }}
+          type="text"
+          placeholder="Usuario responsable..."
+          value={filterUser}
+          onChange={(e) => { setFilterUser(e.target.value); setPage(1); }}
+          style={{ padding: "8px", borderRadius: "8px", border: "1px solid #ccc" }}
+        />
+        <select 
+          value={filterEntity} 
+          onChange={(e) => { setFilterEntity(e.target.value); setPage(1); }}
+          style={{ padding: "8px", borderRadius: "8px", border: "1px solid #ccc" }}
+        >
+          <option value="todos">Todas las Entidades</option>
+          <option value="despacho">Despachos</option>
+          <option value="producto">Productos</option>
+          <option value="certificacion">Certificaciones</option>
+          <option value="usuario">Usuarios</option>
+        </select>
+        <input 
+          type="date" 
+          value={filterDateStart} 
+          onChange={(e) => { setFilterDateStart(e.target.value); setPage(1); }}
+          style={{ padding: "8px", borderRadius: "8px", border: "1px solid #ccc" }}
+        />
+        <input 
+          type="date" 
+          value={filterDateEnd} 
+          onChange={(e) => { setFilterDateEnd(e.target.value); setPage(1); }}
+          style={{ padding: "8px", borderRadius: "8px", border: "1px solid #ccc" }}
         />
         <button className="button secondary small" onClick={exportCSV}>Exportar CSV</button>
       </div>
-      <div className="audit-list">
-        {paginated.map((event) => (
-          <article key={event.id}>
-            <strong>{event.operation}</strong>
-            <span>{event.user} · {event.entity} · {new Date(event.createdAt).toLocaleString("es-PE")}</span>
-            <p>{event.detail}</p>
-          </article>
-        ))}
-      </div>
-      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+      
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "2rem" }}>Cargando bitácora...</div>
+      ) : events.length === 0 ? (
+        <EmptyState title="Sin eventos de auditoria" description="No se encontraron registros para estos filtros." />
+      ) : (
+        <>
+          <div className="audit-list">
+            {paginated.map((event) => (
+              <article key={event.id}>
+                <strong>{event.operation}</strong>
+                <span>{event.user} · {event.entity} · {new Date(event.createdAt).toLocaleString("es-PE")}</span>
+                <p>{event.detail}</p>
+              </article>
+            ))}
+          </div>
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+        </>
+      )}
     </>
   );
 }

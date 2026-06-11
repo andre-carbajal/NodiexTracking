@@ -268,6 +268,26 @@ export async function getVisibleCertificates() {
   return certificates.map(serializeCertificate);
 }
 
+export async function getVisibleContent(lang = "es") {
+  const contents = await prisma.contenido.findMany({
+    where: { estadoPublicacion: "publicado" },
+    include: {
+      traducciones: {
+        where: { idioma: { in: [lang, "es"] } }
+      }
+    }
+  });
+
+  const map = {};
+  for (const item of contents) {
+    const translation = item.traducciones.find(t => t.idioma === lang) || item.traducciones.find(t => t.idioma === "es");
+    if (translation) {
+      map[item.seccion] = { titulo: translation.titulo, cuerpo: translation.cuerpo };
+    }
+  }
+  return map;
+}
+
 export async function getUserByUsername(username) {
   return prisma.usuario.findUnique({
     where: { username },
@@ -340,7 +360,7 @@ export async function getAdminData(user, page = 1, pageSize = 8, filters = {}) {
     } : {})
   };
 
-  const [shipments, products, productOptions, certificates, events, totalShipments, totalProducts, users] = await Promise.all([
+  const [shipments, products, productOptions, certificates, events, totalShipments, totalProducts, users, content, rawShipmentStats] = await Promise.all([
     prisma.despacho.findMany({
       select: shipmentSelect(includeNotifications),
       orderBy: { fechaRegistro: "desc" },
@@ -367,8 +387,29 @@ export async function getAdminData(user, page = 1, pageSize = 8, filters = {}) {
     prisma.producto.count({ where: productWhere }),
     user.role === "superadmin"
       ? prisma.usuario.findMany({ include: { roles: { include: { rol: true } } }, orderBy: { createdAt: "desc" } })
-      : Promise.resolve([])
+      : Promise.resolve([]),
+    prisma.contenido.findMany({ include: { traducciones: true } }),
+    prisma.despacho.findMany({ select: { estadoActual: true, fechaRegistro: true } })
   ]);
+
+  const statusCounts = {};
+  const timelineCounts = {};
+
+  rawShipmentStats.forEach(s => {
+    const estado = s.estadoActual === "registrado" ? "Registrado" : s.estadoActual === "transito" ? "En tránsito" : "Entregado";
+    statusCounts[estado] = (statusCounts[estado] || 0) + 1;
+    
+    if (s.fechaRegistro) {
+      const date = new Date(s.fechaRegistro);
+      const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      timelineCounts[month] = (timelineCounts[month] || 0) + 1;
+    }
+  });
+
+  const chartsData = {
+    statusData: Object.entries(statusCounts).map(([name, value]) => ({ name, value })),
+    timelineData: Object.entries(timelineCounts).sort((a,b) => a[0].localeCompare(b[0])).map(([month, despachos]) => ({ month, despachos }))
+  };
 
   return {
     shipments: shipments.map(serializeShipment),
@@ -378,7 +419,15 @@ export async function getAdminData(user, page = 1, pageSize = 8, filters = {}) {
     audit: events.map(serializeAudit),
     users: users.map(serializeUser),
     totalShipments,
-    totalProducts
+    totalProducts,
+    content,
+    chartsData,
+    pagination: {
+      page,
+      pageSize,
+      totalCount: totalShipments,
+      totalPages: Math.ceil(totalShipments / pageSize)
+    }
   };
 }
 
@@ -645,6 +694,10 @@ function normalizeProductPayload(body) {
   return {
     name: String(body.name || "").trim(),
     description: String(body.description || "").trim(),
+    nameEn: String(body.nameEn || "").trim(),
+    descriptionEn: String(body.descriptionEn || "").trim(),
+    namePt: String(body.namePt || "").trim(),
+    descriptionPt: String(body.descriptionPt || "").trim(),
     imageUrl: String(body.imageUrl || "").trim(),
     publish: Boolean(body.publish),
     active: body.active !== false,
@@ -715,12 +768,26 @@ export async function createProduct(user, body) {
         imagenUrl: payload.imageUrl || null,
         estadoPublicacion: payload.publish ? "publicado" : "borrador",
         traducciones: {
-          create: {
-            idioma: "es",
-            titulo: payload.name,
-            cuerpo: payload.description,
-            estado: payload.publish ? "publicado" : "borrador"
-          }
+          create: [
+            {
+              idioma: "es",
+              titulo: payload.name,
+              cuerpo: payload.description,
+              estado: payload.publish ? "publicado" : "borrador"
+            },
+            {
+              idioma: "en",
+              titulo: payload.nameEn || "",
+              cuerpo: payload.descriptionEn || "",
+              estado: payload.publish ? "publicado" : "borrador"
+            },
+            {
+              idioma: "pt",
+              titulo: payload.namePt || "",
+              cuerpo: payload.descriptionPt || "",
+              estado: payload.publish ? "publicado" : "borrador"
+            }
+          ]
         },
         presentaciones: {
           create: validation.presentations.map((presentation) => ({
@@ -748,21 +815,29 @@ export async function updateProduct(user, body) {
     const existing = await tx.producto.findUnique({ where: { id: body.id } });
     if (!existing) return { error: "Producto no encontrado", status: 404 };
 
-    await tx.traduccion.upsert({
-      where: { productoId_idioma: { productoId: body.id, idioma: "es" } },
-      update: {
-        titulo: payload.name,
-        cuerpo: payload.description,
-        estado: payload.publish ? "publicado" : "borrador"
-      },
-      create: {
-        productoId: body.id,
-        idioma: "es",
-        titulo: payload.name,
-        cuerpo: payload.description,
-        estado: payload.publish ? "publicado" : "borrador"
-      }
-    });
+    const langs = [
+      { code: "es", name: payload.name, desc: payload.description },
+      { code: "en", name: payload.nameEn, desc: payload.descriptionEn },
+      { code: "pt", name: payload.namePt, desc: payload.descriptionPt }
+    ];
+
+    for (const l of langs) {
+      await tx.traduccion.upsert({
+        where: { productoId_idioma: { productoId: body.id, idioma: l.code } },
+        update: {
+          titulo: l.name || "",
+          cuerpo: l.desc || "",
+          estado: payload.publish ? "publicado" : "borrador"
+        },
+        create: {
+          productoId: body.id,
+          idioma: l.code,
+          titulo: l.name || "",
+          cuerpo: l.desc || "",
+          estado: payload.publish ? "publicado" : "borrador"
+        }
+      });
+    }
 
     await tx.presentacionLogistica.deleteMany({ where: { productoId: body.id } });
 
@@ -877,6 +952,55 @@ export async function deleteCertificate(user, body) {
     await audit(user.username, "eliminar", "certificacion", existing.tipo, tx, user.id);
     return { item: serializeCertificate(certificate) };
   });
+}
+
+export async function updateContent(user, body) {
+  try {
+    const { seccion, tituloEs, cuerpoEs, tituloEn, cuerpoEn, tituloPt, cuerpoPt } = body;
+    
+    // Check if it exists or create
+    let contenido = await prisma.contenido.findFirst({ where: { seccion } });
+    if (!contenido) {
+      contenido = await prisma.contenido.create({
+        data: { seccion, estadoPublicacion: "publicado" }
+      });
+    }
+
+    const langs = [
+      { code: "es", titulo: tituloEs, cuerpo: cuerpoEs },
+      { code: "en", titulo: tituloEn, cuerpo: cuerpoEn },
+      { code: "pt", titulo: tituloPt, cuerpo: cuerpoPt }
+    ];
+
+    for (const lang of langs) {
+      const existingTrans = await prisma.traduccion.findFirst({
+        where: { contenidoId: contenido.id, idioma: lang.code }
+      });
+      if (existingTrans) {
+        await prisma.traduccion.update({
+          where: { id: existingTrans.id },
+          data: { titulo: lang.titulo || "", cuerpo: lang.cuerpo || "" }
+        });
+      } else {
+        await prisma.traduccion.create({
+          data: { contenidoId: contenido.id, idioma: lang.code, titulo: lang.titulo || "", cuerpo: lang.cuerpo || "" }
+        });
+      }
+    }
+
+    await audit(user.username, "actualizar", "cms", seccion, prisma, user.id);
+    
+    // Devolvemos el contenido actualizado con sus traducciones
+    const updated = await prisma.contenido.findFirst({
+      where: { seccion },
+      include: { traducciones: true }
+    });
+    
+    return { item: updated };
+  } catch (error) {
+    console.error("updateContent error:", error);
+    return { error: "Error de base de datos.", status: 500 };
+  }
 }
 
 async function generateTrackingCode(tx) {

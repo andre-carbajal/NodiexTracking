@@ -10,6 +10,7 @@ export const metadata = {
 };
 
 import Header from "@/components/Header";
+import { I18nProvider } from "@/components/I18nProvider";
 
 export default function RootLayout({ children }) {
   return (
@@ -20,8 +21,10 @@ export default function RootLayout({ children }) {
         `}} />
       </head>
       <body className={inter.className}>
-        <Header />
-        {children}
+        <I18nProvider>
+          <Header />
+          {children}
+        </I18nProvider>
       </body>
     </html>
   );

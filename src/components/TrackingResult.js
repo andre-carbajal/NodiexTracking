@@ -1,6 +1,7 @@
 "use client";
 
 import { Leaf, Ship, MapPin, Truck, ClipboardCheck } from "lucide-react";
+import { motion } from "framer-motion";
 
 function fmtDate(value) {
   return new Intl.DateTimeFormat("es-PE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
@@ -8,6 +9,8 @@ function fmtDate(value) {
 
 export default function TrackingResult({ tracking, t }) {
   if (!tracking) return null;
+
+  const currentIndex = Math.max(0, tracking.history.findIndex(h => h.status === tracking.currentStatus));
 
   return (
     <section className="tracking-result-wrapper">
@@ -21,21 +24,27 @@ export default function TrackingResult({ tracking, t }) {
 
           <div className="shipment-facts-modern">
             <div className="fact-item">
-              <Leaf size={24} className="fact-icon" />
+              <div className="fact-icon-wrapper">
+                <Leaf size={24} className="fact-icon" />
+              </div>
               <div>
                 <span className="fact-title">Producto</span>
                 <strong className="fact-data">{tracking.product}</strong>
               </div>
             </div>
             <div className="fact-item">
-              <Ship size={24} className="fact-icon" />
+              <div className="fact-icon-wrapper">
+                <Ship size={24} className="fact-icon" />
+              </div>
               <div>
                 <span className="fact-title">Estado</span>
                 <strong className="fact-data">{tracking.currentStatus}</strong>
               </div>
             </div>
             <div className="fact-item">
-              <MapPin size={24} className="fact-icon" />
+              <div className="fact-icon-wrapper">
+                <MapPin size={24} className="fact-icon" />
+              </div>
               <div>
                 <span className="fact-title">Destino</span>
                 <strong className="fact-data">{tracking.destination}</strong>
@@ -43,19 +52,37 @@ export default function TrackingResult({ tracking, t }) {
             </div>
           </div>
 
-          <ol className="timeline-modern-history">
-            {tracking.history.map((item, index) => {
-              const isCurrent = item.status === tracking.currentStatus;
-              return (
-                <li className={`history-step ${isCurrent ? "current" : ""}`} key={`${item.status}-${item.at}`}>
-                  <div className="step-dot"></div>
-                  <strong>{item.status}</strong>
-                  <span>{fmtDate(item.at)}</span>
-                  {index < tracking.history.length - 1 && <div className="step-line"></div>}
-                </li>
-              );
-            })}
-          </ol>
+          <div className="timeline-container" style={{ position: "relative" }}>
+            <motion.div
+              className="progress-line-fill"
+              initial={{ width: `${(0.5 / tracking.history.length) * 100}%` }}
+              animate={{ width: `${(currentIndex + 0.5) / tracking.history.length * 100}%` }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+            />
+            <motion.div
+              className="truck-indicator"
+              initial={{ left: `${(0.5 / tracking.history.length) * 100}%` }}
+              animate={{ left: `${(currentIndex + 0.5) / tracking.history.length * 100}%` }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+            >
+              <Truck size={24} color="var(--green-lima)" fill="white" />
+            </motion.div>
+
+            <ol className="timeline-modern-history">
+              {tracking.history.map((item, index) => {
+                const isCurrent = item.status === tracking.currentStatus;
+                const isPast = index <= currentIndex;
+                return (
+                  <li className={`history-step ${isPast ? "current" : ""}`} key={`${item.status}-${item.at}`}>
+                    <div className="step-dot"></div>
+                    <strong>{item.status}</strong>
+                    <span>{fmtDate(item.at)}</span>
+                    {index < tracking.history.length - 1 && <div className="step-line"></div>}
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
 
           <div className="route-note-modern">
             <Truck size={18} />

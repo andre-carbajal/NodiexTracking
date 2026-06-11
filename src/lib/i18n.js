@@ -1,7 +1,7 @@
 export const languages = [
-  { code: "es", label: "ES" },
-  { code: "en", label: "EN" },
-  { code: "pt", label: "PT" }
+  { code: "es", label: "ES", country: "es" },
+  { code: "en", label: "EN", country: "us" },
+  { code: "pt", label: "PT", country: "br" }
 ];
 
 export const copy = {
