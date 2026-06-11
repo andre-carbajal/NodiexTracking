@@ -1,6 +1,5 @@
 "use client";
 
-import { Facebook, Youtube } from "lucide-react";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -43,10 +42,6 @@ export default function Header() {
         </nav>
 
         <div className="header-actions">
-          <div className="social-links">
-            <a href="#" aria-label="Facebook"><Facebook size={16} /></a>
-            <a href="#" aria-label="YouTube"><Youtube size={16} /></a>
-          </div>
           <div className="lang-selector">
             <select 
               value={lang} 
