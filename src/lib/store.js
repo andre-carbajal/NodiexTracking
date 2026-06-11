@@ -437,9 +437,9 @@ export async function createUser(user, body) {
   const role = String(body.role || "").trim();
   const allowedRoles = ["superadmin", "operativo", "comercial", "gerencia"];
 
-  if (!username || password.length < 8 || !allowedRoles.includes(role)) {
-    return { error: "Usuario, contrasena o rol invalido", status: 400 };
-  }
+  if (!username) return { error: "Ingresa un nombre de usuario.", status: 400 };
+  if (password.length < 8) return { error: "La contrasena debe tener al menos 8 caracteres.", status: 400 };
+  if (!allowedRoles.includes(role)) return { error: "Selecciona un rol valido.", status: 400 };
 
   return prisma.$transaction(async (tx) => {
     const existing = await tx.usuario.findUnique({ where: { username } });
