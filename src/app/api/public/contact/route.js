@@ -6,7 +6,14 @@ const rateLimitMap = globalThis.__nodiexContactRateLimit ?? new Map();
 globalThis.__nodiexContactRateLimit = rateLimitMap;
 
 function clientIp(request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  if (request.ip) return request.ip;
+  const cfIp = request.headers.get("cf-connecting-ip");
+  if (cfIp) return cfIp.trim();
+  const realIp = request.headers.get("x-real-ip");
+  if (realIp) return realIp.trim();
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) return forwardedFor.split(",")[0].trim();
+  return "local";
 }
 
 export async function POST(request) {
