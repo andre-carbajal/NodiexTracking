@@ -23,6 +23,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -30,6 +31,7 @@ body {
   background: var(--soft);
   color: var(--ink);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 a {
@@ -4684,3 +4686,116 @@ h2 {
     padding: 14px 20px !important;
   }
 }
+
+/* --- ADAPTIVE FIXES FOR CONTACT SECTION AND MOBILE NAV MENU --- */
+@media (max-width: 900px) {
+  .site-header {
+    position: fixed !important;
+    top: 10px !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    transform: none !important;
+    border-radius: 30px !important;
+    padding: 0 15px !important;
+  }
+
+  .header-inner {
+    min-height: 60px !important;
+  }
+
+  .contact-section-modern {
+    padding: 60px 20px !important;
+  }
+  .contact-section-modern::before {
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100% !important;
+  }
+
+  /* Mobile menu button styles */
+  .mobile-menu-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: var(--green) !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    min-height: 36px !important;
+    box-shadow: 0 4px 10px rgba(67, 173, 65, 0.2) !important;
+  }
+  .mobile-menu-button span {
+    display: inline-block !important;
+    width: 18px !important;
+    height: 2px !important;
+    background: white !important;
+    position: relative !important;
+  }
+  .mobile-menu-button span::before,
+  .mobile-menu-button span::after {
+    content: "" !important;
+    position: absolute !important;
+    width: 18px !important;
+    height: 2px !important;
+    background: white !important;
+    left: 0 !important;
+    transition: all 0.3s !important;
+  }
+  .mobile-menu-button span::before { top: -6px !important; }
+  .mobile-menu-button span::after { bottom: -6px !important; }
+
+  /* Dropdown menu overrides */
+  .main-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white !important;
+    flex-direction: column;
+    padding: 15px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+    margin-top: 12px;
+    align-items: stretch !important;
+    z-index: 1001;
+  }
+  
+  .main-nav.open {
+    display: flex !important;
+  }
+  
+  .main-nav a {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    min-height: 48px !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    color: #10251a !important; /* var(--ink) */
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    transition: all 0.2s ease !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: none !important;
+  }
+  
+  .main-nav a:hover,
+  .main-nav a:active {
+    background: rgba(95, 169, 11, 0.1) !important;
+    color: #428207 !important;
+  }
+
+  /* Desktop-only elements hidden in mobile viewports */
+  .header-actions .button-lima,
+  .header-actions .social-links {
+    display: none !important;
+  }
+}
+
