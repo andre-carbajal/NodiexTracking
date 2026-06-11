@@ -23,6 +23,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -30,6 +31,7 @@ body {
   background: var(--soft);
   color: var(--ink);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 a {
@@ -1834,12 +1836,13 @@ h2 {
     padding: 8px 16px;
     border-radius: 20px;
     transition: all 0.2s;
+    color: var(--ink) !important;
   }
 
   .main-nav a:hover,
   .main-nav a.active {
     background: rgba(197, 241, 29, 0.15);
-    color: var(--green-dark);
+    color: var(--green-dark) !important;
     font-weight: 600;
   }
 
@@ -3993,21 +3996,30 @@ h2 {
 }
 
 @media (max-width: 900px) {
-  .contact-container {
+  .contact-split-layout {
     flex-direction: column;
+    align-items: stretch;
+    gap: 30px;
   }
 
-  .contact-info-panel {
-    padding: 40px 30px;
+  .contact-text-side {
+    flex: none;
+    width: 100%;
+    text-align: center;
+  }
+
+  .contact-text-side h2 {
+    font-size: 32px;
   }
 
   .contact-form-panel {
-    padding: 40px 30px;
+    padding: 30px 20px;
+    width: 100%;
   }
 
   .form-row {
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
   }
 }
 
@@ -4479,6 +4491,7 @@ h2 {
     width: 100%;
     padding: 12px 0;
     border-bottom: 1px solid var(--line);
+    color: var(--ink) !important;
   }
   .main-nav a:last-child {
     border-bottom: none;
@@ -4602,3 +4615,187 @@ h2 {
   background: #ffffff;
   border: 1px solid #f0f0f0;
 }
+
+/* --- CUSTOM MOBILE RESPONSIVE FIXES --- */
+@media (max-width: 768px) {
+  .admin-list-row {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    padding: 16px !important;
+  }
+  .admin-topbar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .admin-topbar > span {
+    align-self: flex-start;
+  }
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .product-form-main {
+    grid-template-columns: 1fr !important;
+  }
+  .price-row {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .list-filter-panel {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .site-footer-modern {
+    padding: 30px 16px !important;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+  .header-actions {
+    gap: 10px !important;
+  }
+  .product-detail {
+    margin-top: 100px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-stats {
+    grid-template-columns: 1fr !important;
+  }
+  .tracking-input-wrapper-mockup {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .tracking-input-wrapper-mockup input {
+    padding: 14px 20px !important;
+    border-radius: 8px !important;
+  }
+  .button-buscar-mockup {
+    position: static !important;
+    width: 100% !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    padding: 14px 20px !important;
+  }
+}
+
+/* --- ADAPTIVE FIXES FOR CONTACT SECTION AND MOBILE NAV MENU --- */
+@media (max-width: 900px) {
+  .site-header {
+    position: fixed !important;
+    top: 10px !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    transform: none !important;
+    border-radius: 30px !important;
+    padding: 0 15px !important;
+  }
+
+  .header-inner {
+    min-height: 60px !important;
+  }
+
+  .contact-section-modern {
+    padding: 60px 20px !important;
+  }
+  .contact-section-modern::before {
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100% !important;
+  }
+
+  /* Mobile menu button styles */
+  .mobile-menu-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: var(--green) !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    min-height: 36px !important;
+    box-shadow: 0 4px 10px rgba(67, 173, 65, 0.2) !important;
+  }
+  .mobile-menu-button span {
+    display: inline-block !important;
+    width: 18px !important;
+    height: 2px !important;
+    background: white !important;
+    position: relative !important;
+  }
+  .mobile-menu-button span::before,
+  .mobile-menu-button span::after {
+    content: "" !important;
+    position: absolute !important;
+    width: 18px !important;
+    height: 2px !important;
+    background: white !important;
+    left: 0 !important;
+    transition: all 0.3s !important;
+  }
+  .mobile-menu-button span::before { top: -6px !important; }
+  .mobile-menu-button span::after { bottom: -6px !important; }
+
+  /* Dropdown menu overrides */
+  .main-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white !important;
+    flex-direction: column;
+    padding: 15px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+    margin-top: 12px;
+    align-items: stretch !important;
+    z-index: 1001;
+  }
+  
+  .main-nav.open {
+    display: flex !important;
+  }
+  
+  .main-nav a {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    min-height: 48px !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    color: #10251a !important; /* var(--ink) */
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    transition: all 0.2s ease !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: none !important;
+  }
+  
+  .main-nav a:hover,
+  .main-nav a:active {
+    background: rgba(95, 169, 11, 0.1) !important;
+    color: #428207 !important;
+  }
+
+  /* Desktop-only elements hidden in mobile viewports */
+  .header-actions .button-lima,
+  .header-actions .social-links {
+    display: none !important;
+  }
+}
+
