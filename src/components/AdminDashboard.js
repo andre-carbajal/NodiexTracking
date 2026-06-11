@@ -69,7 +69,6 @@ async function readJsonResponse(response) {
 
 export default function AdminDashboard({ user, data, token, onLogout, load }) {
   const [activeSection, setActiveSection] = useState("dashboard");
-  const [message, setMessage] = useState("");
   const [toast, setToast] = useState(null);
   const [shipment, setShipment] = useState(initialShipment);
   const [editShipment, setEditShipment] = useState(initialShipment);
@@ -228,6 +227,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
   }, [activeSection, sections]);
 
   function changeSection(sectionId) {
+    setToast(null);
     setActiveSection(sectionId);
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `#${sectionId}`);
@@ -272,7 +272,6 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
       body: JSON.stringify(actualBody)
     });
     const json = await readJsonResponse(res);
-    setMessage(json.message || (res.ok ? "Operacion registrada en bitacora." : "Operacion rechazada."));
     setToast({ message: json.message || (res.ok ? "Operacion exitosa" : "Error"), variant: res.ok ? "success" : "error" });
     if (res.ok) {
       if (body.type === "shipment") {
@@ -646,7 +645,6 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
           </div>
           <span>{user?.username}</span>
         </header>
-        {(message || toast) && <p className="notice">{message}</p>}
         {toast && <Toast message={toast.message} variant={toast.variant} onClose={() => setToast(null)} duration={3000} />}
         {renderSection()}
       </section>
