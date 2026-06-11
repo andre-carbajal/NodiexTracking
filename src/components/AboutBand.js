@@ -1,13 +1,10 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { ShieldCheck, Activity, MapPin, Play } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
-export default function AboutBand({ t, content }) {
-  const title = content?.about?.titulo || t.trustTitle || "Confianza exportadora, informacion verificable";
-  const body = content?.about?.cuerpo || t.trustBody;
-
+export default function AboutBand() {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -22,39 +19,79 @@ export default function AboutBand({ t, content }) {
   };
 
   return (
-    <section className="about-modern-wrapper" id="about">
+    <section className="agency-about-section" id="about">
       <motion.div 
-        className="about-bento-container"
+        className="agency-about-container"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.2 }}
       >
-        <motion.div className="bento-text-card" variants={itemVariants}>
-          <p className="eyebrow-modern">Bienvenidos a NODIEX DEL PERU S.A.C.</p>
-          <h2>{title}</h2>
-          <p>{body}</p>
-          <a className="bento-link" href="#contact">Conoce más sobre nosotros <ChevronRight size={18} /></a>
+        {/* Top Header */}
+        <motion.div className="agency-top-row" variants={itemVariants}>
+          <div className="agency-title">
+            <h2>Tradición y <span>Calidad</span> Exportadora</h2>
+          </div>
+          <div className="agency-desc">
+            <p>Somos una empresa familiar dedicada a la producción y comercialización de productos de primera calidad, desde el cultivo, recolección y distribución. Gracias a la visión empresarial nuestra empresa es actualmente reconocida en el mercado nacional e internacional.</p>
+            <p>Poseemos una amplia gama de productos disponibles en el mercado, destacando las hierbas aromáticas y especias, nos apoyamos en nuestro equipo de profesionales para aplicar las nuevas normas alimentarias y sanitarias para la mejora de calidad a las necesidades de nuestros clientes.</p>
+          </div>
         </motion.div>
-        
-        <motion.div className="bento-image-grid" variants={itemVariants}>
-          <div className="bento-img-wrapper img-1">
+
+        {/* Middle Cards */}
+        <motion.div className="agency-cards-row" variants={itemVariants}>
+          <div className="agency-feature-card">
+            <div className="agency-icon-circle icon-red">
+              <ShieldCheck size={28} />
+            </div>
+            <div className="agency-card-text">
+              <h4>Primera Calidad</h4>
+              <p>Productos de primer nivel desde el cultivo hasta la distribución.</p>
+            </div>
+          </div>
+          
+          <div className="agency-feature-card">
+            <div className="agency-icon-circle icon-black">
+              <Activity size={28} />
+            </div>
+            <div className="agency-card-text">
+              <h4>Normas Sanitarias</h4>
+              <p>Aplicación de las más recientes normas alimentarias y sanitarias.</p>
+            </div>
+          </div>
+          
+          <div className="agency-feature-card">
+            <div className="agency-icon-circle icon-red">
+              <MapPin size={28} />
+            </div>
+            <div className="agency-card-text">
+              <h4>Trazabilidad Total</h4>
+              <p>Aseguramiento de calidad y control de producción en planta.</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Bottom Collage */}
+        <motion.div className="agency-image-collage" variants={itemVariants}>
+          <div className="collage-main-img">
             <Image 
-              alt="Control de calidad agroexportador" 
-              src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=900&q=80" 
+              alt="Planta de procesamiento Nodiex" 
+              src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=1200&q=80" 
               fill
               style={{ objectFit: 'cover' }}
             />
           </div>
-          <div className="bento-img-wrapper img-2">
+          
+          <div className="collage-sub-img">
             <Image 
-              alt="Hierbas aromaticas y especias" 
-              src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=900&q=80" 
+              alt="Campos de cultivo Nodiex" 
+              src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=800&q=80" 
               fill
               style={{ objectFit: 'cover' }}
             />
           </div>
         </motion.div>
+
       </motion.div>
     </section>
   );
