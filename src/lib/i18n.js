@@ -6,7 +6,7 @@ export const languages = [
 
 export const copy = {
   es: {
-    nav: { catalog: "Catálogo", certificates: "Certificaciones", tracking: "Tracking", contact: "Contacto", admin: "Panel" },
+    nav: { catalog: "Catálogo", certificates: "Certificaciones", tracking: "Seguimiento", contact: "Contacto", admin: "Panel" },
     heroTitle: "NODIEX DEL PERÚ S.A.C.",
     heroLead: "Agroexportación con trazabilidad logística, certificaciones visibles y atención preparada para compradores internacionales.",
     heroMeta: "Tacna, Perú · Exportaciones agrícolas · ES / EN / PT",
