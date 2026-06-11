@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Activity, Award, Boxes, FileClock, Ship, ShieldCheck, Users
+  Activity, Award, Boxes, FileClock, Ship, ShieldCheck, Users, FileText
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import Toast from "@/components/Toast";
@@ -15,13 +15,16 @@ import CertificacionForm from "@/components/CertificacionForm";
 import BitacoraView from "@/components/BitacoraView";
 import UsuariosList from "@/components/UsuariosList";
 import UsuarioForm from "@/components/UsuarioForm";
+import ContentForm from "@/components/ContentForm";
+import AdminCharts from "@/components/AdminCharts";
 import Pagination from "@/components/Pagination";
 import { validateShipmentFields, validateProductFields, validateCertificateFields } from "@/lib/validators";
 
 const initialShipment = { client: "", destination: "", product: "", emailCliente: "", idiomaPreferido: "es", currentStatus: "registrado" };
 const initialProduct = {
-  name: "",
-  description: "",
+  name: "", description: "",
+  nameEn: "", descriptionEn: "",
+  namePt: "", descriptionPt: "",
   publish: false,
   imageUrl: "",
   previewUrl: "",
@@ -134,50 +137,76 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
     { label: "Eventos auditoria", value: data.audit.length, icon: Activity, section: "audit" }
   ], [data]);
 
-  const sections = useMemo(() => [
-    {
-      id: "dashboard",
-      label: "Dashboard",
-      title: "Dashboard operativo",
-      description: "Resumen general de operaciones comerciales y trazabilidad.",
-      icon: ShieldCheck
-    },
-    {
-      id: "shipments",
-      label: "Despachos",
-      title: "Gestion de despachos",
-      description: "Crea despachos, filtra estados y actualiza el avance logistico.",
-      icon: Ship
-    },
-    {
-      id: "catalog",
-      label: "Catalogo",
-      title: "Catalogo y precios",
-      description: "Administra productos publicados, unidades comerciales y precios.",
-      icon: Boxes
-    },
-    {
-      id: "certifications",
-      label: "Certificaciones",
-      title: "Certificaciones",
-      description: "Registra vigencias, evidencias y controles documentarios.",
-      icon: Award
-    },
-    ...(user?.canReadAudit ? [{
-      id: "audit",
-      label: "Auditoria",
-      title: "Bitacora gerencial",
-      description: "Consulta operaciones recientes y exporta evidencias de auditoria.",
-      icon: FileClock
-    }] : []),
-    ...(user?.role === "superadmin" ? [{
-      id: "users",
-      label: "Usuarios",
-      title: "Gestion de usuarios",
-      description: "Crea accesos administrativos segun los roles del equipo.",
-      icon: Users
-    }] : [])
-  ], [user]);
+  const sections = useMemo(() => {
+    const role = user?.role;
+    const list = [
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        title: "Panel Gerencial",
+        description: "Resumen estadistico de las operaciones de exportacion.",
+        icon: Activity
+      }
+    ];
+
+    if (role === "superadmin" || role === "operativo") {
+      list.push({
+        id: "shipments",
+        label: "Despachos",
+        title: "Despachos",
+        description: "Crea y actualiza la linea de tiempo de envios de exportacion.",
+        icon: Ship
+      });
+    }
+
+    if (role === "superadmin" || role === "comercial") {
+      list.push(
+        {
+          id: "cms",
+          label: "Web CMS",
+          title: "Contenido Web",
+          description: "Administra los textos de la página pública en múltiples idiomas.",
+          icon: FileText
+        },
+        {
+          id: "catalog",
+          label: "Catalogo",
+          title: "Catalogo y precios",
+          description: "Administra productos publicados, unidades comerciales y precios.",
+          icon: Boxes
+        },
+        {
+          id: "certifications",
+          label: "Certificaciones",
+          title: "Certificaciones",
+          description: "Registra vigencias, evidencias y controles documentarios.",
+          icon: Award
+        }
+      );
+    }
+
+    if (user?.canReadAudit) {
+      list.push({
+        id: "audit",
+        label: "Auditoria",
+        title: "Bitacora gerencial",
+        description: "Consulta operaciones recientes y exporta evidencias de auditoria.",
+        icon: FileClock
+      });
+    }
+
+    if (role === "superadmin") {
+      list.push({
+        id: "users",
+        label: "Usuarios",
+        title: "Gestion de usuarios",
+        description: "Crea accesos administrativos segun los roles del equipo.",
+        icon: Users
+      });
+    }
+
+    return list;
+  }, [user]);
 
   const currentSection = sections.find((section) => section.id === activeSection) || sections[0];
 
@@ -299,8 +328,12 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
     setEditingProductId(item.id);
     changeSection("catalog");
     setEditProduct({
-      name: item.name || "",
-      description: item.description || "",
+      name: item.translations?.es?.name || item.name || "",
+      description: item.translations?.es?.description || item.description || "",
+      nameEn: item.translations?.en?.name || "",
+      descriptionEn: item.translations?.en?.description || "",
+      namePt: item.translations?.pt?.name || "",
+      descriptionPt: item.translations?.pt?.description || "",
       publish: item.published,
       imageUrl: item.imageUrl || "",
       previewUrl: item.imageUrl || "",
@@ -392,8 +425,10 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
         <section className="admin-panel dashboard-panel">
           <div className="panel-heading"><ShieldCheck /><h2>Vista general</h2></div>
 
+          <AdminCharts chartsData={data.chartsData} />
+
           {latestAudit.length > 0 && (
-            <div className="dashboard-feed">
+            <div className="dashboard-feed" style={{ marginTop: "30px" }}>
               <h3>Ultima actividad</h3>
               <div className="audit-list compact">
                 {latestAudit.map((event) => (
@@ -545,7 +580,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
       return (
         <section className="admin-panel">
           <div className="panel-heading"><FileClock /><h2>Bitacora gerencial</h2></div>
-          <BitacoraView events={data.audit} />
+          <BitacoraView token={token} />
         </section>
       );
     }
@@ -556,6 +591,35 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
           <div className="panel-heading"><Users /><h2>Gestion de usuarios</h2></div>
           <UsuarioForm usuario={usuario} setUsuario={setUsuario} onPost={post} />
           <UsuariosList usuarios={data.users || []} />
+        </section>
+      );
+    }
+
+    if (activeSection === "cms" && (user?.role === "superadmin" || user?.role === "comercial")) {
+      const getContent = (sec) => (data.content || []).find(c => c.seccion === sec);
+      return (
+        <section className="admin-panel">
+          <div className="panel-heading"><FileText /><h2>Secciones de la Página Pública</h2></div>
+          
+          <div style={{ background: "#f9f9f9", padding: "1rem", borderRadius: "8px", marginBottom: "2rem" }}>
+            <h3>1. Hero Slide 1 (Orégano)</h3>
+            <ContentForm sectionId="hero-1" contentData={getContent("hero-1")} onPost={post} />
+          </div>
+
+          <div style={{ background: "#f9f9f9", padding: "1rem", borderRadius: "8px", marginBottom: "2rem" }}>
+            <h3>2. Hero Slide 2 (Páprika)</h3>
+            <ContentForm sectionId="hero-2" contentData={getContent("hero-2")} onPost={post} />
+          </div>
+
+          <div style={{ background: "#f9f9f9", padding: "1rem", borderRadius: "8px", marginBottom: "2rem" }}>
+            <h3>3. Hero Slide 3 (Familia)</h3>
+            <ContentForm sectionId="hero-3" contentData={getContent("hero-3")} onPost={post} />
+          </div>
+
+          <div style={{ background: "#f9f9f9", padding: "1rem", borderRadius: "8px", marginBottom: "2rem" }}>
+            <h3>4. Sección "Nosotros"</h3>
+            <ContentForm sectionId="about" contentData={getContent("about")} onPost={post} />
+          </div>
         </section>
       );
     }

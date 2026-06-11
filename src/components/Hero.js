@@ -35,7 +35,7 @@ const slides = [
   }
 ];
 
-export default function Hero({ t }) {
+export default function Hero({ t, content }) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -45,7 +45,20 @@ export default function Hero({ t }) {
     return () => clearInterval(timer);
   }, []);
 
-  const slide = slides[currentSlide];
+  const dynamicSlides = slides.map((s, idx) => {
+    const slideData = content && content[`hero-${idx + 1}`];
+    if (slideData && slideData.titulo) {
+      return {
+        ...s,
+        title1: slideData.titulo,
+        title2: "",
+        description: slideData.cuerpo || s.description
+      };
+    }
+    return s;
+  });
+
+  const slide = dynamicSlides[currentSlide];
 
   return (
     <section

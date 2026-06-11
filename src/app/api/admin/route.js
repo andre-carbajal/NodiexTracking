@@ -11,7 +11,8 @@ import {
   updateCertificate,
   updateProduct,
   updateShipment,
-  updateShipmentStatus
+  updateShipmentStatus,
+  updateContent
 } from "@/lib/store";
 
 function deny() {
@@ -19,7 +20,9 @@ function deny() {
 }
 
 function serverError(error) {
-  console.error("Admin API error:", error);
+  console.error("====== ADMIN API CRASH ======");
+  console.error(error.stack || error);
+  console.error("=============================");
   return NextResponse.json({
     ok: false,
     message: process.env.NODE_ENV === "development"
@@ -128,6 +131,13 @@ export async function POST(request) {
       const result = await createUser(user, body);
       if (result.error) return NextResponse.json({ ok: false, message: result.error }, { status: result.status });
       return NextResponse.json({ ok: true, item: result.item, message: "Usuario creado." });
+    }
+
+    if (body.type === "content") {
+      if (!can(user.role, "catalog:write")) return deny(); // we can use catalog:write or something similar
+      const result = await updateContent(user, body);
+      if (result.error) return NextResponse.json({ ok: false, message: result.error }, { status: result.status });
+      return NextResponse.json({ ok: true, item: result.item, message: "Contenido CMS actualizado." });
     }
 
     return NextResponse.json({ ok: false, message: "Operacion no soportada" }, { status: 400 });

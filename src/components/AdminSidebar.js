@@ -15,7 +15,7 @@ export default function AdminSidebar({ sections = [], activeSection, onSectionCh
   return (
     <aside className="admin-sidebar">
       <div className="admin-sidebar-head">
-        <Link className="brand" href="/"><span>N</span><strong>NODIEX</strong></Link>
+        <Link className="brand" href="/"><img src="/logo1.png" alt="Nodiex Logo" className="admin-sidebar-logo" /></Link>
         <button
           className="admin-menu-button"
           type="button"
