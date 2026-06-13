@@ -62,7 +62,7 @@ export default function HomePage() {
     <ErrorBoundary>
       <main className="public-site">
         <Hero t={t} content={publicData.content} />
-        <StatsBanner />
+        <StatsBanner t={t} />
         <section id="tracking" className="tracking-wrapper-modern">
           <TrackingWidget
             t={t}
@@ -75,7 +75,7 @@ export default function HomePage() {
         </section>
         <TrackingResult tracking={tracking} t={t} />
         <CatalogSection t={t} publicData={publicData} hasFallback={hasFallback} />
-        <CertificatesStrip publicData={publicData} />
+        <CertificatesStrip publicData={publicData} t={t} />
         <AboutBand t={t} content={publicData.content} />
         <ContactForm t={t} />
         <Footer />
