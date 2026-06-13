@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import EmptyState from "@/components/EmptyState";
-
+import { useI18n } from "@/components/I18nProvider";
+import { copy } from "@/lib/i18n";
 
 function priceText(prices) {
   return Object.entries(prices || {})
@@ -18,6 +19,8 @@ function normalizeSearch(value) {
 }
 
 export default function ProductCatalogBrowser({ products = [] }) {
+  const { lang } = useI18n();
+  const t = copy[lang] || copy["es"];
   const [search, setSearch] = useState("");
   const filteredProducts = useMemo(() => {
     const query = normalizeSearch(search.trim());
@@ -33,15 +36,18 @@ export default function ProductCatalogBrowser({ products = [] }) {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar producto"
-            aria-label="Buscar producto"
+            placeholder={t.searchPlaceholder || "Buscar producto"}
+            aria-label={t.searchPlaceholder || "Buscar producto"}
           />
         </label>
-        <span>{filteredProducts.length} productos publicados</span>
+        <span>{filteredProducts.length} {t.productsCount || "productos publicados"}</span>
       </div>
 
       {filteredProducts.length === 0 ? (
-        <EmptyState title="Sin productos" description="No hay productos publicados que coincidan con la busqueda." />
+        <EmptyState 
+          title={t.noProducts || "Sin productos"} 
+          description={t.noProductsDesc || "No hay productos publicados que coincidan con la busqueda."} 
+        />
       ) : (
         <div className="catalog-grid-modern">
           {filteredProducts.map((product, index) => (
@@ -56,7 +62,7 @@ export default function ProductCatalogBrowser({ products = [] }) {
                 
                 <div className="card-actions-row" style={{ display: 'flex', justifyContent: 'center' }}>
                   <Link className="button-lima" href={`/productos/${product.id}`}>
-                    Ver más información ↗
+                    {t.viewMore || "Ver más información ↗"}
                   </Link>
                 </div>
               </div>
@@ -70,10 +76,10 @@ export default function ProductCatalogBrowser({ products = [] }) {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-lima)" strokeWidth="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
         </div>
         <div className="banner-text">
-          <h3>¿Buscas un producto específico o presentación especial?</h3>
-          <p>Trabajamos contigo para ofrecer soluciones a la medida de tu negocio.</p>
+          <h3>{t.specialRequestTitle || "¿Buscas un producto específico o presentación especial?"}</h3>
+          <p>{t.specialRequestDesc || "Trabajamos contigo para ofrecer soluciones a la medida de tu negocio."}</p>
         </div>
-        <Link href="/#contact" className="button-lima banner-btn">Contáctanos ↗</Link>
+        <Link href="/#contact" className="button-lima banner-btn">{t.contactUs || "Contáctanos ↗"}</Link>
       </div>
 
       <div className="newsletter-banner-modern">
@@ -81,12 +87,12 @@ export default function ProductCatalogBrowser({ products = [] }) {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-dark)" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
         </div>
         <div className="banner-text">
-          <h3>Mantente informado</h3>
-          <p>Recibe novedades, catálogos y noticias del mundo agroexportador.</p>
+          <h3>{t.newsletterTitle || "Mantente informado"}</h3>
+          <p>{t.newsletterDesc || "Recibe novedades, catálogos y noticias del mundo agroexportador."}</p>
         </div>
-        <form className="newsletter-form" onSubmit={(e) => { e.preventDefault(); alert("Gracias por suscribirte!"); }}>
-          <input type="email" placeholder="Ingresa tu correo electrónico" required />
-          <button type="submit" className="button-dark">Suscribirme</button>
+        <form className="newsletter-form" onSubmit={(e) => { e.preventDefault(); alert(t.newsletterThanks || "¡Gracias por suscribirte!"); }}>
+          <input type="email" placeholder={t.newsletterPlaceholder || "Ingresa tu correo electrónico"} required />
+          <button type="submit" className="button-dark">{t.newsletterSubscribe || "Suscribirme"}</button>
         </form>
       </div>
     </section>

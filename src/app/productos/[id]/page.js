@@ -4,6 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Footer from "@/components/Footer";
 import { getPublicProduct } from "@/lib/store";
+import { cookies } from "next/headers";
+import { copy } from "@/lib/i18n";
 
 const fallbackImage = "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=1100&q=80";
 
@@ -17,10 +19,13 @@ function priceText(prices) {
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const product = await getPublicProduct(id, "es");
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("nodiex_lang")?.value || "es";
+  const product = await getPublicProduct(id, lang);
+  const t = copy[lang] || copy["es"];
   if (!product) {
     return {
-      title: "Producto no encontrado | NODIEX"
+      title: t.productNotFound || "Producto no encontrado | NODIEX"
     };
   }
 
@@ -32,8 +37,12 @@ export async function generateMetadata({ params }) {
 
 export default async function ProductoDetallePage({ params }) {
   const { id } = await params;
-  const product = await getPublicProduct(id, "es");
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("nodiex_lang")?.value || "es";
+  const product = await getPublicProduct(id, lang);
   if (!product) notFound();
+
+  const t = copy[lang] || copy["es"];
 
   return (
     <main className="public-site">
@@ -42,18 +51,18 @@ export default async function ProductoDetallePage({ params }) {
           <Image unoptimized src={product.imageUrl || fallbackImage} alt={product.name} width={920} height={520} style={{ display: 'block', width: '100%', height: 'auto' }} />
         </div>
         <div className="product-detail-info" style={{ paddingTop: '20px' }}>
-          <p className="eyebrow" style={{ color: 'var(--green-dark)', fontWeight: 'bold' }}>PRODUCTO PUBLICADO</p>
+          <p className="eyebrow" style={{ color: 'var(--green-dark)', fontWeight: 'bold' }}>{t.publishedProduct || "PRODUCTO PUBLICADO"}</p>
           <h1 style={{ fontSize: '54px', color: 'var(--green-dark)', marginTop: '8px', marginBottom: '24px', lineHeight: '1.1' }}>{product.name}</h1>
           <p style={{ fontSize: '18px', color: 'var(--charcoal)', lineHeight: '1.6', marginBottom: '32px' }}>{product.description}</p>
-          <a className="button-lima" href={`/api/public/productos/${product.id}/ficha`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><Download size={18} />Descargar ficha tecnica</a>
+          <a className="button-lima" href={`/api/public/productos/${product.id}/ficha`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><Download size={18} />{t.downloadSpecs || "Descargar ficha tecnica"}</a>
         </div>
         <div className="product-detail-table" style={{ gridColumn: '1 / -1', marginTop: '40px', background: 'white', padding: '32px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
-          <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>Presentaciones y precios</h2>
+          <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>{t.presentationsTitle || "Presentaciones y precios"}</h2>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #eee', textAlign: 'left' }}>
-                <th style={{ padding: '12px 0', color: 'var(--ink)' }}>Unidad logistica</th>
-                <th style={{ padding: '12px 0', color: 'var(--ink)' }}>Precios disponibles</th>
+                <th style={{ padding: '12px 0', color: 'var(--ink)' }}>{t.unitCol || "Unidad logistica"}</th>
+                <th style={{ padding: '12px 0', color: 'var(--ink)' }}>{t.priceCol || "Precios disponibles"}</th>
               </tr>
             </thead>
             <tbody>
