@@ -186,3 +186,15 @@ model BitacoraEvento {
   @@index([entidad, accion, fechaHora])
   @@map("bitacora_eventos")
 }
+
+model Contacto {
+  id        String   @id @default(uuid())
+  nombre    String
+  empresa   String?
+  correo    String
+  pais      String?
+  mensaje   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("contactos")
+}

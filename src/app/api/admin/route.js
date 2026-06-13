@@ -35,6 +35,7 @@ export async function GET(request) {
   const user = verifyToken(request);
   if (!user) return deny();
   user.canReadAudit = can(user.role, "audit:read");
+  user.canReadContacts = can(user.role, "contacts:read");
 
   try {
     const url = new URL(request.url);

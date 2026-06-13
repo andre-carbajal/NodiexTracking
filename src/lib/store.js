@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sendTrackingUpdate } from "@/lib/notifications";
+import { can } from "@/lib/auth";
 
 const globalRateLimit = globalThis.__nodiexRateLimit ?? new Map();
 globalThis.__nodiexRateLimit = globalRateLimit;
@@ -161,6 +162,18 @@ function serializeUser(user) {
     username: user.username,
     estado: user.estado,
     roles: user.roles?.map((item) => item.rol.nombreRol) ?? []
+  };
+}
+
+function serializeContact(contact) {
+  return {
+    id: contact.id,
+    name: contact.nombre,
+    company: contact.empresa || "",
+    email: contact.correo,
+    country: contact.pais || "",
+    message: contact.mensaje,
+    createdAt: contact.createdAt.toISOString()
   };
 }
 
@@ -360,7 +373,9 @@ export async function getAdminData(user, page = 1, pageSize = 8, filters = {}) {
     } : {})
   };
 
-  const [shipments, products, productOptions, certificates, events, totalShipments, totalProducts, users, content, rawShipmentStats] = await Promise.all([
+  const canReadContacts = can(user.role, "contacts:read");
+
+  const [shipments, products, productOptions, certificates, events, totalShipments, totalProducts, users, content, rawShipmentStats, contacts] = await Promise.all([
     prisma.despacho.findMany({
       select: shipmentSelect(includeNotifications),
       orderBy: { fechaRegistro: "desc" },
@@ -389,7 +404,10 @@ export async function getAdminData(user, page = 1, pageSize = 8, filters = {}) {
       ? prisma.usuario.findMany({ include: { roles: { include: { rol: true } } }, orderBy: { createdAt: "desc" } })
       : Promise.resolve([]),
     prisma.contenido.findMany({ include: { traducciones: true } }),
-    prisma.despacho.findMany({ select: { estadoActual: true, fechaRegistro: true } })
+    prisma.despacho.findMany({ select: { estadoActual: true, fechaRegistro: true } }),
+    canReadContacts
+      ? prisma.contacto.findMany({ orderBy: { createdAt: "desc" } })
+      : Promise.resolve([])
   ]);
 
   const statusCounts = {};
@@ -418,6 +436,7 @@ export async function getAdminData(user, page = 1, pageSize = 8, filters = {}) {
     certificates: certificates.map(serializeCertificate),
     audit: events.map(serializeAudit),
     users: users.map(serializeUser),
+    contacts: contacts.map(serializeContact),
     totalShipments,
     totalProducts,
     content,
@@ -428,7 +447,7 @@ export async function getAdminData(user, page = 1, pageSize = 8, filters = {}) {
       totalCount: totalShipments,
       totalPages: Math.ceil(totalShipments / pageSize)
     }
-  };
+  };;
 }
 
 export async function createUser(user, body) {

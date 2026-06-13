@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Activity, Award, Boxes, FileClock, Ship, ShieldCheck, Users, FileText
+  Activity, Award, Boxes, FileClock, Ship, ShieldCheck, Users, FileText, Mail
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import Toast from "@/components/Toast";
@@ -16,6 +16,7 @@ import BitacoraView from "@/components/BitacoraView";
 import UsuariosList from "@/components/UsuariosList";
 import UsuarioForm from "@/components/UsuarioForm";
 import ContentForm from "@/components/ContentForm";
+import ContactosList from "@/components/ContactosList";
 import AdminCharts from "@/components/AdminCharts";
 import Pagination from "@/components/Pagination";
 import { validateShipmentFields, validateProductFields, validateCertificateFields } from "@/lib/validators";
@@ -133,6 +134,7 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
     { label: "Despachos", value: data.totalShipments || data.shipments.length, icon: Ship, section: "shipments" },
     { label: "Productos", value: data.totalProducts || data.products.length, icon: Boxes, section: "catalog" },
     { label: "Certificaciones", value: data.certificates.length, icon: Award, section: "certifications" },
+    { label: "Contactos", value: data.contacts?.length || 0, icon: Mail, section: "contacts" },
     { label: "Eventos auditoria", value: data.audit.length, icon: Activity, section: "audit" }
   ], [data]);
 
@@ -182,6 +184,16 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
           icon: Award
         }
       );
+    }
+
+    if (user?.canReadContacts) {
+      list.push({
+        id: "contacts",
+        label: "Contactos",
+        title: "Mensajes de contacto",
+        description: "Visualiza los mensajes enviados por los clientes a través del formulario de contacto.",
+        icon: Mail
+      });
     }
 
     if (user?.canReadAudit) {
@@ -408,7 +420,11 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
       <>
         <div className="admin-stats">
           {stats
-            .filter((item) => item.section !== "audit" || user?.canReadAudit)
+            .filter((item) => {
+              if (item.section === "audit" && !user?.canReadAudit) return false;
+              if (item.section === "contacts" && !user?.canReadContacts) return false;
+              return true;
+            })
             .map((item) => {
               const Icon = item.icon;
               return (
@@ -621,6 +637,15 @@ export default function AdminDashboard({ user, data, token, onLogout, load }) {
             <h3>4. Sección &quot;Nosotros&quot;</h3>
             <ContentForm sectionId="about" contentData={getContent("about")} onPost={post} />
           </div>
+        </section>
+      );
+    }
+
+    if (activeSection === "contacts" && user?.canReadContacts) {
+      return (
+        <section className="admin-panel">
+          <div className="panel-heading"><Mail /><h2>Mensajes de contacto</h2></div>
+          <ContactosList contacts={data.contacts || []} />
         </section>
       );
     }
