@@ -4,7 +4,7 @@ import { ShieldCheck, Activity, MapPin, Play } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
-export default function AboutBand() {
+export default function AboutBand({ t = {} }) {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -30,11 +30,11 @@ export default function AboutBand() {
         {/* Top Header */}
         <motion.div className="agency-top-row" variants={itemVariants}>
           <div className="agency-title">
-            <h2>Tradición y <span>Calidad</span> Exportadora</h2>
+            <h2>{t.aboutTitle1 || "Tradición y "}<span>{t.aboutTitle2 || "Calidad"}</span>{t.aboutTitleSuffix || " Exportadora"}</h2>
           </div>
           <div className="agency-desc">
-            <p>Somos una empresa familiar dedicada a la producción y comercialización de productos de primera calidad, desde el cultivo, recolección y distribución. Gracias a la visión empresarial nuestra empresa es actualmente reconocida en el mercado nacional e internacional.</p>
-            <p>Poseemos una amplia gama de productos disponibles en el mercado, destacando las hierbas aromáticas y especias, nos apoyamos en nuestro equipo de profesionales para aplicar las nuevas normas alimentarias y sanitarias para la mejora de calidad a las necesidades de nuestros clientes.</p>
+            <p>{t.aboutDesc1 || "Somos una empresa familiar dedicada a la producción y comercialización de productos de primera calidad, desde el cultivo, recolección y distribución. Gracias a la visión empresarial nuestra empresa es actualmente reconocida en el mercado nacional e internacional."}</p>
+            <p>{t.aboutDesc2 || "Poseemos una amplia gama de productos disponibles en el mercado, destacando las hierbas aromáticas y especias, nos apoyamos en nuestro equipo de profesionales para aplicar las nuevas normas alimentarias y sanitarias para la mejora de calidad a las necesidades de nuestros clientes."}</p>
           </div>
         </motion.div>
 
@@ -45,8 +45,8 @@ export default function AboutBand() {
               <ShieldCheck size={28} />
             </div>
             <div className="agency-card-text">
-              <h4>Primera Calidad</h4>
-              <p>Productos de primer nivel desde el cultivo hasta la distribución.</p>
+              <h4>{t.aboutFeature1Title || "Primera Calidad"}</h4>
+              <p>{t.aboutFeature1Desc || "Productos de primer nivel desde el cultivo hasta la distribución."}</p>
             </div>
           </div>
           
@@ -55,8 +55,8 @@ export default function AboutBand() {
               <Activity size={28} />
             </div>
             <div className="agency-card-text">
-              <h4>Normas Sanitarias</h4>
-              <p>Aplicación de las más recientes normas alimentarias y sanitarias.</p>
+              <h4>{t.aboutFeature2Title || "Normas Sanitarias"}</h4>
+              <p>{t.aboutFeature2Desc || "Aplicación de las más recientes normas alimentarias y sanitarias."}</p>
             </div>
           </div>
           
@@ -65,8 +65,8 @@ export default function AboutBand() {
               <MapPin size={28} />
             </div>
             <div className="agency-card-text">
-              <h4>Trazabilidad Total</h4>
-              <p>Aseguramiento de calidad y control de producción en planta.</p>
+              <h4>{t.aboutFeature3Title || "Trazabilidad Total"}</h4>
+              <p>{t.aboutFeature3Desc || "Aseguramiento de calidad y control de producción en planta."}</p>
             </div>
           </div>
         </motion.div>
@@ -75,7 +75,7 @@ export default function AboutBand() {
         <motion.div className="agency-image-collage" variants={itemVariants}>
           <div className="collage-main-img">
             <Image 
-              alt="Planta de procesamiento Nodiex" 
+              alt={t.aboutAltMainImg || "Planta de procesamiento Nodiex"} 
               src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=1200&q=80" 
               fill
               style={{ objectFit: 'cover' }}
@@ -84,7 +84,7 @@ export default function AboutBand() {
           
           <div className="collage-sub-img">
             <Image 
-              alt="Campos de cultivo Nodiex" 
+              alt={t.aboutAltSubImg || "Campos de cultivo Nodiex"} 
               src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=800&q=80" 
               fill
               style={{ objectFit: 'cover' }}

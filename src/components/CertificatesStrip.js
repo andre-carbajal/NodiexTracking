@@ -21,12 +21,12 @@ const itemVariants = {
   }
 };
 
-export default function CertificatesStrip({ publicData }) {
+export default function CertificatesStrip({ publicData, t = {} }) {
   return (
     <section className="certificate-strip-modern" id="certificates">
       <div className="certificates-header">
-        <h2 className="certificates-title">Certificaciones que Respaldan Nuestra Calidad</h2>
-        <p className="certificates-subtitle">Inocuidad, calidad y seguridad en la cadena de suministro internacional.</p>
+        <h2 className="certificates-title">{t.stripTitle || "Certificaciones que Respaldan Nuestra Calidad"}</h2>
+        <p className="certificates-subtitle">{t.stripSubtitle || "Inocuidad, calidad y seguridad en la cadena de suministro internacional."}</p>
       </div>
       
       <motion.div 

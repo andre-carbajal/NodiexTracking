@@ -51,12 +51,12 @@ export default function CatalogSection({ t, publicData }) {
 
         {/* Elemento 2: Bloque de Texto Central (Ubicado entre Col 2 y 3, Fila 1) */}
         <motion.div variants={itemVariants} className="catalog-header-v">
-          <span className="catalog-subtitle">■ Del Campo al Mundo</span>
-          <h2 className="catalog-title-main">Descubre el Arte de la Exportación a través de nuestros Productos</h2>
-          <p className="catalog-desc-main">Ofrecemos productos orgánicos de la más alta calidad, seleccionados bajo estrictos estándares internacionales para garantizar el mejor sabor en cada envío.</p>
+          <span className="catalog-subtitle">■ {t.catalogSubtitle || "Del Campo al Mundo"}</span>
+          <h2 className="catalog-title-main">{t.catalogTitleMain || "Descubre el Arte de la Exportación a través de nuestros Productos"}</h2>
+          <p className="catalog-desc-main">{t.catalogDescMain || "Ofrecemos productos orgánicos de la más alta calidad, seleccionados bajo estrictos estándares internacionales para garantizar el mejor sabor en cada envío."}</p>
           <div className="catalog-cta-wrapper">
             <Link href="/productos" className="button-lima">
-              Ver Productos
+              {t.catalogCtaBtn || "Ver Productos"}
             </Link>
           </div>
         </motion.div>

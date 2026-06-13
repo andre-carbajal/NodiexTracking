@@ -24,11 +24,11 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
     setLocalError("");
     const code = String(trackingCode).trim();
     if (!code) {
-      setLocalError("Ingrese un codigo de seguimiento.");
+      setLocalError(t.enterCodeError || "Ingrese un codigo de seguimiento.");
       return;
     }
     if (!isValidTrackingCode(code)) {
-      setLocalError("Formato de codigo invalido. Ejemplo: NDX-8Q4M-2026");
+      setLocalError(t.invalidCodeFormat || "Formato de codigo invalido. Ejemplo: NDX-8Q4M-2026");
       return;
     }
     submitTracking(e);
@@ -43,12 +43,12 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
           </div>
           <div>
             <h2>{t.trackingTitle || "Tracking de pedidos"}</h2>
-            <p>Ingrese el código opaco entregado por NODIEX. No necesita crear una cuenta.</p>
+            <p>{t.trackingHelp || "Ingrese el código opaco entregado por NODIEX. No necesita crear una cuenta."}</p>
           </div>
         </div>
 
         <div className="tracking-input-area">
-          <label htmlFor="tracking-code-input">Ingrese el código opaco entregado por NODIEX</label>
+          <label htmlFor="tracking-code-input">{t.trackingInputLabel || "Ingrese el código opaco entregado por NODIEX"}</label>
           <div className="tracking-input-wrapper-mockup">
             <input
               id="tracking-code-input"
@@ -62,7 +62,7 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
                 <span className="spinner-small" />
               ) : (
                 <>
-                  <Search size={18} /> Buscar
+                  <Search size={18} /> {t.searchBtnLabel || "Buscar"}
                 </>
               )}
             </button>
@@ -74,24 +74,24 @@ export default function TrackingWidget({ t, trackingCode, setTrackingCode, loadi
           <div className={`timeline-step ${currentStep >= 1 ? "active" : ""}`}>
             <div className="step-icon"><ClipboardCheck size={20} /></div>
             <div>
-              <strong>Registrado</strong>
-              <span>Hemos recibido tu pedido</span>
+              <strong>{t.registeredLabel || "Registrado"}</strong>
+              <span>{t.registeredSub || "Hemos recibido tu pedido"}</span>
             </div>
           </div>
           <div className={`timeline-divider ${currentStep >= 2 ? "filled" : ""}`}></div>
           <div className={`timeline-step ${currentStep >= 2 ? "active" : ""}`}>
             <div className="step-icon"><Truck size={20} /></div>
             <div>
-              <strong>En tránsito</strong>
-              <span>Tu pedido va en camino</span>
+              <strong>{t.inTransitLabel || "En tránsito"}</strong>
+              <span>{t.inTransitSub || "Tu pedido va en camino"}</span>
             </div>
           </div>
           <div className="timeline-divider"></div>
           <div className="timeline-step">
             <div className="step-icon"><CheckCircle2 size={20} /></div>
             <div>
-              <strong>Entregado</strong>
-              <span>Tu pedido fue entregado</span>
+              <strong>{t.deliveredLabel || "Entregado"}</strong>
+              <span>{t.deliveredSub || "Tu pedido fue entregado"}</span>
             </div>
           </div>
         </div>

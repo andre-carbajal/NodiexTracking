@@ -100,7 +100,79 @@ export const copy = {
     currentLocation: "Ubicación actual",
     lastUpdate: "Última actualización",
     copyLinkBtn: "Copiar enlace",
-    copiedSuccess: "Enlace copiado al portapapeles"
+    copiedSuccess: "Enlace copiado al portapapeles",
+
+    // AboutBand (Nosotros)
+    aboutTitle1: "Tradición y ",
+    aboutTitle2: "Calidad",
+    aboutTitleSuffix: " Exportadora",
+    aboutDesc1: "Somos una empresa familiar dedicada a la producción y comercialización de productos de primera calidad, desde el cultivo, recolección y distribución. Gracias a la visión empresarial nuestra empresa es actualmente reconocida en el mercado nacional e internacional.",
+    aboutDesc2: "Poseemos una amplia gama de productos disponibles en el mercado, destacando las hierbas aromáticas y especias, nos apoyamos en nuestro equipo de profesionales para aplicar las nuevas normas alimentarias y sanitarias para la mejora de calidad a las necesidades de nuestros clientes.",
+    aboutFeature1Title: "Primera Calidad",
+    aboutFeature1Desc: "Productos de primer nivel desde el cultivo hasta la distribución.",
+    aboutFeature2Title: "Normas Sanitarias",
+    aboutFeature2Desc: "Aplicación de las más recientes normas alimentarias y sanitarias.",
+    aboutFeature3Title: "Trazabilidad Total",
+    aboutFeature3Desc: "Aseguramiento de calidad y control de producción en planta.",
+    aboutAltMainImg: "Planta de procesamiento Nodiex",
+    aboutAltSubImg: "Campos de cultivo Nodiex",
+
+    // ContactForm
+    contactHeading: "Información de Contacto",
+    contactSub: "¿Interesado en nuestros productos o requiere una cotización personalizada? Nuestro equipo comercial está listo para atender sus requerimientos.",
+    contactLabelName: "Tu Nombre",
+    contactPlaceholderName: "Ej. Juan Pérez",
+    contactLabelCompany: "Empresa",
+    contactPlaceholderCompany: "Ej. Importaciones SAC",
+    contactLabelEmail: "Tu Correo",
+    contactPlaceholderEmail: "ejemplo@empresa.com",
+    contactLabelCountry: "País",
+    contactPlaceholderCountry: "Ej. España",
+    contactLabelMessage: "Mensaje",
+    contactPlaceholderMessage: "Escribe aquí tus requerimientos o interés comercial...",
+    contactBtnSend: "Enviar Mensaje",
+    contactToastSuccess: "Solicitud enviada correctamente. Nos pondremos en contacto pronto.",
+    contactToastError: "Error al enviar. Intente nuevamente.",
+
+    // CertificatesStrip (Galería)
+    stripTitle: "Certificaciones que Respaldan Nuestra Calidad",
+    stripSubtitle: "Inocuidad, calidad y seguridad en la cadena de suministro internacional.",
+
+    // StatsBanner
+    statClients: "Clientes Satisfechos",
+    statYears: "Años de Experiencia",
+    statShipments: "Envíos Exitosos",
+    statTons: "Toneladas Exportadas",
+
+    // Hero slides por defecto
+    heroSlide1Title1: "Orégano Verde ",
+    heroSlide1Title2: "& Especias.",
+    heroSlide1Desc: "Hojas seleccionadas con altos niveles de aceites esenciales. Adaptamos la mejora de calidad a las necesidades de nuestros clientes internacionales.",
+    heroSlide1Btn: "Realiza tu Pedido",
+    heroSlide2Title1: "Páprika de ",
+    heroSlide2Title2: "Exportación.",
+    heroSlide2Desc: "Nuestro producto estrella. Color intenso, aroma inconfundible y un riguroso procesamiento bajo estrictas normas alimentarias y sanitarias.",
+    heroSlide2Btn: "Ver Producto",
+    heroSlide3Title1: "Tradición familiar, ",
+    heroSlide3Title2: "calidad global.",
+    heroSlide3Desc: "Somos una empresa familiar dedicada a la producción y comercialización de productos agrícolas de primera calidad, desde el cultivo hasta la distribución.",
+    heroSlide3Btn: "Nuestra Empresa",
+
+    // CatalogSection en Landing
+    catalogSubtitle: "Del Campo al Mundo",
+    catalogTitleMain: "Descubre el Arte de la Exportación a través de nuestros Productos",
+    catalogDescMain: "Ofrecemos productos orgánicos de la más alta calidad, seleccionados bajo estrictos estándares internacionales para garantizar el mejor sabor en cada envío.",
+    catalogCtaBtn: "Ver Productos",
+
+    // TrackingWidget en Landing
+    trackingInputLabel: "Ingrese el código opaco entregado por NODIEX",
+    searchBtnLabel: "Buscar",
+    registeredLabel: "Registrado",
+    registeredSub: "Hemos recibido tu pedido",
+    inTransitLabel: "En tránsito",
+    inTransitSub: "Tu pedido va en camino",
+    deliveredLabel: "Entregado",
+    deliveredSub: "Tu pedido fue entregado"
   },
   en: {
     nav: {
@@ -197,7 +269,79 @@ export const copy = {
     currentLocation: "Current location",
     lastUpdate: "Last update",
     copyLinkBtn: "Copy link",
-    copiedSuccess: "Link copied to clipboard"
+    copiedSuccess: "Link copied to clipboard",
+
+    // AboutBand (Nosotros)
+    aboutTitle1: "Tradition & ",
+    aboutTitle2: "Quality",
+    aboutTitleSuffix: " in Export",
+    aboutDesc1: "We are a family-owned company dedicated to the production and commercialization of premium quality products, from cultivation and harvesting to distribution. Thanks to our business vision, our company is currently recognized in both domestic and international markets.",
+    aboutDesc2: "We have a wide range of products available in the market, highlighting aromatic herbs and spices. We rely on our team of professionals to apply new food and sanitary standards to improve quality and meet the needs of our international clients.",
+    aboutFeature1Title: "Premium Quality",
+    aboutFeature1Desc: "First-class products from cultivation to distribution.",
+    aboutFeature2Title: "Sanitary Standards",
+    aboutFeature2Desc: "Application of the most recent food and sanitary regulations.",
+    aboutFeature3Title: "Total Traceability",
+    aboutFeature3Desc: "Quality assurance and production control in our processing plant.",
+    aboutAltMainImg: "Nodiex processing plant",
+    aboutAltSubImg: "Nodiex cultivation fields",
+
+    // ContactForm
+    contactHeading: "Contact Information",
+    contactSub: "Interested in our products or need a personalized quote? Our commercial team is ready to assist you.",
+    contactLabelName: "Your Name",
+    contactPlaceholderName: "Ex. John Doe",
+    contactLabelCompany: "Company",
+    contactPlaceholderCompany: "Ex. Imports LLC",
+    contactLabelEmail: "Your Email",
+    contactPlaceholderEmail: "example@company.com",
+    contactLabelCountry: "Country",
+    contactPlaceholderCountry: "Ex. United States",
+    contactLabelMessage: "Message",
+    contactPlaceholderMessage: "Write your requirements or commercial interest here...",
+    contactBtnSend: "Send Message",
+    contactToastSuccess: "Request sent successfully. We will contact you soon.",
+    contactToastError: "Failed to send. Please try again.",
+
+    // CertificatesStrip (Galería)
+    stripTitle: "Certifications Backing Our Quality",
+    stripSubtitle: "Safety, quality and security in the international supply chain.",
+
+    // StatsBanner
+    statClients: "Satisfied Clients",
+    statYears: "Years of Experience",
+    statShipments: "Successful Shipments",
+    statTons: "Exported Tons",
+
+    // Hero slides por defecto
+    heroSlide1Title1: "Green Oregano ",
+    heroSlide1Title2: "& Spices.",
+    heroSlide1Desc: "Selected leaves with high levels of essential oils. We adapt quality improvements to the needs of our international customers.",
+    heroSlide1Btn: "Place Your Order",
+    heroSlide2Title1: "Export ",
+    heroSlide2Title2: "Paprika.",
+    heroSlide2Desc: "Our flagship product. Intense color, unmistakable aroma and rigorous processing under strict food and health standards.",
+    heroSlide2Btn: "View Product",
+    heroSlide3Title1: "Family tradition, ",
+    heroSlide3Title2: "global quality.",
+    heroSlide3Desc: "We are a family business dedicated to the production and marketing of top quality agricultural products, from cultivation to distribution.",
+    heroSlide3Btn: "Our Company",
+
+    // CatalogSection en Landing
+    catalogSubtitle: "From Field to the World",
+    catalogTitleMain: "Discover the Art of Export through our Products",
+    catalogDescMain: "We offer organic products of the highest quality, selected under strict international standards to guarantee the best flavor in every shipment.",
+    catalogCtaBtn: "View Products",
+
+    // TrackingWidget en Landing
+    trackingInputLabel: "Enter the opaque code provided by NODIEX",
+    searchBtnLabel: "Search",
+    registeredLabel: "Registered",
+    registeredSub: "We have received your order",
+    inTransitLabel: "In transit",
+    inTransitSub: "Your order is on the way",
+    deliveredLabel: "Delivered",
+    deliveredSub: "Your order was delivered"
   },
   pt: {
     nav: {
@@ -217,7 +361,7 @@ export const copy = {
       terms: "Termos de Uso",
       privacy: "Política de Privacidade",
       adminAccess: "Acesso Administrador",
-      rights: "Todos os direitos reservados.",
+      rights: "Todos os derechos reservados.",
       support: "Suporte",
       about: "Sobre Nós",
       certifications: "Certificações",
@@ -225,10 +369,10 @@ export const copy = {
       gallery: "Galeria",
       contact: "Contato",
       tracking: "Rastreamento de Pedidos",
-      slogan: "Agroexportação com qualidade e confiança"
+      slogan: "Agroexportação com qualidade e confianza"
     },
     heroTitle: "NODIEX DEL PERU S.A.C.",
-    heroLead: "Agroexportação com rastreabilidade logística, certificações visíveis e atendimento para compradores internacionais.",
+    heroLead: "Agroexportação com rastreabilidade logística, certificações visíveis e atendimento para compradores internacionales.",
     heroMeta: "Tacna, Peru · Exportações agrícolas · ES / EN / PT",
     ctaTracking: "Consultar envio",
     ctaCatalog: "Ver catálogo",
@@ -238,7 +382,7 @@ export const copy = {
     trackingHelp: "Digite o código opaco entregue pela NODIEX. Não é necessário criar conta.",
     trackingPlaceholder: "Ex. NDX-8Q4M-2026",
     trackingButton: "Consultar",
-    invalidTracking: "Não foi possível validar o código. Verifique o dado ou entre em contato com a NODIEX.",
+    invalidTracking: "Não foi possível validar o código. Verifique o dato ou entre em contato com a NODIEX.",
     catalogTitle: "Catálogo de exportação",
     certificatesTitle: "Certificações vigentes",
     contactTitle: "Contato comercial",
@@ -248,8 +392,8 @@ export const copy = {
     // Catálogo
     catalogHeroTitle: "Nossos",
     catalogHeroSubtitle: "Produtos.",
-    catalogHeroDesc: "Exportamos orégano, especiarias e ervas aromáticas com os mais altos padrões de qualidade. Cultivados, selecionados e processados para levar o melhor do Peru ao mundo.",
-    searchPlaceholder: "Pesquisar produto",
+    catalogHeroDesc: "Exportamos orégano, especiarias e ervas aromáticas com os más altos padrões de qualidade. Cultivados, selecionados e processados para levar o melhor do Peru ao mundo.",
+    searchPlaceholder: "Pesquisar producto",
     productsCount: "produtos publicados",
     noProducts: "Sem produtos",
     noProductsDesc: "Não há produtos publicados que correspondam à pesquisa.",
@@ -258,7 +402,7 @@ export const copy = {
     specialRequestDesc: "Trabalhamos com você para oferecer soluções sob medida para o seu negócio.",
     contactUs: "Contate-nos ↗",
     newsletterTitle: "Mantenha-se informado",
-    newsletterDesc: "Receba novidades, catálogos e notícias do mundo agroexportador.",
+    newsletterDesc: "Receba novidades, catálogos e notícias del mundo agroexportador.",
     newsletterPlaceholder: "Digite seu e-mail",
     newsletterSubscribe: "Inscrever-se",
     newsletterThanks: "Obrigado por se inscrever!",
@@ -294,6 +438,78 @@ export const copy = {
     currentLocation: "Ubicación actual",
     lastUpdate: "Última atualização",
     copyLinkBtn: "Copiar link",
-    copiedSuccess: "Link copiado para a área de transferência"
+    copiedSuccess: "Link copiado para a área de transferência",
+
+    // AboutBand (Nosotros)
+    aboutTitle1: "Tradição e ",
+    aboutTitle2: "Qualidade",
+    aboutTitleSuffix: " Exportadora",
+    aboutDesc1: "Somos uma empresa familiar dedicada à produção e comercialização de produtos de primeira qualidade, desde o cultivo, colheita e distribuição. Graças à nossa visão empresarial, nossa empresa é atualmente reconhecida no mercado nacional e internacional.",
+    aboutDesc2: "Possuímos uma ampla gama de produtos disponíveis no mercado, destacando ervas aromáticas e especiarias. Apoiamo-nos na nossa equipe de profissionais para aplicar as novas normas alimentares e sanitárias para la melhoria da qualidade para as necessidades dos nossos clientes.",
+    aboutFeature1Title: "Primeira Qualidade",
+    aboutFeature1Desc: "Produtos de primeiro nível desde o cultivo até a distribuição.",
+    aboutFeature2Title: "Normas Sanitárias",
+    aboutFeature2Desc: "Aplicação das mais recentes normas alimentares e sanitárias.",
+    aboutFeature3Title: "Rastreabilidade Total",
+    aboutFeature3Desc: "Garantia de qualidade e controle de produção na fábrica.",
+    aboutAltMainImg: "Fábrica de processamento da Nodiex",
+    aboutAltSubImg: "Campos de cultivo da Nodiex",
+
+    // ContactForm
+    contactHeading: "Informações de Contato",
+    contactSub: "Interessado em nossos produtos ou precisa de uma cotação personalizada? Nossa equipe comercial está pronta para atender às suas necessidades.",
+    contactLabelName: "Seu Nome",
+    contactPlaceholderName: "Ex. João Silva",
+    contactLabelCompany: "Empresa",
+    contactPlaceholderCompany: "Ex. Importações Ltda",
+    contactLabelEmail: "Seu E-mail",
+    contactPlaceholderEmail: "exemplo@empresa.com",
+    contactLabelCountry: "País",
+    contactPlaceholderCountry: "Ex. Brasil",
+    contactLabelMessage: "Mensagem",
+    contactPlaceholderMessage: "Escreva aqui suas necessidades ou interesse comercial...",
+    contactBtnSend: "Enviar Mensagem",
+    contactToastSuccess: "Solicitação enviada com sucesso. Entraremos em contato em breve.",
+    contactToastError: "Erro ao enviar. Tente novamente.",
+
+    // CertificatesStrip (Galería)
+    stripTitle: "Certificações que Comprovam Nossa Qualidade",
+    stripSubtitle: "Inocuidade, qualidade e segurança na cadeia de suprimentos internacional.",
+
+    // StatsBanner
+    statClients: "Clientes Satisfeitos",
+    statYears: "Anos de Experiencia",
+    statShipments: "Envios de Sucesso",
+    statTons: "Toneladas Exportadas",
+
+    // Hero slides por defecto
+    heroSlide1Title1: "Orégano Verde ",
+    heroSlide1Title2: "& Especiarias.",
+    heroSlide1Desc: "Folhas selecionadas com altos níveis de óleos essenciais. Adaptamos a melhoria da qualidade às necessidades dos nossos clientes internacionais.",
+    heroSlide1Btn: "Faça seu Pedido",
+    heroSlide2Title1: "Páprica de ",
+    heroSlide2Title2: "Exportação.",
+    heroSlide2Desc: "Nosso principal produto. Cor intensa, aroma inconfundível e processamento rigoroso sob rígidas normas alimentarias e sanitarias.",
+    heroSlide2Btn: "Ver Produto",
+    heroSlide3Title1: "Tradição familiar, ",
+    heroSlide3Title2: "qualidade global.",
+    heroSlide3Desc: "Somos uma empresa familiar dedicada à produção e comercialização de produtos agrícolas de primeira qualidade, desde o cultivo até a distribuição.",
+    heroSlide3Btn: "Nuestra Empresa",
+
+    // CatalogSection en Landing
+    catalogSubtitle: "Do Campo para o Mundo",
+    catalogTitleMain: "Descubra a Arte da Exportação através dos nossos Produtos",
+    catalogDescMain: "Oferecemos produtos orgânicos da mais alta qualidade, selecionados sob rigorosos padrões internacionais para garantir o melhor sabor em cada remessa.",
+    catalogCtaBtn: "Ver Produtos",
+
+    // TrackingWidget en Landing
+    trackingInputLabel: "Insira o código opaco fornecido pela NODIEX",
+    searchBtnLabel: "Buscar",
+    registeredLabel: "Registrado",
+    registeredSub: "Recebemos o seu pedido",
+    inTransitLabel: "Em trânsito",
+    inTransitSub: "Seu pedido está a caminho",
+    deliveredLabel: "Entregue",
+    deliveredSub: "Seu pedido foi entregue"
   }
 };

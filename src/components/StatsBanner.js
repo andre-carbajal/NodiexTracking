@@ -24,25 +24,25 @@ function AnimatedNumber({ value, duration = 2, suffix = "" }) {
   return <strong ref={ref}>{displayValue}{suffix}</strong>;
 }
 
-export default function StatsBanner() {
+export default function StatsBanner({ t = {} }) {
   return (
     <div className="stats-banner-container">
       <div className="stats-banner-pill">
         <div className="stat-item">
           <AnimatedNumber value={2000} suffix="+" />
-          <span>Clientes Satisfechos</span>
+          <span>{t.statClients || "Clientes Satisfechos"}</span>
         </div>
         <div className="stat-item">
           <AnimatedNumber value={15} suffix="+" />
-          <span>Años de Experiencia</span>
+          <span>{t.statYears || "Años de Experiencia"}</span>
         </div>
         <div className="stat-item">
           <AnimatedNumber value={800} suffix="+" />
-          <span>Envíos Exitosos</span>
+          <span>{t.statShipments || "Envíos Exitosos"}</span>
         </div>
         <div className="stat-item">
           <AnimatedNumber value={150} suffix="M+" />
-          <span>Toneladas Exportadas</span>
+          <span>{t.statTons || "Toneladas Exportadas"}</span>
         </div>
       </div>
     </div>
