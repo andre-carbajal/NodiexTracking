@@ -77,10 +77,10 @@ export default function ContactosList({ contacts = [] }) {
           <div className="data-table">
             {paginated.map((c) => (
               <div
-                className="data-row admin-list-row"
+                className="data-row"
                 key={c.id}
                 style={{
-                  gridTemplateColumns: "150px 200px 200px 1fr auto",
+                  gridTemplateColumns: "180px 1fr 1fr auto",
                 }}
               >
                 <span>{formatDate(c.createdAt)}</span>
@@ -100,16 +100,6 @@ export default function ContactosList({ contacts = [] }) {
                   )}
                 </strong>
                 <span>{c.email}</span>
-                <span
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    color: "var(--muted)",
-                  }}
-                >
-                  {c.message}
-                </span>
                 <div className="row-actions">
                   <button
                     className="ghost-button small"
