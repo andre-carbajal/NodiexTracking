@@ -33,11 +33,11 @@ export default function Header() {
         </Link>
 
         <nav className={`main-nav ${menuOpen ? "open" : ""}`} id="main-menu">
-          <Link href="/#top" onClick={() => setMenuOpen(false)}>Inicio</Link>
-          <Link href="/#about" onClick={() => setMenuOpen(false)}>Nosotros</Link>
+          <Link href="/#top" onClick={() => setMenuOpen(false)}>{t.nav.home || "Inicio"}</Link>
+          <Link href="/#about" onClick={() => setMenuOpen(false)}>{t.nav.about || "Nosotros"}</Link>
           <Link href="/productos" onClick={() => setMenuOpen(false)}>{t.nav.catalog || "Productos"}</Link>
-          <Link href="/#certificates" onClick={() => setMenuOpen(false)}>Galería</Link>
-          <Link href="/empresa/certificaciones" onClick={() => setMenuOpen(false)}>Certificaciones</Link>
+          <Link href="/#certificates" onClick={() => setMenuOpen(false)}>{t.nav.gallery || "Galería"}</Link>
+          <Link href="/empresa/certificaciones" onClick={() => setMenuOpen(false)}>{t.nav.certificates || "Certificaciones"}</Link>
           <Link href="/#contact" onClick={() => setMenuOpen(false)}>{t.nav.contact || "Contacto"}</Link>
         </nav>
 
