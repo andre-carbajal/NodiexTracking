@@ -8,10 +8,10 @@ function getJwtSecret() {
 }
 
 export const permissions = {
-  superadmin: ["shipments:write", "catalog:write", "certificates:write", "content:write", "audit:read", "roles:manage"],
+  superadmin: ["shipments:write", "catalog:write", "certificates:write", "content:write", "audit:read", "roles:manage", "contacts:read"],
   operativo: ["shipments:write", "audit:read"],
-  comercial: ["catalog:write", "certificates:write", "content:write"],
-  gerencia: ["audit:read"]
+  comercial: ["catalog:write", "certificates:write", "content:write", "contacts:read"],
+  gerencia: ["audit:read", "contacts:read"]
 };
 
 export function signUser(user, expiresAt = new Date(Date.now() + 8 * 60 * 60 * 1000)) {

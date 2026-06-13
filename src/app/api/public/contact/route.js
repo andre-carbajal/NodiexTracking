@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { validateContactFields } from "@/lib/validators";
 import { audit } from "@/lib/store";
+import { prisma } from "@/lib/prisma";
 
 const rateLimitMap = globalThis.__nodiexContactRateLimit ?? new Map();
 globalThis.__nodiexContactRateLimit = rateLimitMap;
@@ -32,6 +33,17 @@ export async function POST(request) {
   if (!valid) {
     return NextResponse.json({ ok: false, message: "Campos invalidos", errors }, { status: 400 });
   }
+
+  // Guardar mensaje de contacto en base de datos
+  await prisma.contacto.create({
+    data: {
+      nombre: body.name,
+      empresa: body.company || null,
+      correo: body.email,
+      pais: body.country || null,
+      mensaje: body.message
+    }
+  });
 
   await audit("publico", "contacto_enviado", "contacto", `${body.name} - ${body.email}`);
 
