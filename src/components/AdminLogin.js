@@ -3,7 +3,7 @@
 import { LogIn, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
-const passwordHint = "Usuario: admin, operativo, comercial o gerencia · Clave: Nodiex2026!";
+const passwordHint = "Por favor ingrese su usuario y contraseña.";
 
 export default function AdminLogin({ login, setLogin, message, doLogin }) {
   return (

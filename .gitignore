@@ -7,3 +7,10 @@ yarn-debug.log*
 yarn-error.log*
 
 .vercel
+
+# Secrets
+.env
+*.pem
+*.key
+credentials.json
+.env.example

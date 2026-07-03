@@ -11,7 +11,7 @@ export default function AdminPage() {
   const [user, setUser] = useState(null);
   const [data, setData] = useState({ shipments: [], products: [], certificates: [], audit: [], users: [] });
   const [message, setMessage] = useState("");
-  const [login, setLogin] = useState({ username: "admin", password: "Nodiex2026!" });
+  const [login, setLogin] = useState({ username: "", password: "" });
 
   const load = useCallback(async (currentToken = token, params = {}) => {
     if (!currentToken) return;
